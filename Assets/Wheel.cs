@@ -7,9 +7,11 @@ public class Wheel : MonoBehaviour
     public float radius;
     public float rotationSpeed;
     private float rotationAngle;
-    private List<InPlayCard> inPlayCards = new ();
+    private List<InPlayCard> inPlayCards = new List<InPlayCard>();
     public InPlayCard inPlayCardPrefab;
     private List<Vector2> positions = new List<Vector2>();
+    private bool isRotating = false;
+    private float startAngle;
 
     private void OnEnable()
     {
@@ -27,27 +29,54 @@ public class Wheel : MonoBehaviour
 
             // Create and position the object
             var go = Instantiate(inPlayCardPrefab, this.transform);
+            var sr = go.GetComponentInChildren<SpriteRenderer>();
+            sr.color = new Color(i / 1f, i / 1f, i / 1f, 1f);
             go.transform.localPosition = position;
             inPlayCards.Add(go);
         }
     }
+
     private void Update()
     {
-        if (!Input.GetMouseButton(0))
+        if (Input.GetMouseButtonDown(0))
         {
-            //cancel or return.
-            return;
+            isRotating = true;
+            startAngle = rotationAngle;
+
         }
-//if (current rotation > delta)
-//stop rotating, execute action.
+
+        if (Input.GetMouseButtonUp(0))
+        {
+            isRotating = false;
+            SnapToNearestPosition();
+        }
+
+        if (!isRotating) return;
+        
+        var rotationInput = Input.GetAxis("Mouse X");
+        rotationAngle += rotationInput * rotationSpeed * Time.deltaTime;
+
+        var anglePerItem = (1.5f * Mathf.PI) / (size);
+
+        if (Mathf.Abs(rotationAngle - startAngle) >= anglePerItem)
+        {
+            isRotating = false;
+            SnapToNearestPosition();
+        }
+        
+        RotateWithMouse();
+    }
+
+    private void SnapToNearestPosition()
+    {
+        float anglePerItem = 2 * Mathf.PI / size;
+        float targetAngle = Mathf.Round(rotationAngle / anglePerItem) * anglePerItem;
+        rotationAngle = targetAngle;
         RotateWithMouse();
     }
 
     private void RotateWithMouse()
     {
-        var rotationInput = Input.GetAxis("Mouse X");
-        rotationAngle += rotationInput * rotationSpeed * Time.deltaTime;
-
         // Apply rotation incrementally around the circle based on initial positions
         for (var i = 0; i < size; i++)
         {
