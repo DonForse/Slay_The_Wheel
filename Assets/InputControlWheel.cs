@@ -19,13 +19,11 @@ public class InputControlWheel : MonoBehaviour, IControlWheel
 
     private void Update()
     {
-        Debug.Log("Update");
-
         if (!_enabled) return;
         if (!isRotating && Input.GetMouseButtonDown(0))
         {
-            isRotating = true;
             startAngle = rotationAngle;
+            isRotating = true;
         }
 
         if (isRotating && Input.GetMouseButtonUp(0))
@@ -37,7 +35,8 @@ public class InputControlWheel : MonoBehaviour, IControlWheel
 
         if (!isRotating) return;
         
-        var rotationInput = Input.GetAxis("Mouse X");
+        var rotationInput = Mathf.Clamp(Input.GetAxis("Mouse X"), -1f,1f);
+        
         rotationAngle += rotationInput * rotationSpeed * Time.deltaTime;
 
         var anglePerItem = (1.5f * Mathf.PI) / (wheel.Size);
@@ -83,28 +82,19 @@ public class InputControlWheel : MonoBehaviour, IControlWheel
 
     private void OnApplicationFocus(bool hasFocus)
     {
-        
         if (hasFocus)
         {
-            Debug.Log("Restore Focus");
-            WaitAndEnable();
+            isRotating = false;
+            if (_wasEnabled)
+                _enabled = true;
+            _wasEnabled = false;
         }
         else
         {
-            Debug.Log("Lost Focus");
             if (_enabled)
                 _wasEnabled = true;
             _enabled = false;
-            RollbackPosition();
+            SnapToNearestPosition();
         }
-    }
-
-    private void WaitAndEnable()
-    {
-        RollbackPosition();
-        isRotating = false;
-        if (_wasEnabled)
-            _enabled = true;
-        _wasEnabled = false;
     }
 }
