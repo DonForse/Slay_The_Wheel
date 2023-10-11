@@ -1,95 +1,98 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class Wheel : MonoBehaviour
 {
-    public int size;
-    public float radius;
-    public float rotationSpeed;
-    private float rotationAngle;
-    private List<InPlayCard> inPlayCards = new List<InPlayCard>();
+    public float Radius;
+    [HideInInspector]public int Size;
     public InPlayCard inPlayCardPrefab;
-    private List<Vector2> positions = new List<Vector2>();
-    private bool isRotating = false;
-    private float startAngle;
+    [HideInInspector]public List<InPlayCard> Cards = new();
+    [HideInInspector]public List<Vector2> Positions = new();
+    private IControlWheel input;
 
-    private void OnEnable()
+
+    private List<RunCard> _cardsToAdd;
+    private int frontCardIndex;
+    public event EventHandler<InPlayCard> Acted;
+    private void Awake() => input = GetComponent<IControlWheel>();
+
+    public void InitializeWheel(bool player)
     {
         float angleOffset = Mathf.PI / 2; // Offset to start at the top of the circle
 
-        for (var i = 0; i < size; i++)
+        for (var i = 0; i < Size; i++)
         {
             // Calculate spherical coordinates with angle offset
-            var theta = 2 * Mathf.PI * i / size + angleOffset;
-            var x = radius * Mathf.Cos(theta);
-            var y = radius * Mathf.Sin(theta);
+            var theta = 2 * Mathf.PI * i / Size + angleOffset;
+            var x = Radius * Mathf.Cos(theta);
+            var y = Radius * Mathf.Sin(theta);
 
             var position = new Vector2(x, y);
-            positions.Add(position);
+            Positions.Add(position);
 
             // Create and position the object
             var go = Instantiate(inPlayCardPrefab, this.transform);
-            var sr = go.GetComponentInChildren<SpriteRenderer>();
-            sr.color = new Color(i / 1f, i / 1f, i / 1f, 1f);
+            go.SetCard(_cardsToAdd[i], player);
             go.transform.localPosition = position;
-            inPlayCards.Add(go);
+            Cards.Add(go);
         }
+
+        frontCardIndex = 0;
+        input.TurnRight += OnTurnRight;
+        input.TurnLeft += OnTurnLeft;
+        input.Enable();
     }
 
-    private void Update()
+    private void OnTurnLeft(object sender, EventArgs e)
     {
-        if (Input.GetMouseButtonDown(0))
-        {
-            isRotating = true;
-            startAngle = rotationAngle;
+        Debug.Log("TurnLeft");
+        IncrementFrontCardIndex();
 
-        }
-
-        if (Input.GetMouseButtonUp(0))
-        {
-            isRotating = false;
-            SnapToNearestPosition();
-        }
-
-        if (!isRotating) return;
-        
-        var rotationInput = Input.GetAxis("Mouse X");
-        rotationAngle += rotationInput * rotationSpeed * Time.deltaTime;
-
-        var anglePerItem = (1.5f * Mathf.PI) / (size);
-
-        if (Mathf.Abs(rotationAngle - startAngle) >= anglePerItem)
-        {
-            isRotating = false;
-            SnapToNearestPosition();
-        }
-        
-        RotateWithMouse();
+        Acted?.Invoke(this, Cards[frontCardIndex]);
     }
 
-    private void SnapToNearestPosition()
+    private void OnTurnRight(object sender, EventArgs e)
     {
-        float anglePerItem = 2 * Mathf.PI / size;
-        float targetAngle = Mathf.Round(rotationAngle / anglePerItem) * anglePerItem;
-        rotationAngle = targetAngle;
-        RotateWithMouse();
+        Debug.Log("TurnRight");
+        DecrementFrontCardIndex();
+
+        Acted?.Invoke(this, Cards[frontCardIndex]);
     }
 
-    private void RotateWithMouse()
+    public void LockWheel()
     {
-        // Apply rotation incrementally around the circle based on initial positions
-        for (var i = 0; i < size; i++)
-        {
-            // Calculate the new angle for rotation (around the circle) based on initial angle and rotationAngle
-            var initialTheta = Mathf.Atan2(positions[i].y, positions[i].x);
-            var newTheta = initialTheta + rotationAngle;
+        input.Disable();
+    }
 
-            // Calculate new position using the updated angle
-            var x = radius * Mathf.Cos(newTheta);
-            var y = radius * Mathf.Sin(newTheta);
+    public void UnlockWheel()
+    {
+        input.Enable();
+    }
 
-            var newPosition = new Vector2(x, y);
-            inPlayCards[i].transform.localPosition = newPosition;
-        }
+    public InPlayCard GetFrontCard() => Cards[frontCardIndex];
+
+    public void SetSize(int value)
+    {
+        Size = value;
+    }
+
+    public void SetCards(List<RunCard> deck)
+    {
+        _cardsToAdd = deck;
+    }
+
+    private void DecrementFrontCardIndex()
+    {
+        frontCardIndex--;
+        if (frontCardIndex < 0)
+            frontCardIndex = Cards.Count - 1;
+    }
+
+    private void IncrementFrontCardIndex()
+    {
+        frontCardIndex++;
+        if (frontCardIndex > Cards.Count - 1)
+            frontCardIndex = 0;
     }
 }
