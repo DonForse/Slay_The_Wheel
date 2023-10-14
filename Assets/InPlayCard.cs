@@ -9,6 +9,7 @@ public class InPlayCard : MonoBehaviour
     [SerializeField] private Transform viewContainer;
     [SerializeField] private TMP_Text hpText;
     [SerializeField] private TMP_Text atkText;
+    private bool _isDead = false;
     public string CardName => _card.CardName;
     public void SetCard(RunCard runCard, bool player)
     {
@@ -31,4 +32,15 @@ public class InPlayCard : MonoBehaviour
     {
         return _card;
     }
+
+    public void SetDead()
+    {
+        _isDead = true;
+        hpText.text = "0";
+        atkText.text = "0";
+        spriteRenderer.sprite =
+            Sprite.Create(Texture2D.grayTexture, new Rect(Vector2.zero, Vector2.one), Vector2.one*0.5f);
+    }
+
+    public bool IsDead => _isDead;
 }

@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: SlimeCard
   m_EditorClassIdentifier: 
   cardName: Slime
-  hp: 5
-  attack: 1
+  hp: 15
+  attack: 2
   abilities: 
   cardSprite: {fileID: 21300000, guid: 48ba6c50dbd9b66409f4670dc7564a4c, type: 3}

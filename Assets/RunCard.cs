@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 
 public class RunCard
 {
@@ -59,4 +60,10 @@ public class RunCard
     }
 
     public event EventHandler<RunCard> ValueChanged;
+}
+
+public enum ActionEnum
+{
+    Attack,
+    Skip,
 }

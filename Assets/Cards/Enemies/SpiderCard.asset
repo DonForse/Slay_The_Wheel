@@ -13,5 +13,7 @@ MonoBehaviour:
   m_Name: SpiderCard
   m_EditorClassIdentifier: 
   cardName: Spider
-  hp: 5
-  attack: 1
+  hp: 25
+  attack: 7
+  abilities: 
+  cardSprite: {fileID: 21300000, guid: b4faee6af7eb75c45b82c372e19cca02, type: 3}

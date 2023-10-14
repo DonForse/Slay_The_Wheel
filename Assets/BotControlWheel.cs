@@ -8,7 +8,6 @@ public class BotControlWheel : MonoBehaviour, IControlWheel
     [SerializeField] private Wheel wheel;
     private float rotationAngle;
     private float startAngle;
-    private float anglePerItem;
     public event EventHandler TurnRight;
     public event EventHandler TurnLeft;
 
@@ -22,16 +21,49 @@ public class BotControlWheel : MonoBehaviour, IControlWheel
         this.enabled = false;
     }
 
+    public IEnumerator TurnRightWithoutNotifying()
+    {
+        var anglePerItem = (1.5f * Mathf.PI) / (wheel.Size);
+        startAngle = rotationAngle;
+
+        var rotationInput = 1;
+        while (Mathf.Abs(rotationAngle - startAngle) < anglePerItem)
+        {
+            rotationAngle += rotationInput * rotationSpeed * Time.deltaTime;
+            RotateToNewPosition();
+            yield return new WaitForEndOfFrame();
+        }
+
+        SnapToNearestPosition();
+    }
+
+    public IEnumerator TurnLeftWithoutNotifying()
+    {
+        var anglePerItem = (1.5f * Mathf.PI) / (wheel.Size);
+        startAngle = rotationAngle;
+
+        var rotationInput = -1;
+        while (Mathf.Abs(rotationAngle - startAngle) < anglePerItem)
+        {
+            rotationAngle += rotationInput * rotationSpeed * Time.deltaTime;
+            RotateToNewPosition();
+            yield return new WaitForEndOfFrame();
+        }
+
+        SnapToNearestPosition();
+    }
+
     public IEnumerator TurnTowardsDirection(bool right)
     {
         startAngle = rotationAngle;
-        anglePerItem = (1.5f * Mathf.PI) / (wheel.Size);
         return MoveTowardsDirection(right);
     }
 
     private IEnumerator MoveTowardsDirection(bool right)
     {
         var rotationInput = right ? 1 : -1;
+        var anglePerItem = (1.5f * Mathf.PI) / (wheel.Size);
+
         while (Mathf.Abs(rotationAngle - startAngle) < anglePerItem)
         {
             rotationAngle += rotationInput * rotationSpeed * Time.deltaTime;

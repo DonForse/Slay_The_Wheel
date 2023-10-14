@@ -8,10 +8,14 @@ public class Game : MonoBehaviour
 {
     [SerializeField] private Wheel playerWheel;
     [SerializeField] private Wheel enemyWheel;
-    [FormerlySerializedAs("_botControlWheel")] [SerializeField] private BotControlWheel botControlWheel;
+
+    [FormerlySerializedAs("_botControlWheel")] [SerializeField]
+    private BotControlWheel botControlWheel;
+
     [SerializeField] private BaseCardsScriptableObject cardsDb;
+    [SerializeField] private BaseCardScriptableObject emptyCard;
     private int _actions;
-    private int turn = 0; 
+    private int turn = 0;
 
     // Start is called before the first frame update
     void Start()
@@ -26,66 +30,102 @@ public class Game : MonoBehaviour
             var playerUnit = new RunCard(unitCardDb);
             deck.Add(playerUnit);
         }
-        var enemyDb = cardsDb.cards.FirstOrDefault(x => x.cardName.Contains("Slime"));
+
+        var enemy3 = cardsDb.cards.FirstOrDefault(x => x.cardName.Contains("Slime"));
+        // var enemy1 = cardsDb.cards.FirstOrDefault(x => x.cardName.Contains("Zombie"));
+        // var enemy2 = cardsDb.cards.FirstOrDefault(x => x.cardName.Contains("Spider"));
 
         playerWheel.SetSize(5);
         playerWheel.SetCards(deck);
-        
-        enemyWheel.SetCards(new List<RunCard>() { new RunCard(enemyDb), new RunCard(enemyDb), new RunCard(enemyDb) });
+
+        enemyWheel.SetCards(new List<RunCard>() { new RunCard(enemy3), new RunCard(enemy3), new RunCard(enemy3) });
         enemyWheel.SetSize(3);
-        
+
         playerWheel.InitializeWheel(true);
         enemyWheel.InitializeWheel(false);
 
         enemyWheel.LockWheel();
         playerWheel.UnlockWheel();
-        
+
         playerWheel.Acted += OnPlayerActed;
         enemyWheel.Acted += OnEnemyActed;
-
     }
 
-    private void OnPlayerActed(object sender, InPlayCard inPlayPlayerCard)
+    private void OnEnemyActed(object sender, InPlayCard e)
     {
+        StartCoroutine(OnEnemyActed_Coroutine(e));
+    }
+
+    private void OnPlayerActed(object sender, InPlayCard e)
+    {
+        StartCoroutine(OnPlayerActed_Coroutine(e));
+    }
+
+    private IEnumerator OnPlayerActed_Coroutine(InPlayCard inPlayPlayerCard)
+    {
+        var inPlayEnemyCard = enemyWheel.GetFrontCard();
+        var enemyCard = inPlayEnemyCard.GetCard();
+        var playerCard = inPlayPlayerCard.GetCard();
+
         playerWheel.LockWheel();
         _actions++;
-        var enemyInPlayCard = enemyWheel.GetFrontCard();
-        var enemyCard = enemyInPlayCard.GetCard();
-        var playerCard = inPlayPlayerCard.GetCard();
+        
         enemyCard.Hp -= playerCard.Attack;
-        if (enemyCard.Hp < 0)
-            Debug.Log("ENEMY DEADDDD");
+        if (enemyCard.Hp <= 0)
+        {
+            inPlayEnemyCard.SetDead();
+            if (enemyWheel.AllUnitsDead())
+            {
+                Debug.Log("WIN");
+                yield break;
+            }
+
+            yield return StartCoroutine(enemyWheel.PutAliveUnitAtFront());
+        }
+
 
         if (turn == 0 && _actions == 2)
         {
             ChangeTurn();
-            return;
+            yield break;;
         }
         else if (_actions == 3)
         {
             ChangeTurn();
-            return;
+            yield break;;
         }
+
         playerWheel.UnlockWheel();
     }
-    
-    private void OnEnemyActed(object sender, InPlayCard inPlayEnemyCard)
+
+    private IEnumerator OnEnemyActed_Coroutine(InPlayCard inPlayEnemyCard)
     {
-        enemyWheel.LockWheel();
-        _actions++;
         var inPlayPlayerCard = playerWheel.GetFrontCard();
         var playerCard = inPlayPlayerCard.GetCard();
         var enemyCard = inPlayEnemyCard.GetCard();
+
+        enemyWheel.LockWheel();
+        _actions++;
+
         playerCard.Hp -= enemyCard.Attack;
-        
-        if (playerCard.Hp < 0)
-            Debug.Log("Player DEADDDD");
+        if (playerCard.Hp <= 0)
+        {
+            inPlayPlayerCard.SetDead();
+            if (playerWheel.AllUnitsDead())
+            {
+                Debug.Log("LOST");
+                yield break;
+            }
+
+            yield return StartCoroutine(playerWheel.PutAliveUnitAtFront());
+        }
 
         if (_actions == 3)
         {
             ChangeTurn();
-            return;
+            yield break;
         }
+
         enemyWheel.UnlockWheel();
     }
 
@@ -124,5 +164,4 @@ public class Game : MonoBehaviour
         enemyWheel.LockWheel();
         playerWheel.UnlockWheel();
     }
-
 }

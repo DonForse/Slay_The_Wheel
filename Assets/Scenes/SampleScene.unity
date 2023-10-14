@@ -390,7 +390,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 4
+  m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 180}
 --- !u!114 &652674506
 MonoBehaviour:
@@ -503,6 +503,7 @@ MonoBehaviour:
   enemyWheel: {fileID: 652674504}
   botControlWheel: {fileID: 652674506}
   cardsDb: {fileID: 11400000, guid: dfbe68cbcfa8d974b83a94816166b1df, type: 2}
+  emptyCard: {fileID: 11400000, guid: 9f862dc2663577445adfdb04e2f1cf87, type: 2}
 --- !u!4 &1689651477
 Transform:
   m_ObjectHideFlags: 0
@@ -516,5 +517,5 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 3
+  m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}

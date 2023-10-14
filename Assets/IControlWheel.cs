@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 
 public interface IControlWheel 
 {
@@ -6,4 +7,6 @@ public interface IControlWheel
     event EventHandler TurnLeft;
     void Enable();
     void Disable();
+    IEnumerator TurnRightWithoutNotifying();
+    IEnumerator TurnLeftWithoutNotifying();
 }

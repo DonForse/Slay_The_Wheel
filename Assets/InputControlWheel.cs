@@ -55,6 +55,35 @@ public class InputControlWheel : MonoBehaviour, IControlWheel
         RotateToNewPosition();
     }
 
+    public IEnumerator TurnLeftWithoutNotifying()
+    {
+        var rotationInput = -1;
+        var anglePerItem = (1.5f * Mathf.PI) / (wheel.Size);
+
+        while (Mathf.Abs(rotationAngle - startAngle) < anglePerItem)
+        {
+            rotationAngle += rotationInput * rotationSpeed * Time.deltaTime;
+            RotateToNewPosition();
+            yield return new WaitForEndOfFrame();
+        }
+
+        SnapToNearestPosition();
+    }
+
+    public IEnumerator TurnRightWithoutNotifying()
+    {
+        var rotationInput = 1;
+        var anglePerItem = (1.5f * Mathf.PI) / (wheel.Size);
+        while (Mathf.Abs(rotationAngle - startAngle) < anglePerItem)
+        {
+            rotationAngle += rotationInput * rotationSpeed * Time.deltaTime;
+            RotateToNewPosition();
+            yield return new WaitForEndOfFrame();
+        }
+
+        SnapToNearestPosition();
+    }
+
     private void SnapToNearestPosition()
     {
         float anglePerItem = 2 * Mathf.PI / wheel.Size;
