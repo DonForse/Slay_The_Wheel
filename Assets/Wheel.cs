@@ -15,7 +15,6 @@ public class Wheel : MonoBehaviour
 
     private List<RunCard> _cardsToAdd;
     private int frontCardIndex;
-    private bool isPlayer;
     public event EventHandler<InPlayCard> Acted;
     private void Awake() => input = GetComponent<IControlWheel>();
 
@@ -30,7 +29,6 @@ public class Wheel : MonoBehaviour
         input.TurnRight += OnTurnRight;
         input.TurnLeft += OnTurnLeft;
         input.Enable();
-        isPlayer = player;
     }
 
     public void LockWheel() => input.Disable();
@@ -47,19 +45,16 @@ public class Wheel : MonoBehaviour
 
     public void SetCards(List<RunCard> deck) => _cardsToAdd = deck;
 
-    public bool AllUnitsDead()
-    {
-        return Cards.All(x => x.IsDead);
-    }
+    public bool AllUnitsDead() => Cards.All(x => x.IsDead);
 
     public IEnumerator PutAliveUnitAtFront()
     {
-        if (Cards.All(x => x.IsDead))
+        if (AllUnitsDead())
             yield break;
-        
+
         while (Cards[frontCardIndex].IsDead)
         {
-            DecrementFrontCardIndex();
+            IncrementFrontCardIndex();
             yield return StartCoroutine(input.TurnLeftWithoutNotifying());
         }
     }
@@ -90,16 +85,38 @@ public class Wheel : MonoBehaviour
 
     private void OnTurnLeft(object sender, EventArgs e)
     {
-        Debug.Log("TurnLeft");
-        IncrementFrontCardIndex();
-
-        Acted?.Invoke(this, Cards[frontCardIndex]);
+        if (AllUnitsDead())
+            return;
+        StartCoroutine(TurnLeft());
     }
 
     private void OnTurnRight(object sender, EventArgs e)
     {
-        Debug.Log("TurnRight");
+        if (AllUnitsDead())
+            return;
+        StartCoroutine(TurnRight());
+    }
+
+    private IEnumerator TurnLeft()
+    {
+        IncrementFrontCardIndex();
+        while (Cards[frontCardIndex].IsDead)
+        {
+            IncrementFrontCardIndex();
+            yield return StartCoroutine(input.TurnLeftWithoutNotifying());
+        }
+
+        Acted?.Invoke(this, Cards[frontCardIndex]);
+    }
+
+    private IEnumerator TurnRight()
+    {
         DecrementFrontCardIndex();
+        while (Cards[frontCardIndex].IsDead)
+        {
+            DecrementFrontCardIndex();
+            yield return StartCoroutine(input.TurnRightWithoutNotifying());
+        }
 
         Acted?.Invoke(this, Cards[frontCardIndex]);
     }

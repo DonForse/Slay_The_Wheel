@@ -51,96 +51,56 @@ public class Game : MonoBehaviour
         enemyWheel.Acted += OnEnemyActed;
     }
 
-    private void OnEnemyActed(object sender, InPlayCard e)
+    private void OnEnemyActed(object sender, InPlayCard attacker)
     {
-        StartCoroutine(OnEnemyActed_Coroutine(e));
-    }
-
-    private void OnPlayerActed(object sender, InPlayCard e)
-    {
-        StartCoroutine(OnPlayerActed_Coroutine(e));
-    }
-
-    private IEnumerator OnPlayerActed_Coroutine(InPlayCard inPlayPlayerCard)
-    {
-        var inPlayEnemyCard = enemyWheel.GetFrontCard();
-        var enemyCard = inPlayEnemyCard.GetCard();
-        var playerCard = inPlayPlayerCard.GetCard();
-
-        playerWheel.LockWheel();
         _actions++;
-        
-        enemyCard.Hp -= playerCard.Attack;
-        if (enemyCard.Hp <= 0)
-        {
-            inPlayEnemyCard.SetDead();
-            if (enemyWheel.AllUnitsDead())
-            {
-                Debug.Log("WIN");
-                yield break;
-            }
-
-            yield return StartCoroutine(enemyWheel.PutAliveUnitAtFront());
-        }
-
-
-        if (turn == 0 && _actions == 2)
-        {
-            ChangeTurn();
-            yield break;;
-        }
-        else if (_actions == 3)
-        {
-            ChangeTurn();
-            yield break;;
-        }
-
-        playerWheel.UnlockWheel();
+        var defender = playerWheel.GetFrontCard();
+        StartCoroutine(Attack(attacker, enemyWheel, defender, playerWheel));
     }
 
-    private IEnumerator OnEnemyActed_Coroutine(InPlayCard inPlayEnemyCard)
+    private void OnPlayerActed(object sender, InPlayCard attacker)
     {
-        var inPlayPlayerCard = playerWheel.GetFrontCard();
-        var playerCard = inPlayPlayerCard.GetCard();
-        var enemyCard = inPlayEnemyCard.GetCard();
-
-        enemyWheel.LockWheel();
         _actions++;
+        var defender = enemyWheel.GetFrontCard();
+        StartCoroutine(Attack(attacker, playerWheel, defender, enemyWheel));
+    }
 
-        playerCard.Hp -= enemyCard.Attack;
-        if (playerCard.Hp <= 0)
+    private IEnumerator Attack(InPlayCard attacker,Wheel attackerWheel, InPlayCard defender, Wheel defenderWheel )
+    {
+        attackerWheel.LockWheel();
+
+        var defenderCard = defender.GetCard();
+        var enemyCard = attacker.GetCard();
+        defenderCard.Hp -= enemyCard.Attack;
+        if (defenderCard.Hp <= 0)
         {
-            inPlayPlayerCard.SetDead();
-            if (playerWheel.AllUnitsDead())
+            defender.SetDead();
+            if (defenderWheel.AllUnitsDead())
             {
                 Debug.Log("LOST");
                 yield break;
             }
 
-            yield return StartCoroutine(playerWheel.PutAliveUnitAtFront());
+            yield return StartCoroutine(defenderWheel.PutAliveUnitAtFront());
         }
-
         if (_actions == 3)
         {
             ChangeTurn();
             yield break;
         }
 
-        enemyWheel.UnlockWheel();
+        attackerWheel.UnlockWheel();
     }
 
     private void ChangeTurn()
     {
         turn++;
         _actions = 0;
+        
         if (turn % 2 == 0)
-        {
             StartPlayerTurn();
-        }
         else
-        {
             PlayBotTurn();
-        }
     }
 
     private void PlayBotTurn()
