@@ -42,6 +42,16 @@ public class RunCard
             ValueChanged?.Invoke(this, this);
         }
     }
+    
+    public List<Ability> Effects
+    {
+        get => _effects;
+        set
+        {
+            _effects = value;
+            ValueChanged?.Invoke(this, this);
+        }
+    }
 
     public readonly BaseCardScriptableObject baseCard;
     
@@ -49,6 +59,7 @@ public class RunCard
     private Ability[] _abilities;
     private int _hp;
     private string _cardName;
+    private List<Ability> _effects;
 
     public RunCard(BaseCardScriptableObject heroCardDb)
     {
@@ -56,6 +67,7 @@ public class RunCard
         _hp = heroCardDb.hp;
         _attack = heroCardDb.attack;
         _abilities = heroCardDb.abilities;
+        _effects = new();
         baseCard = heroCardDb;
     }
 

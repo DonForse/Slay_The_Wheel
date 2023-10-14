@@ -68,20 +68,28 @@ public class Game : MonoBehaviour
     private IEnumerator Attack(InPlayCard attacker,Wheel attackerWheel, InPlayCard defender, Wheel defenderWheel )
     {
         attackerWheel.LockWheel();
+        var attackerCard = attacker.GetCard();
 
-        var defenderCard = defender.GetCard();
-        var enemyCard = attacker.GetCard();
-        defenderCard.Hp -= enemyCard.Attack;
-        if (defenderCard.Hp <= 0)
+        yield return StartCoroutine(ApplyWheelMovementEffect(attackerWheel));
+        if (attacker.IsDead) //own unit dead on movement
         {
-            defender.SetDead();
-            if (defenderWheel.AllUnitsDead())
+            if (_actions == 3)
             {
-                Debug.Log("LOST");
+                ChangeTurn();
                 yield break;
             }
+            yield break;
+        }
 
-            yield return StartCoroutine(defenderWheel.PutAliveUnitAtFront());
+        ApplyFrontCardEffect(attackerCard, defenderWheel);
+
+        yield return StartCoroutine(ApplyDamage(attackerCard.Attack, defender, defenderWheel));
+        
+        
+        if (defenderWheel.AllUnitsDead())
+        {
+            Debug.Log("LOST");
+            yield break;
         }
         if (_actions == 3)
         {
@@ -90,6 +98,42 @@ public class Game : MonoBehaviour
         }
 
         attackerWheel.UnlockWheel();
+    }
+
+    private IEnumerator ApplyDamage(int damage, InPlayCard defender, Wheel defenderWheel)
+    {
+        var defenderCard = defender.GetCard();
+        defenderCard.Hp -= damage;
+        if (defenderCard.Hp <= 0)
+        {
+            defender.SetDead();
+            yield return StartCoroutine(defenderWheel.PutAliveUnitAtFront());
+        }
+    }
+
+    private static void ApplyFrontCardEffect(RunCard attackerCard, Wheel defenderWheel)
+    {
+        foreach (var ability in attackerCard.Abilities)
+        {
+            if (ability == Ability.Burn)
+            {
+                defenderWheel.GetFrontCard().GetCard().Effects.Add(Ability.Burn);
+            }
+        }
+    }
+
+    private IEnumerator ApplyWheelMovementEffect(Wheel wheel)
+    {
+        foreach (var card in wheel.Cards)
+        {
+            var cardActiveEffects = card.GetCard().Effects;
+            var burns = cardActiveEffects.Count(a => a == Ability.Burn);
+            if (burns > 0)
+            {
+                yield return StartCoroutine(ApplyDamage(burns, card, wheel));
+                card.GetCard().Effects.Remove(Ability.Burn);
+            }
+        }
     }
 
     private void ChangeTurn()
