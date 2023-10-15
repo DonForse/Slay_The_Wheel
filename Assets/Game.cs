@@ -100,10 +100,10 @@ public class Game : MonoBehaviour
         attackerWheel.UnlockWheel();
     }
 
-    private IEnumerator ApplyDamage(int damage, InPlayCard defender, Wheel defenderWheel)
+    private IEnumerator ApplyDamage(int damage, InPlayCard defender, Wheel defenderWheel, Ability? source = null)
     {
         var defenderCard = defender.GetCard();
-        defender.PlayGetHitAnimation(damage);
+        defender.PlayGetHitAnimation(damage, source);
         defenderCard.Hp -= damage;
         if (defenderCard.Hp <= 0)
         {
@@ -131,7 +131,7 @@ public class Game : MonoBehaviour
             var burns = cardActiveEffects.Count(a => a == Ability.Burn);
             if (burns > 0)
             {
-                yield return StartCoroutine(ApplyDamage(burns, card, wheel));
+                yield return StartCoroutine(ApplyDamage(burns, card, wheel, Ability.Burn));
                 card.GetCard().Effects.Remove(Ability.Burn);
             }
         }

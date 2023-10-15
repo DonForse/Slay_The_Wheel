@@ -189,6 +189,7 @@ MonoBehaviour:
   hpText: {fileID: 6363361793529549309}
   atkText: {fileID: 5686538585994836151}
   _player: {fileID: 8020572161793104433}
+  _feedbackFloatingText: {fileID: 0}
 --- !u!95 &8524329497729110065
 Animator:
   serializedVersion: 5
@@ -7015,7 +7016,7 @@ MonoBehaviour:
         DebugActive: 0
         Intensity: 1
         Value: 100
-        UseIntensityAsValue: 1
+        UseIntensityAsValue: 0
         RoundingMethod: 0
         ForceColor: 1
         AnimateColorGradient:
@@ -7123,7 +7124,7 @@ MonoBehaviour:
         DebugActive: 0
         Intensity: 1
         Value: 100
-        UseIntensityAsValue: 1
+        UseIntensityAsValue: 0
         RoundingMethod: 0
         ForceColor: 1
         AnimateColorGradient:
