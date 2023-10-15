@@ -103,6 +103,7 @@ public class Game : MonoBehaviour
     private IEnumerator ApplyDamage(int damage, InPlayCard defender, Wheel defenderWheel)
     {
         var defenderCard = defender.GetCard();
+        defender.PlayGetHitAnimation(damage);
         defenderCard.Hp -= damage;
         if (defenderCard.Hp <= 0)
         {
