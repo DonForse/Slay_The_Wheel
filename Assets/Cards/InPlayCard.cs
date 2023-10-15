@@ -1,3 +1,4 @@
+using System.Linq;
 using MoreMountains.Feedbacks;
 using TMPro;
 using UnityEngine;
@@ -6,9 +7,11 @@ public class InPlayCard : MonoBehaviour
 {
     private RunCard _card;
     [SerializeField] private SpriteRenderer spriteRenderer;
+    [SerializeField] private Sprite cardBack;
     [SerializeField] private Transform viewContainer;
     [SerializeField] private TMP_Text hpText;
     [SerializeField] private TMP_Text atkText;
+    [SerializeField] private MMF_Player _player;
     private bool _isDead = false;
     public string CardName => _card.CardName;
     public void SetCard(RunCard runCard, bool player)
@@ -24,6 +27,11 @@ public class InPlayCard : MonoBehaviour
 
     private void UpdateCardValues(object sender, RunCard e)
     {
+        if (_isDead)
+        {
+            hpText.text = "0";
+            atkText.text = "0";
+        }
         hpText.text = e.Hp.ToString();
         atkText.text = e.Attack.ToString();
     }
@@ -38,8 +46,12 @@ public class InPlayCard : MonoBehaviour
         _isDead = true;
         hpText.text = "0";
         atkText.text = "0";
-        spriteRenderer.sprite =
-            Sprite.Create(Texture2D.grayTexture, new Rect(Vector2.zero, Vector2.one), Vector2.one*0.5f);
+        spriteRenderer.sprite = cardBack;
+    }
+
+    public void PlayGetHitAnimation(int damage)
+    {
+        _player.PlayFeedbacks(this.transform.position, damage);
     }
 
     public bool IsDead => _isDead;

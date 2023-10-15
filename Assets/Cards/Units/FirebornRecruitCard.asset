@@ -15,5 +15,5 @@ MonoBehaviour:
   cardName: Fireborn Recruit
   hp: 8
   attack: 2
-  abilities: 
+  abilities: 01000000
   cardSprite: {fileID: 21300000, guid: 24e2bbe58fa30b544814f45d40bc83a2, type: 3}
