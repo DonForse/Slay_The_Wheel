@@ -25,7 +25,7 @@ public class InputControlWheel : ControlWheel, IControlWheel
         if (!_enabled) return;
         if (!_isRotating && Input.GetMouseButtonDown(0))
         {
-            startAngle = rotationAngle;
+            startAngle = wheelController.WheelData.RotationAngle;
             _isRotating = true;
         }
 
@@ -40,16 +40,16 @@ public class InputControlWheel : ControlWheel, IControlWheel
         
         var rotationInput = Mathf.Clamp(Input.GetAxis("Mouse X"), -1f,1f);
         
-        rotationAngle += rotationInput * rotationSpeed * Time.deltaTime;
+        wheelController.WheelData.RotationAngle += rotationInput * rotationSpeed * Time.deltaTime;
 
-        var anglePerItem = (1.5f * Mathf.PI) / (wheel.Size);
+        var anglePerItem = (1.5f * Mathf.PI) / (wheelController.WheelData.Size);
 
-        if (Mathf.Abs(rotationAngle - startAngle) >= anglePerItem)
+        if (Mathf.Abs(wheelController.WheelData.RotationAngle - startAngle) >= anglePerItem)
         {
             _isRotating = false;
             SnapToNearestPosition();
             
-            if ((rotationAngle - startAngle) > 0)
+            if ((wheelController.WheelData.RotationAngle - startAngle) > 0)
                 TurnRight?.Invoke(this, null);
             else
                 TurnLeft?.Invoke(this, null);
@@ -58,7 +58,7 @@ public class InputControlWheel : ControlWheel, IControlWheel
         RotateToNewPosition();
     }
     
-    private void RollbackPosition() => rotationAngle = startAngle;
+    private void RollbackPosition() => wheelController.WheelData.RotationAngle = startAngle;
 
     private void OnApplicationFocus(bool hasFocus)
     {

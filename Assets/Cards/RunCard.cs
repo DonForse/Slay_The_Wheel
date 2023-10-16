@@ -53,6 +53,9 @@ public class RunCard
         }
     }
 
+    public AttackType AttackType { get; set; }
+
+
     public readonly BaseCardScriptableObject baseCard;
     
     private int _attack;
@@ -69,6 +72,7 @@ public class RunCard
         _abilities = heroCardDb.abilities;
         _effects = new();
         baseCard = heroCardDb;
+        AttackType = heroCardDb.attackType;
     }
 
     public event EventHandler<RunCard> ValueChanged;

@@ -8,4 +8,5 @@ public class BaseCardScriptableObject : ScriptableObject
     public int attack;
     public Ability[] abilities;
     public Sprite cardSprite;
+    public AttackType attackType;
 }

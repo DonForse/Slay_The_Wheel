@@ -7,6 +7,4 @@ public interface IControlWheel
     event EventHandler TurnLeft;
     void Enable();
     void Disable();
-    IEnumerator TurnRightWithoutNotifying();
-    IEnumerator TurnLeftWithoutNotifying();
 }

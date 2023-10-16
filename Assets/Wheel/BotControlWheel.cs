@@ -9,25 +9,25 @@ public class BotControlWheel : ControlWheel
     
     public IEnumerator TurnTowardsDirection(bool right)
     {
-        startAngle = rotationAngle;
+        startAngle = wheelController.WheelData.RotationAngle;
         return MoveTowardsDirection(right);
     }
 
     private IEnumerator MoveTowardsDirection(bool right)
     {
         var rotationInput = right ? 1 : -1;
-        var anglePerItem = (1.5f * Mathf.PI) / (wheel.Size);
+        var anglePerItem = (1.5f * Mathf.PI) / (wheelController.WheelData.Size);
 
-        while (Mathf.Abs(rotationAngle - startAngle) < anglePerItem)
+        while (Mathf.Abs(wheelController.WheelData.RotationAngle - startAngle) < anglePerItem)
         {
-            rotationAngle += rotationInput * rotationSpeed * Time.deltaTime;
+            wheelController.WheelData.RotationAngle += rotationInput * rotationSpeed * Time.deltaTime;
             RotateToNewPosition();
             yield return new WaitForEndOfFrame();
         }
 
         SnapToNearestPosition();
 
-        if ((rotationAngle - startAngle) > 0)
+        if ((wheelController.WheelData.RotationAngle - startAngle) > 0)
             TurnRight?.Invoke(this, null);
         else
             TurnLeft?.Invoke(this, null);

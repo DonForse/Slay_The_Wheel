@@ -1,5 +1,11 @@
 public enum Ability
 {
     AttackAll,
-    Burn
+    Burn,
+    RotateRightOne,
+    RotateRightTwo,
+    RotateRightThree,
+    RotateLeftOne,
+    RotateLeftTwo,
+    RotateLeftThree,
 }

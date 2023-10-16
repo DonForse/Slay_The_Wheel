@@ -6,8 +6,8 @@ using UnityEngine.Serialization;
 
 public class Game : MonoBehaviour
 {
-    [SerializeField] private Wheel playerWheel;
-    [SerializeField] private Wheel enemyWheel;
+    [FormerlySerializedAs("playerWheel")] [SerializeField] private WheelController playerWheelController;
+    [FormerlySerializedAs("enemyWheel")] [SerializeField] private WheelController enemyWheelController;
 
     [FormerlySerializedAs("_botControlWheel")] [SerializeField]
     private BotControlWheel botControlWheel;
@@ -16,6 +16,7 @@ public class Game : MonoBehaviour
     [SerializeField] private BaseCardScriptableObject emptyCard;
     private int _actions;
     private int turn = 0;
+    private bool _acting;
 
     // Start is called before the first frame update
     void Start()
@@ -32,106 +33,184 @@ public class Game : MonoBehaviour
         }
 
         var enemy3 = cardsDb.cards.FirstOrDefault(x => x.cardName.Contains("Slime"));
-        // var enemy1 = cardsDb.cards.FirstOrDefault(x => x.cardName.Contains("Zombie"));
-        // var enemy2 = cardsDb.cards.FirstOrDefault(x => x.cardName.Contains("Spider"));
+        var enemy1 = cardsDb.cards.FirstOrDefault(x => x.cardName.Contains("Zombie"));
+        var enemy2 = cardsDb.cards.FirstOrDefault(x => x.cardName.Contains("Spider"));
 
-        playerWheel.SetSize(5);
-        playerWheel.SetCards(deck);
+        playerWheelController.SetSize(5);
+        playerWheelController.SetCards(deck);
 
-        enemyWheel.SetCards(new List<RunCard>() { new RunCard(enemy3), new RunCard(enemy3), new RunCard(enemy3) });
-        enemyWheel.SetSize(3);
+        enemyWheelController.SetCards(new List<RunCard>() { new RunCard(enemy1), new RunCard(enemy2), new RunCard(enemy3) });
+        enemyWheelController.SetSize(3);
 
-        playerWheel.InitializeWheel(true);
-        enemyWheel.InitializeWheel(false);
+        playerWheelController.InitializeWheel(true);
+        enemyWheelController.InitializeWheel(false);
 
-        enemyWheel.LockWheel();
-        playerWheel.UnlockWheel();
+        enemyWheelController.LockWheel();
+        playerWheelController.UnlockWheel();
 
-        playerWheel.Acted += OnPlayerActed;
-        enemyWheel.Acted += OnEnemyActed;
+        playerWheelController.Acted += OnPlayerActed;
+        enemyWheelController.Acted += OnEnemyActed;
+        playerWheelController.WheelTurn += OnPlayerWheelMoved;
+        enemyWheelController.WheelTurn += OnEnemyWheelMoved;
+    }
+
+    private void OnEnemyWheelMoved(object sender, InPlayCard e)
+    {
+        StartCoroutine(ApplyWheelMovementEffect(enemyWheelController));
+    }
+
+    private void OnPlayerWheelMoved(object sender, InPlayCard e)
+    {
+        StartCoroutine(ApplyWheelMovementEffect(playerWheelController));
     }
 
     private void OnEnemyActed(object sender, InPlayCard attacker)
     {
         _actions++;
-        var defender = playerWheel.GetFrontCard();
-        StartCoroutine(Attack(attacker, enemyWheel, defender, playerWheel));
+        StartCoroutine(Attack(attacker, enemyWheelController, playerWheelController));
     }
 
     private void OnPlayerActed(object sender, InPlayCard attacker)
     {
         _actions++;
-        var defender = enemyWheel.GetFrontCard();
-        StartCoroutine(Attack(attacker, playerWheel, defender, enemyWheel));
+        StartCoroutine(Attack(attacker, playerWheelController, enemyWheelController));
     }
 
-    private IEnumerator Attack(InPlayCard attacker,Wheel attackerWheel, InPlayCard defender, Wheel defenderWheel )
+    private IEnumerator Attack(InPlayCard attacker,WheelController attackerWheelController, WheelController defenderWheelController )
     {
-        attackerWheel.LockWheel();
+        _acting = true;
+        attackerWheelController.LockWheel();
         var attackerCard = attacker.GetCard();
 
-        yield return StartCoroutine(ApplyWheelMovementEffect(attackerWheel));
+        yield return ApplyWheelMovementEffect(attackerWheelController);
+        
         if (attacker.IsDead) //own unit dead on movement
         {
             if (_actions == 3)
             {
                 ChangeTurn();
+                _acting = false;
                 yield break;
             }
+            _acting = false;
             yield break;
         }
 
-        ApplyFrontCardEffect(attackerCard, defenderWheel);
+        ApplyFrontCardEffect(attackerCard, defenderWheelController);
+        yield return ApplyFrontCardAttack(attackerCard, defenderWheelController);
 
-        yield return StartCoroutine(ApplyDamage(attackerCard.Attack, defender, defenderWheel));
-        
-        
-        if (defenderWheel.AllUnitsDead())
+        yield return ApplyAfterHitEffect(attackerCard, defenderWheelController);
+        if (defenderWheelController.AllUnitsDead())
         {
             Debug.Log("LOST");
+            _acting = false;
             yield break;
         }
         if (_actions == 3)
         {
             ChangeTurn();
+            _acting = false;
             yield break;
         }
 
-        attackerWheel.UnlockWheel();
+        attackerWheelController.UnlockWheel();
+        _acting = false;
     }
 
-    private IEnumerator ApplyDamage(int damage, InPlayCard defender, Wheel defenderWheel, Ability? source = null)
+    private IEnumerator ApplyAfterHitEffect(RunCard attackerCard, WheelController defenderWheelController)
     {
-        var defenderCard = defender.GetCard();
-        defender.PlayGetHitAnimation(damage, source);
-        defenderCard.Hp -= damage;
-        if (defenderCard.Hp <= 0)
+        if (attackerCard.Abilities.Any(x => x == Ability.RotateRightThree))
         {
-            defender.SetDead();
-            yield return StartCoroutine(defenderWheel.PutAliveUnitAtFront());
+            //TODO: Differentiate between rotate as action and rotate as abilities / death.
+            yield return defenderWheelController.RotateRight();
+        }
+
+        if (attackerCard.Abilities.Any(x => x == Ability.RotateRightTwo))
+        {
+            yield return defenderWheelController.RotateRight();
+            yield return defenderWheelController.RotateRight();
+        }
+
+        if (attackerCard.Abilities.Any(x => x == Ability.RotateRightOne))
+        {
+            yield return defenderWheelController.RotateRight();
+            yield return defenderWheelController.RotateRight();
+            yield return defenderWheelController.RotateRight();
+        }
+        
+        if (attackerCard.Abilities.Any(x => x == Ability.RotateLeftOne))
+        {
+            //TODO: Differentiate between rotate as action and rotate as abilities / death.
+            yield return defenderWheelController.RotateLeft();
+        }
+
+        if (attackerCard.Abilities.Any(x => x == Ability.RotateLeftTwo))
+        {
+            yield return defenderWheelController.RotateLeft();
+            yield return defenderWheelController.RotateLeft();
+        }
+
+        if (attackerCard.Abilities.Any(x => x == Ability.RotateLeftThree))
+        {
+            yield return defenderWheelController.RotateLeft();
+            yield return defenderWheelController.RotateLeft();
+            yield return defenderWheelController.RotateLeft();
         }
     }
 
-    private static void ApplyFrontCardEffect(RunCard attackerCard, Wheel defenderWheel)
+    private IEnumerator ApplyFrontCardAttack(RunCard attackerCard, WheelController defenderWheelController)
+    {
+        if (attackerCard.AttackType == AttackType.Front)
+        {
+            var defender = defenderWheelController.GetFrontCard();
+            yield return ApplyDamage(attackerCard.Attack, defender, defenderWheelController);
+        }
+        else if (attackerCard.AttackType == AttackType.All)
+        {
+            foreach (var defender in defenderWheelController.Cards)
+                yield return ApplyDamage(attackerCard.Attack, defender, defenderWheelController);
+        }
+        else if (attackerCard.AttackType == AttackType.FrontAndSides)
+        {
+            var defenders = defenderWheelController.GetFrontNeighborsCards(0,2).ToList();
+            foreach (var defender in defenders)
+                yield return ApplyDamage(attackerCard.Attack, defender, defenderWheelController);
+        }
+    }
+
+    private IEnumerator ApplyDamage(int damage, InPlayCard defender, WheelController defenderWheelController, Ability? source = null)
+    {
+        var defenderCard = defender.GetCard();
+        if (defender.IsDead) yield break;
+        
+        defender.PlayGetHitAnimation(damage, source);
+        defenderCard.Hp -= damage;
+        if (defenderCard.Hp > 0) yield break;
+        
+        defender.SetDead();
+        yield return defenderWheelController.PutAliveUnitAtFront(true);
+    }
+
+    private static void ApplyFrontCardEffect(RunCard attackerCard, WheelController defenderWheelController)
     {
         foreach (var ability in attackerCard.Abilities)
         {
             if (ability == Ability.Burn)
             {
-                defenderWheel.GetFrontCard().GetCard().Effects.Add(Ability.Burn);
+                defenderWheelController.GetFrontCard().GetCard().Effects.Add(Ability.Burn);
             }
         }
     }
 
-    private IEnumerator ApplyWheelMovementEffect(Wheel wheel)
+    private IEnumerator ApplyWheelMovementEffect(WheelController wheelController)
     {
-        foreach (var card in wheel.Cards)
+        foreach (var card in wheelController.Cards)
         {
             var cardActiveEffects = card.GetCard().Effects;
             var burns = cardActiveEffects.Count(a => a == Ability.Burn);
             if (burns > 0)
             {
-                yield return StartCoroutine(ApplyDamage(burns, card, wheel, Ability.Burn));
+                yield return ApplyDamage(burns, card, wheelController, Ability.Burn);
                 card.GetCard().Effects.Remove(Ability.Burn);
             }
         }
@@ -150,8 +229,8 @@ public class Game : MonoBehaviour
 
     private void PlayBotTurn()
     {
-        playerWheel.LockWheel();
-        enemyWheel.UnlockWheel();
+        playerWheelController.LockWheel();
+        enemyWheelController.UnlockWheel();
         StartCoroutine(BotAction());
     }
 
@@ -159,14 +238,16 @@ public class Game : MonoBehaviour
     {
         for (int i = 0; i < 3; i++)
         {
-            yield return StartCoroutine(botControlWheel.TurnTowardsDirection(Random.Range(0, 2) == 1));
-            yield return new WaitForSeconds(Random.Range(1f, 1.5f));
+            while (_actions < i || _acting)
+                yield return new WaitForSeconds(0.1f);
+            yield return botControlWheel.TurnTowardsDirection(Random.Range(0, 2) == 1);
+            yield return new WaitForSeconds(0.2f);
         }
     }
 
     private void StartPlayerTurn()
     {
-        enemyWheel.LockWheel();
-        playerWheel.UnlockWheel();
+        enemyWheelController.LockWheel();
+        playerWheelController.UnlockWheel();
     }
 }
