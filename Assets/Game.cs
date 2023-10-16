@@ -26,9 +26,16 @@ public class Game : MonoBehaviour
         var heroCard = new RunCard(heroCardDb);
         deck.Add(heroCard);
         var unitCardDb = cardsDb.cards.FirstOrDefault(x => x.cardName.Contains("Fireborn Recruit"));
-        for (int i = 0; i < 5; i++)
+        var unitCardDb2 = cardsDb.cards.FirstOrDefault(x => x.cardName.Contains("Fireborn Warrior"));
+
+        for (int i = 0; i < 3; i++)
         {
             var playerUnit = new RunCard(unitCardDb);
+            deck.Add(playerUnit);
+        }
+        for (int i = 0; i < 2; i++)
+        {
+            var playerUnit = new RunCard(unitCardDb2);
             deck.Add(playerUnit);
         }
 
@@ -123,6 +130,8 @@ public class Game : MonoBehaviour
         {
             //TODO: Differentiate between rotate as action and rotate as abilities / death.
             yield return defenderWheelController.RotateRight();
+            yield return defenderWheelController.RotateRight();
+            yield return defenderWheelController.RotateRight();
         }
 
         if (attackerCard.Abilities.Any(x => x == Ability.RotateRightTwo))
@@ -133,8 +142,6 @@ public class Game : MonoBehaviour
 
         if (attackerCard.Abilities.Any(x => x == Ability.RotateRightOne))
         {
-            yield return defenderWheelController.RotateRight();
-            yield return defenderWheelController.RotateRight();
             yield return defenderWheelController.RotateRight();
         }
         
@@ -156,6 +163,7 @@ public class Game : MonoBehaviour
             yield return defenderWheelController.RotateLeft();
             yield return defenderWheelController.RotateLeft();
         }
+        yield return defenderWheelController.PutAliveUnitAtFront(true);
     }
 
     private IEnumerator ApplyFrontCardAttack(RunCard attackerCard, WheelController defenderWheelController)
@@ -213,6 +221,7 @@ public class Game : MonoBehaviour
                 yield return ApplyDamage(burns, card, wheelController, Ability.Burn);
                 card.GetCard().Effects.Remove(Ability.Burn);
             }
+            yield return wheelController.PutAliveUnitAtFront(true);
         }
     }
 
