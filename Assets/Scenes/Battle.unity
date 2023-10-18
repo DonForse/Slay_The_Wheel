@@ -2780,7 +2780,7 @@ GameObject:
   - component: {fileID: 1689651477}
   - component: {fileID: 1689651476}
   m_Layer: 0
-  m_Name: Game
+  m_Name: Battle
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
