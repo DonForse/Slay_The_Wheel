@@ -63,27 +63,27 @@ public class Game : MonoBehaviour
 
     private void OnEnemyWheelMoved(object sender, InPlayCard e)
     {
-        StartCoroutine(ApplyWheelMovementEffect(enemyWheelController));
+        StartCoroutine(SpinWheel(enemyWheelController));
     }
 
     private void OnPlayerWheelMoved(object sender, InPlayCard e)
     {
-        StartCoroutine(ApplyWheelMovementEffect(playerWheelController));
+        StartCoroutine(SpinWheel(playerWheelController));
     }
 
     private void OnEnemyActed(object sender, InPlayCard attacker)
     {
         _actions++;
-        StartCoroutine(Attack(attacker, enemyWheelController, playerWheelController));
+        StartCoroutine(Act(attacker, enemyWheelController, playerWheelController));
     }
 
     private void OnPlayerActed(object sender, InPlayCard attacker)
     {
         _actions++;
-        StartCoroutine(Attack(attacker, playerWheelController, enemyWheelController));
+        StartCoroutine(Act(attacker, playerWheelController, enemyWheelController));
     }
 
-    private IEnumerator Attack(InPlayCard attacker,WheelController attackerWheelController, WheelController defenderWheelController )
+    private IEnumerator Act(InPlayCard attacker,WheelController attackerWheelController, WheelController defenderWheelController )
     {
         _acting = true;
         attackerWheelController.LockWheel();
@@ -124,6 +124,11 @@ public class Game : MonoBehaviour
         _acting = false;
     }
 
+    private IEnumerator SpinWheel(WheelController wheelController)
+    {
+        yield return ApplyWheelMovementEffect(wheelController);
+    }
+
     private IEnumerator ApplyAfterHitEffect(RunCard attackerCard, WheelController defenderWheelController)
     {
         foreach (var ability in attackerCard.Abilities)
@@ -133,7 +138,7 @@ public class Game : MonoBehaviour
             if (ability == Ability.RotateLeft)
                 yield return defenderWheelController.RotateLeft();
         }
-        yield return defenderWheelController.PutAliveUnitAtFront(true);
+        // yield return defenderWheelController.PutAliveUnitAtFront(true);
     }
 
     private IEnumerator ApplyFrontCardAttack(RunCard attackerCard, WheelController defenderWheelController)
@@ -191,7 +196,6 @@ public class Game : MonoBehaviour
                 yield return ApplyDamage(burns, card, wheelController, Ability.Burn);
                 card.GetCard().Effects.Remove(Ability.Burn);
             }
-            yield return wheelController.PutAliveUnitAtFront(true);
         }
     }
 

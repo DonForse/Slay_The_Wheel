@@ -10,7 +10,7 @@ public class BotControlWheel : ControlWheel
     public IEnumerator TurnTowardsDirection(bool right)
     {
         startAngle = wheelController.WheelData.RotationAngle;
-        return MoveTowardsDirection(right);
+        yield return MoveTowardsDirection(right);
     }
 
     private IEnumerator MoveTowardsDirection(bool right)

@@ -10,12 +10,11 @@ public class AutomaticControlWheel : ControlWheel
     public IEnumerator TurnTowardsDirection(bool right)
     {
         startAngle = wheelController.WheelData.RotationAngle;
-        return MoveTowardsDirection(right);
+        yield return MoveTowardsDirection(right);
     }
 
     private IEnumerator MoveTowardsDirection(bool right)
     {
-        
         var rotationInput = right ? 1 : -1;
         var anglePerItem = (1.5f * Mathf.PI) / (wheelController.WheelData.Size);
 

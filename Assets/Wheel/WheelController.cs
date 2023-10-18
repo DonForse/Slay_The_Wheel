@@ -201,12 +201,13 @@ public class WheelController : MonoBehaviour
     public IEnumerator RotateRight()
     {
         Debug.Log("Turn Right: Rotate");
-        return wheelMovement.TurnTowardsDirection(true);
+        yield return wheelMovement.TurnTowardsDirection(true);
+        yield return new WaitForSeconds(.2f);
     }
 
     public IEnumerator RotateLeft()
     {
         Debug.Log("Turn Right: Rotate");
-        return wheelMovement.TurnTowardsDirection(false);
+        yield return wheelMovement.TurnTowardsDirection(false);
     }
 }
