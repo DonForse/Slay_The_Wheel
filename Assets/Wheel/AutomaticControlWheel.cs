@@ -26,11 +26,11 @@ public class AutomaticControlWheel : ControlWheel
             yield return new WaitForEndOfFrame();
         }
         SnapToNearestPosition();
-        //
-        // if ((wheelController.WheelData.RotationAngle - startAngle) > 0)
-        //     TurnRight?.Invoke(this, null);
-        // else
-        //     TurnLeft?.Invoke(this, null);
+    
+        if ((wheelController.WheelData.RotationAngle - startAngle) > 0)
+            TurnRight?.Invoke(this, null);
+        else
+            TurnLeft?.Invoke(this, null);
     }
     
     public void Test (bool right)

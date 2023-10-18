@@ -128,7 +128,6 @@ public class WheelController : MonoBehaviour
         if (AllUnitsDead())
             return;
         DecrementFrontCardIndex();
-
         WheelTurn?.Invoke(this, Cards[frontCardIndex]);
     }
 
@@ -145,8 +144,7 @@ public class WheelController : MonoBehaviour
     private IEnumerator TurnRight(bool sendAction, bool sendMovement)
     {
         yield return PutAliveUnitAtFront(true);
-
-
+        
         if (sendAction)
             Acted?.Invoke(this, Cards[frontCardIndex]);
         if (sendMovement)
