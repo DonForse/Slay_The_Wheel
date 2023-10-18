@@ -10,11 +10,11 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 00bda76894bf4bd385081e8db8a5b6fb, type: 3}
-  m_Name: FirebornRecruitCard
+  m_Name: FirestormSorceressCard
   m_EditorClassIdentifier: 
-  cardName: Fireborn Recruit
-  hp: 20
-  attack: 1
-  abilities: 0000000000000000
-  cardSprite: {fileID: 21300000, guid: 24e2bbe58fa30b544814f45d40bc83a2, type: 3}
+  cardName: Firestorm Sorceress
+  hp: 30
+  attack: 0
+  abilities: 0100000001000000
+  cardSprite: {fileID: 21300000, guid: a21d26ad86162a0419521aab5a155c2e, type: 3}
   attackType: 0

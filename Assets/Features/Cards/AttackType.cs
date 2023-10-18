@@ -1,6 +1,9 @@
-public enum AttackType
+namespace Features.Cards
 {
-    Front,
-    All,
-    FrontAndSides
+    public enum AttackType
+    {
+        Front,
+        All,
+        FrontAndSides
+    }
 }

@@ -1,10 +1,12 @@
 using System;
-using System.Collections;
 
-public interface IControlWheel 
+namespace Features.Battle.Wheel
 {
-    event EventHandler TurnRight;
-    event EventHandler TurnLeft;
-    void Enable();
-    void Disable();
+    public interface IControlWheel 
+    {
+        event EventHandler TurnRight;
+        event EventHandler TurnLeft;
+        void Enable();
+        void Disable();
+    }
 }

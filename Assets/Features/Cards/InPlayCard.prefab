@@ -188,7 +188,7 @@ MonoBehaviour:
   viewContainer: {fileID: 710592379794037747}
   hpText: {fileID: 6363361793529549309}
   atkText: {fileID: 5686538585994836151}
-  _player: {fileID: 8020572161793104433}
+  damageFeedback: {fileID: 8020572161793104433}
   container: {fileID: 1920387090359156846}
   fireIndicatorPrefab: {fileID: 6206021556773077456, guid: 041beb099c005b84395df6fb405c5dc2, type: 3}
   turnIndicatorPrefab: {fileID: 2971843293548022519, guid: a18beabd2c189964aac6b86a4d3ff87a, type: 3}

@@ -1,12 +1,16 @@
+using Features.Battle;
 using UnityEngine;
 
-[CreateAssetMenu(fileName = "Card", menuName = "Cards/Base Card")]
-public class BaseCardScriptableObject : ScriptableObject
+namespace Features.Cards
 {
-    public string cardName;
-    public int hp;
-    public int attack;
-    public Ability[] abilities;
-    public Sprite cardSprite;
-    public AttackType attackType;
+    [CreateAssetMenu(fileName = "Card", menuName = "Cards/Base Card")]
+    public class BaseCardScriptableObject : ScriptableObject
+    {
+        public string cardName;
+        public int hp;
+        public int attack;
+        public Ability[] abilities;
+        public Sprite cardSprite;
+        public AttackType attackType;
+    }
 }

@@ -1,10 +1,13 @@
 using System;
 using UnityEngine;
 
-[Serializable]
-public class WheelData
+namespace Features.Battle.Wheel
 {
-    [HideInInspector]public float RotationAngle;
-    [SerializeField]public float Radius;
-    [HideInInspector]public int Size;
+    [Serializable]
+    public class WheelData
+    {
+        [HideInInspector]public float RotationAngle;
+        [SerializeField]public float Radius;
+        [HideInInspector]public int Size;
+    }
 }

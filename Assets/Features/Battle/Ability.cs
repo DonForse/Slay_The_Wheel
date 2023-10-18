@@ -1,8 +1,14 @@
-public enum Ability
+namespace Features.Battle
 {
-    AttackAll,
-    Burn,
-    RotateRight,
-    RotateLeft,
-
+    public enum Ability
+    {
+        Burn,
+        BurnAll,
+        RotateRight,
+        RotateLeft,
+        AddShieldRight,
+        AddAtkRight,
+        AddShieldLeft,
+        AddAtkLeft,
+    }
 }

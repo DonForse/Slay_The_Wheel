@@ -1,86 +1,90 @@
 using System;
 using System.Collections.Generic;
+using Features.Battle;
 
-public class RunCard
+namespace Features.Cards
 {
-    public string CardName
+    public class RunCard
     {
-        get => _cardName;
-        set
+        public string CardName
         {
-            _cardName = value;
-            ValueChanged?.Invoke(this, this);
+            get => _cardName;
+            set
+            {
+                _cardName = value;
+                ValueChanged?.Invoke(this, this);
+            }
         }
-    }
 
-    public int Hp
-    {
-        get => _hp;
-        set
+        public int Hp
         {
-            _hp = value;
-            ValueChanged?.Invoke(this, this);
+            get => _hp;
+            set
+            {
+                _hp = value;
+                ValueChanged?.Invoke(this, this);
+            }
         }
-    }
 
-    public int Attack
-    {
-        get => _attack;
-        set
+        public int Attack
         {
-            _attack = value;
-            ValueChanged?.Invoke(this, this);
+            get => _attack;
+            set
+            {
+                _attack = value;
+                ValueChanged?.Invoke(this, this);
+            }
         }
-    }
     
-    public Ability[] Abilities
-    {
-        get => _abilities;
-        set
+        public Ability[] Abilities
         {
-            _abilities = value;
-            ValueChanged?.Invoke(this, this);
+            get => _abilities;
+            set
+            {
+                _abilities = value;
+                ValueChanged?.Invoke(this, this);
+            }
         }
-    }
     
-    public List<Ability> Effects
-    {
-        get => _effects;
-        set
+        public List<Ability> Effects
         {
-            _effects = value;
-            ValueChanged?.Invoke(this, this);
+            get => _effects;
+            set
+            {
+                _effects = value;
+                ValueChanged?.Invoke(this, this);
+            }
         }
-    }
 
-    public AttackType AttackType { get; set; }
-    public bool IsDead => Hp <= 0;
+        public AttackType AttackType { get; set; }
+        public bool IsDead => Hp <= 0;
 
 
-    public readonly BaseCardScriptableObject baseCard;
+        public readonly BaseCardScriptableObject baseCard;
     
-    private int _attack;
-    private Ability[] _abilities;
-    private int _hp;
-    private string _cardName;
-    private List<Ability> _effects;
+        private int _attack;
+        private Ability[] _abilities;
+        private int _hp;
+        private string _cardName;
+        private List<Ability> _effects;
 
-    public RunCard(BaseCardScriptableObject heroCardDb)
-    {
-        _cardName = heroCardDb.cardName;
-        _hp = heroCardDb.hp;
-        _attack = heroCardDb.attack;
-        _abilities = heroCardDb.abilities;
-        _effects = new();
-        baseCard = heroCardDb;
-        AttackType = heroCardDb.attackType;
+        public RunCard(BaseCardScriptableObject heroCardDb)
+        {
+            _cardName = heroCardDb.cardName;
+            _hp = heroCardDb.hp;
+            _attack = heroCardDb.attack;
+            _abilities = heroCardDb.abilities;
+            _effects = new();
+            baseCard = heroCardDb;
+            AttackType = heroCardDb.attackType;
+        }
+
+        public event EventHandler<RunCard> ValueChanged;
     }
 
-    public event EventHandler<RunCard> ValueChanged;
-}
-
-public enum ActionEnum
-{
-    Attack,
-    Skip,
+    public enum ActionEnum
+    {
+        Attack,
+        Skip,
+    }
 }
