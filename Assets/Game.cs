@@ -126,42 +126,12 @@ public class Game : MonoBehaviour
 
     private IEnumerator ApplyAfterHitEffect(RunCard attackerCard, WheelController defenderWheelController)
     {
-        if (attackerCard.Abilities.Any(x => x == Ability.RotateRightThree))
+        foreach (var ability in attackerCard.Abilities)
         {
-            //TODO: Differentiate between rotate as action and rotate as abilities / death.
-            yield return defenderWheelController.RotateRight();
-            yield return defenderWheelController.RotateRight();
-            yield return defenderWheelController.RotateRight();
-        }
-
-        if (attackerCard.Abilities.Any(x => x == Ability.RotateRightTwo))
-        {
-            yield return defenderWheelController.RotateRight();
-            yield return defenderWheelController.RotateRight();
-        }
-
-        if (attackerCard.Abilities.Any(x => x == Ability.RotateRightOne))
-        {
-            yield return defenderWheelController.RotateRight();
-        }
-        
-        if (attackerCard.Abilities.Any(x => x == Ability.RotateLeftOne))
-        {
-            //TODO: Differentiate between rotate as action and rotate as abilities / death.
-            yield return defenderWheelController.RotateLeft();
-        }
-
-        if (attackerCard.Abilities.Any(x => x == Ability.RotateLeftTwo))
-        {
-            yield return defenderWheelController.RotateLeft();
-            yield return defenderWheelController.RotateLeft();
-        }
-
-        if (attackerCard.Abilities.Any(x => x == Ability.RotateLeftThree))
-        {
-            yield return defenderWheelController.RotateLeft();
-            yield return defenderWheelController.RotateLeft();
-            yield return defenderWheelController.RotateLeft();
+            if (ability == Ability.RotateRight)    
+                yield return defenderWheelController.RotateRight();
+            if (ability == Ability.RotateLeft)
+                yield return defenderWheelController.RotateLeft();
         }
         yield return defenderWheelController.PutAliveUnitAtFront(true);
     }

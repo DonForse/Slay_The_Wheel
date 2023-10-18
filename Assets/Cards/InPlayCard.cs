@@ -1,4 +1,3 @@
-using System;
 using System.Linq;
 using MoreMountains.Feedbacks;
 using TMPro;
@@ -13,6 +12,10 @@ public class InPlayCard : MonoBehaviour
     [SerializeField] private TMP_Text hpText;
     [SerializeField] private TMP_Text atkText;
     [SerializeField] private MMF_Player _player;
+    [SerializeField] private Transform container;
+    [SerializeField] private GameObject fireIndicatorPrefab;
+    [SerializeField] private GameObject turnIndicatorPrefab;
+    
     private MMF_FloatingText _feedbackFloatingText;
     private bool _isDead = false;
     public string CardName => _card.CardName;
@@ -29,6 +32,21 @@ public class InPlayCard : MonoBehaviour
         if (!player)
             viewContainer.transform.localRotation = new Quaternion(0, 0, 180, 0);
 
+        var burns = runCard.baseCard.abilities.Count(x => x == Ability.Burn);
+        
+        for (int i = 0; i < burns; i++)
+            Instantiate(fireIndicatorPrefab, container);
+        
+        var rotater = runCard.baseCard.abilities.Count(x => x == Ability.RotateRight);
+
+        for (int i = 0; i < rotater; i++)
+            Instantiate(turnIndicatorPrefab, container);
+        
+        var rotatel = runCard.baseCard.abilities.Count(x => x == Ability.RotateLeft);
+
+        for (int i = 0; i < rotatel; i++)
+            Instantiate(turnIndicatorPrefab, container);
+        
         _card.ValueChanged += UpdateCardValues;
         UpdateCardValues(null, _card);
     }
