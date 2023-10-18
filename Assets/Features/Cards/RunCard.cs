@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-using Features.Battle;
+using Features.Battles;
 
 namespace Features.Cards
 {

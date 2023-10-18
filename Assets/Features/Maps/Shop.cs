@@ -4,7 +4,7 @@ using Features.Cards;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
-namespace Features.Map
+namespace Features.Maps
 {
     public class Shop : MonoBehaviour
     {

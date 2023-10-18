@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-namespace Features.Battle.Wheel
+namespace Features.Battles.Wheel
 {
     [Serializable]
     public class WheelData

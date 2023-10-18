@@ -1,6 +1,6 @@
 using System;
 
-namespace Features.Battle.Wheel
+namespace Features.Battles.Wheel
 {
     public interface IControlWheel 
     {

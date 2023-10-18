@@ -2,7 +2,7 @@ using System;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
-namespace Features.Battle.Wheel
+namespace Features.Battles.Wheel
 {
     public class InputControlWheel : ControlWheel, IControlWheel
     {

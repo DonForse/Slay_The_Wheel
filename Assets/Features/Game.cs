@@ -1,7 +1,9 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using Features.Battles;
 using Features.Cards;
+using Features.Maps;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -100,8 +102,8 @@ namespace Features
 
             SceneManager.LoadScene("Battle");
             yield return new WaitForSeconds(.5f);
-            var battleGo = GameObject.Find("Battle").GetComponent<Battle.Battle>();
-            battleGo.Initialize(_deck,GetBattleEnemies(), 5, GetEnemyWheelSize());
+            var battleGo = GameObject.Find("Battle").GetComponent<Battle>();
+            yield return battleGo.Initialize(_deck,GetBattleEnemies(), 5, GetEnemyWheelSize());
             battleGo.BattleFinished += BattleComplete;
         }
 
@@ -109,7 +111,7 @@ namespace Features
         {
             SceneManager.LoadScene("Map");
             yield return new WaitForSeconds(.5f);
-            var mapGo = GameObject.Find("Map").GetComponent<Map.Map>();
+            var mapGo = GameObject.Find("Map").GetComponent<Map>();
             mapGo.Initialize(_currentLevel);
             RemoveDeadCardsFromDeck();
             mapGo.SelectedUpgradeCard += OnMapStageComplete;

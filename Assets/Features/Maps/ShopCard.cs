@@ -4,7 +4,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace Features.Map
+namespace Features.Maps
 {
     public class ShopCard : MonoBehaviour
     {

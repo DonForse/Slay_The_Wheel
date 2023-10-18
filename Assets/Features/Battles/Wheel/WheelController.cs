@@ -5,7 +5,7 @@ using System.Linq;
 using Features.Cards;
 using UnityEngine;
 
-namespace Features.Battle.Wheel
+namespace Features.Battles.Wheel
 {
     public class WheelController : MonoBehaviour
     {
@@ -30,12 +30,12 @@ namespace Features.Battle.Wheel
             wheelMovement = GetComponent<AutomaticControlWheel>();
         }
 
-        public void InitializeWheel(bool player, int enemyWheelSize, List<RunCard> cards)
+        public IEnumerator InitializeWheel(bool player, int enemyWheelSize, List<RunCard> cards)
         {
             Positions = new();
             SetSize(enemyWheelSize);
             CalculatePositions();
-            SetRunCards(player, cards);
+            yield return SetRunCards(player, cards);
 
             frontCardIndex = 0;
             input.TurnRight += OnTurnRightAction;
@@ -157,13 +157,14 @@ namespace Features.Battle.Wheel
                 WheelTurn?.Invoke(this, Cards[frontCardIndex]);
         }
 
-        private void SetRunCards(bool player, List<RunCard>cards)
+        private IEnumerator SetRunCards(bool player, List<RunCard>cards)
         {
             var amountToSet = Mathf.Min(WheelData.Size, cards.Count);
             for (int i = 0; i < amountToSet; i++)
             {
-                Cards[i].SetCard(cards[i], player);
+                Cards[i].SetPlayer(player);
                 Cards[i].transform.localPosition = Positions[i];
+                yield return Cards[i].SetCard(cards[i]);
             }
         }
 

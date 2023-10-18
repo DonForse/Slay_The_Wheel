@@ -1,4 +1,4 @@
-using Features.Battle;
+using Features.Battles;
 using UnityEngine;
 
 namespace Features.Cards

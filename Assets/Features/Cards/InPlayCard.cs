@@ -1,10 +1,9 @@
 using System.Collections;
 using System.Linq;
-using Features.Battle;
+using Features.Battles;
 using MoreMountains.Feedbacks;
 using TMPro;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 namespace Features.Cards
 {
@@ -17,12 +16,23 @@ namespace Features.Cards
         [SerializeField] private TMP_Text hpText;
         [SerializeField] private TMP_Text atkText;
         [SerializeField] private MMF_Player damageFeedback;
+        [SerializeField] private MMF_Player deadFeedback;
+        [SerializeField] private MMF_Player showCardFeedback;
         [SerializeField] private Transform container;
+
         [SerializeField] private GameObject fireIndicatorPrefab;
+
         [SerializeField] private GameObject turnIndicatorPrefab;
-    
+
         private MMF_FloatingText _feedbackFloatingText;
+
         private bool _isDead = false;
+
+        public bool IsDead => _isDead;
+
+        public int Shield;
+        public int Attack;
+
         public string CardName => _card.CardName;
 
         private void OnEnable()
@@ -30,30 +40,50 @@ namespace Features.Cards
             _feedbackFloatingText = damageFeedback.GetFeedbackOfType<MMF_FloatingText>();
         }
 
-        public void SetCard(RunCard runCard, bool player)
+        public void SetPlayer(bool player)
         {
-            _card = runCard;
-            spriteRenderer.sprite = runCard.baseCard.cardSprite;
             if (!player)
                 viewContainer.transform.localRotation = new Quaternion(0, 0, 180, 0);
+        }
 
-            var burns = runCard.baseCard.abilities.Count(x => x == Ability.Burn);
-        
-            for (int i = 0; i < burns; i++)
-                Instantiate(fireIndicatorPrefab, container);
-        
-            var rotater = runCard.baseCard.abilities.Count(x => x == Ability.RotateRight);
+        public IEnumerator SetCard(RunCard runCard)
+        {
+            _card = runCard;
+            _isDead = false;
+            
+            Attack = runCard.Attack;
+            Shield = 0;
+            
+            spriteRenderer.sprite = runCard.baseCard.cardSprite;
 
-            for (int i = 0; i < rotater; i++)
-                Instantiate(turnIndicatorPrefab, container);
-        
-            var rotatel = runCard.baseCard.abilities.Count(x => x == Ability.RotateLeft);
+            foreach (Transform child in container)
+            {
+                Destroy(child.gameObject);
+            }
 
-            for (int i = 0; i < rotatel; i++)
-                Instantiate(turnIndicatorPrefab, container);
-        
+            SetEffectIcons(runCard);
+
             _card.ValueChanged += UpdateCardValues;
             UpdateCardValues(null, _card);
+            yield return showCardFeedback.PlayFeedbacksCoroutine(this.transform.position);
+        }
+
+        private void SetEffectIcons(RunCard runCard)
+        {
+            var burns = runCard.baseCard.abilities.Count(x => x == Ability.Burn);
+
+            for (int i = 0; i < burns; i++)
+                Instantiate(fireIndicatorPrefab, container);
+
+            var rotateR = runCard.baseCard.abilities.Count(x => x == Ability.RotateRight);
+
+            for (int i = 0; i < rotateR; i++)
+                Instantiate(turnIndicatorPrefab, container);
+
+            var rotateL = runCard.baseCard.abilities.Count(x => x == Ability.RotateLeft);
+
+            for (int i = 0; i < rotateL; i++)
+                Instantiate(turnIndicatorPrefab, container);
         }
 
         private void UpdateCardValues(object sender, RunCard e)
@@ -79,8 +109,7 @@ namespace Features.Cards
             hpText.text = "0";
             atkText.text = "0";
             spriteRenderer.sprite = cardBack;
-            return damageFeedback.PlayFeedbacksCoroutine(this.transform.position);
-
+            return deadFeedback.PlayFeedbacksCoroutine(this.transform.position);
         }
 
         public IEnumerator PlayGetHitAnimation(int damage, Ability? source = null)
@@ -148,13 +177,6 @@ namespace Features.Cards
                     new GradientColorKey(Color.yellow, 1f)
                 }
             };
-        }
-
-        public bool IsDead => _isDead;
-
-        public void ChangeCard(RunCard runCard)
-        {
-            throw new System.NotImplementedException();
         }
     }
 }

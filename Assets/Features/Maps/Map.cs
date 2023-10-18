@@ -5,7 +5,7 @@ using Cinemachine;
 using Features.Cards;
 using UnityEngine;
 
-namespace Features.Map
+namespace Features.Maps
 {
     public class Map : MonoBehaviour
     {

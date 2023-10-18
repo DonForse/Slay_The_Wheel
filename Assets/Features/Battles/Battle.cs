@@ -2,13 +2,13 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using Features.Battle.Wheel;
+using Features.Battles.Wheel;
 using Features.Cards;
 using JetBrains.Annotations;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
-namespace Features.Battle
+namespace Features.Battles
 {
     public class Battle : MonoBehaviour
     {
@@ -25,14 +25,14 @@ namespace Features.Battle
         public event EventHandler<bool> BattleFinished;
 
         // Start is called before the first frame update
-        public void Initialize(List<RunCard> deck, List<RunCard> enemies, int playerWheelSize, int enemyWheelSize)
+        public IEnumerator Initialize(List<RunCard> deck, List<RunCard> enemies, int playerWheelSize, int enemyWheelSize)
         {
             _playerBattleDeck = deck.ToList();
             _playerDiscardPile = new();
-            _enemiesDeck = enemies.ToList();
+            _enemiesDeck = enemies.Skip(enemyWheelSize).ToList();
             var cards = DrawCards(playerWheelSize, _playerBattleDeck, _playerDiscardPile);
-            playerWheelController.InitializeWheel(true, playerWheelSize, cards);
-            enemyWheelController.InitializeWheel(false, enemyWheelSize, enemies);
+            yield return playerWheelController.InitializeWheel(true, playerWheelSize, cards);
+            yield return enemyWheelController.InitializeWheel(false, enemyWheelSize, enemies);
 
             enemyWheelController.LockWheel();
             playerWheelController.UnlockWheel();
@@ -60,12 +60,12 @@ namespace Features.Battle
 
         private void OnEnemyWheelMoved(object sender, InPlayCard e)
         {
-            StartCoroutine(SpinWheel(enemyWheelController, _enemiesDeck, new List<RunCard>()));
+            StartCoroutine(SpinWheel(enemyWheelController));
         }
 
         private void OnPlayerWheelMoved(object sender, InPlayCard e)
         {
-            StartCoroutine(SpinWheel(playerWheelController, _playerBattleDeck,  _playerDiscardPile));
+            StartCoroutine(SpinWheel(playerWheelController));
         }
 
         private void OnEnemyActed(object sender, InPlayCard attacker)
@@ -73,7 +73,7 @@ namespace Features.Battle
             _actions++;
             StartCoroutine(Act(attacker,
                 enemyWheelController,
-                playerWheelController, _playerBattleDeck, _playerDiscardPile));
+                playerWheelController));
         }
 
         private void OnPlayerActed(object sender, InPlayCard attacker)
@@ -81,21 +81,22 @@ namespace Features.Battle
             _actions++;
             StartCoroutine(Act(attacker,
                 playerWheelController,
-                enemyWheelController
-                , _enemiesDeck, new List<RunCard>()));
+                enemyWheelController));
         }
 
         private IEnumerator Act(InPlayCard attacker, WheelController attackerWheelController,
-            WheelController defenderWheelController, List<RunCard> battleDeck, List<RunCard> discardPile)
+            WheelController defenderWheelController)
         {
             _acting = true;
             attackerWheelController.LockWheel();
             var attackerCard = attacker.GetCard();
 
-            yield return ApplyWheelMovementEffect(attackerWheelController, battleDeck, discardPile);
+            yield return ApplyWheelMovementEffect(attackerWheelController);
             yield return WaitSpinning();
             if (attacker.IsDead) //own unit dead on movement
             {
+                if (attackerWheelController.AllUnitsDead())
+                    yield return EndBattle(attackerWheelController);
                 if (_actions == 3)
                 {
                     yield return WaitSpinning();
@@ -108,8 +109,8 @@ namespace Features.Battle
                 yield break;
             }
 
-            ApplyFrontCardEffect(attackerCard, defenderWheelController);
-            yield return ApplyFrontCardAttack(attackerCard, defenderWheelController, battleDeck, discardPile);
+            ApplyFrontCardEffect(attackerWheelController, defenderWheelController);
+            yield return ApplyFrontCardAttack(attacker, defenderWheelController);
             yield return WaitSpinning();
             yield return ApplyAfterHitEffect(attackerCard, defenderWheelController);
             yield return WaitSpinning();
@@ -131,10 +132,9 @@ namespace Features.Battle
             yield return new WaitForSeconds(0.1f);
         }
 
-        private IEnumerator SpinWheel(WheelController wheelController, List<RunCard> battleDeck,
-            List<RunCard> discardPile)
+        private IEnumerator SpinWheel(WheelController wheelController)
         {
-            yield return ApplyWheelMovementEffect(wheelController, battleDeck, discardPile);
+            yield return ApplyWheelMovementEffect(wheelController);
         }
 
         private IEnumerator ApplyAfterHitEffect(RunCard attackerCard, WheelController defenderWheelController)
@@ -150,30 +150,28 @@ namespace Features.Battle
             yield return defenderWheelController.PutAliveUnitAtFront(true);
         }
 
-        private IEnumerator ApplyFrontCardAttack(RunCard attackerCard, WheelController defenderWheelController,
-            List<RunCard> battleDeck,
-            List<RunCard> discardPile)
+        private IEnumerator ApplyFrontCardAttack(InPlayCard attackerCard, WheelController defenderWheelController)
         {
-            if (attackerCard.AttackType == AttackType.Front)
+            if (attackerCard.GetCard().AttackType == AttackType.Front)
             {
                 var defender = defenderWheelController.GetFrontCard();
-                yield return ApplyDamage(attackerCard.Attack, defender, defenderWheelController,null,battleDeck, discardPile);
+                yield return ApplyDamage(attackerCard.Attack, defender, defenderWheelController,null);
             }
-            else if (attackerCard.AttackType == AttackType.All)
+            else if (attackerCard.GetCard().AttackType == AttackType.All)
             {
                 foreach (var defender in defenderWheelController.Cards)
-                    yield return ApplyDamage(attackerCard.Attack, defender, defenderWheelController,null,battleDeck,discardPile);
+                    yield return ApplyDamage(attackerCard.Attack, defender, defenderWheelController,null);
             }
-            else if (attackerCard.AttackType == AttackType.FrontAndSides)
+            else if (attackerCard.GetCard().AttackType == AttackType.FrontAndSides)
             {
                 var defenders = defenderWheelController.GetFrontNeighborsCards(0, 2).ToList();
                 foreach (var defender in defenders)
-                    yield return ApplyDamage(attackerCard.Attack, defender, defenderWheelController,null, battleDeck, discardPile);
+                    yield return ApplyDamage(attackerCard.Attack, defender, defenderWheelController,null);
             }
         }
 
         private IEnumerator ApplyDamage(int damage, InPlayCard defender, WheelController defenderWheelController,
-            Ability? source,List<RunCard> deck, List<RunCard> discardPile)
+            Ability? source)
         {
             var defenderCard = defender.GetCard();
             if (defender.IsDead) yield break;
@@ -186,22 +184,21 @@ namespace Features.Battle
             
             yield return defenderWheelController.PutAliveUnitAtFront(true);
             
+            var deck = defenderWheelController == enemyWheelController ? _enemiesDeck : _playerBattleDeck;
+            var discardPile = defenderWheelController == enemyWheelController ? new List<RunCard>() : _playerDiscardPile;
             if (deck.Count> 0)
             {
                 var cards = DrawCards(1, deck, discardPile);
                 if (cards == null || cards.Count == 0)
                     yield return EndBattle(defenderWheelController);
                 else
-                    defender.ChangeCard(cards.First());
-              
+                    yield return defender.SetCard(cards.First());
             }
             
-            if (deck.Count == 0 && discardPile.Count == 0 && playerWheelController.AllUnitsDead())
+            if (deck.Count == 0 && discardPile.Count == 0 && defenderWheelController.AllUnitsDead())
             {
                 yield return EndBattle(defenderWheelController);
             }
-            
-
         }
 
         private IEnumerator EndBattle(WheelController defenderWheelController)
@@ -209,10 +206,12 @@ namespace Features.Battle
             _acting = false;
             yield return new WaitForSeconds(.5f);
             BattleFinished?.Invoke(this, defenderWheelController == enemyWheelController);
+            
         }
 
-        private static void ApplyFrontCardEffect(RunCard attackerCard, WheelController defenderWheelController)
+        private static void ApplyFrontCardEffect(WheelController attackerWheelController, WheelController defenderWheelController)
         {
+            var attackerCard = attackerWheelController.GetFrontCard().GetCard();
             foreach (var ability in attackerCard.Abilities)
             {
                 if (ability == Ability.Burn)
@@ -226,10 +225,39 @@ namespace Features.Battle
                         card.GetCard().Effects.Add(Ability.Burn);
                     }
                 }
+                if (ability == Ability.AddAtkLeft)
+                {
+                    var neighbors = attackerWheelController.GetFrontNeighborsCards(1, 2);
+                    var leftNeighbor = neighbors[0];
+                    if (!leftNeighbor.IsDead)
+                        leftNeighbor.Attack += 1;
+                }
+                
+                if (ability == Ability.AddAtkRight)
+                {
+                    var neighbors = attackerWheelController.GetFrontNeighborsCards(1, 2);
+                    var rightNeighbor = neighbors[1];
+                    if (!rightNeighbor.IsDead)
+                        rightNeighbor.Attack += 1;
+                }
+                if (ability == Ability.AddShieldLeft)
+                {
+                    var neighbors = attackerWheelController.GetFrontNeighborsCards(1, 2);
+                    var leftNeighbor = neighbors[0];
+                    if (!leftNeighbor.IsDead)
+                        leftNeighbor.Shield += 1;
+                }
+                if (ability == Ability.AddShieldRight)
+                {
+                    var neighbors = attackerWheelController.GetFrontNeighborsCards(1, 2);
+                    var rightNeighbor = neighbors[1];
+                    if (!rightNeighbor.IsDead)
+                        rightNeighbor.Shield += 1;
+                }
             }
         }
 
-        private IEnumerator ApplyWheelMovementEffect(WheelController wheelController, List<RunCard> deck, List<RunCard> discardPile)
+        private IEnumerator ApplyWheelMovementEffect(WheelController wheelController)
         {
             foreach (var card in wheelController.Cards)
             {
@@ -237,7 +265,7 @@ namespace Features.Battle
                 var burns = cardActiveEffects.Count(a => a == Ability.Burn);
                 if (burns > 0)
                 {
-                    yield return ApplyDamage(burns, card, wheelController, Ability.Burn, deck,discardPile);
+                    yield return ApplyDamage(burns, card, wheelController, Ability.Burn);
                     card.GetCard().Effects.Remove(Ability.Burn);
                 }
             }

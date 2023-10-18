@@ -2,7 +2,7 @@ using System;
 using System.Collections;
 using UnityEngine;
 
-namespace Features.Battle.Wheel
+namespace Features.Battles.Wheel
 {
     public class AutomaticControlWheel : ControlWheel
     {

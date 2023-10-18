@@ -1,4 +1,4 @@
-namespace Features.Battle
+namespace Features.Battles
 {
     public enum Ability
     {
