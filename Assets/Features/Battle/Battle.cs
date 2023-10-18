@@ -81,11 +81,12 @@ public class Battle : MonoBehaviour
         var attackerCard = attacker.GetCard();
 
         yield return ApplyWheelMovementEffect(attackerWheelController);
-
+        yield return WaitSpinning();
         if (attacker.IsDead) //own unit dead on movement
         {
             if (_actions == 3)
             {
+                yield return WaitSpinning();
                 ChangeTurn();
                 _acting = false;
                 yield break;
@@ -97,9 +98,9 @@ public class Battle : MonoBehaviour
 
         ApplyFrontCardEffect(attackerCard, defenderWheelController);
         yield return ApplyFrontCardAttack(attackerCard, defenderWheelController);
-
+        yield return WaitSpinning();
         yield return ApplyAfterHitEffect(attackerCard, defenderWheelController);
-
+        yield return WaitSpinning();
         if (_actions == 3)
         {
             ChangeTurn();
@@ -109,6 +110,13 @@ public class Battle : MonoBehaviour
 
         attackerWheelController.UnlockWheel();
         _acting = false;
+    }
+
+    private IEnumerator WaitSpinning()
+    {
+        yield return new WaitUntil(()=>!playerWheelController.IsSpinning);
+        yield return new WaitUntil(()=>!enemyWheelController.IsSpinning);
+        yield return new WaitForSeconds(0.1f);
     }
 
     private IEnumerator SpinWheel(WheelController wheelController)
@@ -125,7 +133,8 @@ public class Battle : MonoBehaviour
             if (ability == Ability.RotateLeft)
                 yield return defenderWheelController.RotateLeft();
         }
-        // yield return defenderWheelController.PutAliveUnitAtFront(true);
+
+        yield return defenderWheelController.PutAliveUnitAtFront(true);
     }
 
     private IEnumerator ApplyFrontCardAttack(RunCard attackerCard, WheelController defenderWheelController)
@@ -159,7 +168,7 @@ public class Battle : MonoBehaviour
         if (defenderCard.Hp > 0) yield break;
 
         defender.SetDead();
-        
+
         if (defenderWheelController.AllUnitsDead())
         {
             _acting = false;
@@ -167,7 +176,7 @@ public class Battle : MonoBehaviour
             OnComplete?.Invoke(this, defenderWheelController == enemyWheelController);
             yield break;
         }
-        
+
         yield return defenderWheelController.PutAliveUnitAtFront(true);
     }
 

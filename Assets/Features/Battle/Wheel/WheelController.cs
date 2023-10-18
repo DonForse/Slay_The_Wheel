@@ -16,6 +16,8 @@ public class WheelController : MonoBehaviour
 
     private List<RunCard> _cardsToAdd;
     private int frontCardIndex;
+
+    public bool IsSpinning;
     public event EventHandler<InPlayCard> Acted;
     public event EventHandler<InPlayCard> WheelTurn;
 
@@ -58,6 +60,7 @@ public class WheelController : MonoBehaviour
 
     public IEnumerator PutAliveUnitAtFront(bool toTheRight)
     {
+        IsSpinning = true;
         while (Cards[frontCardIndex].IsDead)
         {
             if (AllUnitsDead())
@@ -66,6 +69,7 @@ public class WheelController : MonoBehaviour
             yield return wheelMovement.TurnTowardsDirection(toTheRight);
             yield return new WaitForSeconds(0.1f);
         }
+        IsSpinning = false;
     }
 
     private void DecrementFrontCardIndex()
@@ -101,7 +105,7 @@ public class WheelController : MonoBehaviour
         if (AllUnitsDead())
             return;
         IncrementFrontCardIndex();
-        StartCoroutine(TurnLeft(true, false));
+        StartCoroutine(TurnLeftUntilAliveAndSendEvent(true, false));
     }
 
     private void OnTurnRightAction(object sender, EventArgs e)
@@ -110,7 +114,7 @@ public class WheelController : MonoBehaviour
         if (AllUnitsDead())
             return;
         DecrementFrontCardIndex();
-        StartCoroutine(TurnRight(true, false));
+        StartCoroutine(TurnRightUntilAliveAndSendEvent(true, false));
     }
 
     private void OnTurnLeft(object sender, EventArgs e)
@@ -131,7 +135,7 @@ public class WheelController : MonoBehaviour
         WheelTurn?.Invoke(this, Cards[frontCardIndex]);
     }
 
-    private IEnumerator TurnLeft(bool sendAction, bool sendMovement)
+    private IEnumerator TurnLeftUntilAliveAndSendEvent(bool sendAction, bool sendMovement)
     {
         yield return PutAliveUnitAtFront(false);
 
@@ -141,7 +145,7 @@ public class WheelController : MonoBehaviour
             WheelTurn?.Invoke(this, Cards[frontCardIndex]);
     }
 
-    private IEnumerator TurnRight(bool sendAction, bool sendMovement)
+    private IEnumerator TurnRightUntilAliveAndSendEvent(bool sendAction, bool sendMovement)
     {
         yield return PutAliveUnitAtFront(true);
         
@@ -200,14 +204,18 @@ public class WheelController : MonoBehaviour
 
     public IEnumerator RotateRight()
     {
+        IsSpinning = true;
         Debug.Log("Turn Right: Rotate");
         yield return wheelMovement.TurnTowardsDirection(true);
         yield return new WaitForSeconds(.2f);
+        IsSpinning = false;
     }
 
     public IEnumerator RotateLeft()
     {
+        IsSpinning = true;
         Debug.Log("Turn Right: Rotate");
         yield return wheelMovement.TurnTowardsDirection(false);
+        IsSpinning = false;
     }
 }

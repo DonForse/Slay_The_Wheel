@@ -9,8 +9,10 @@ public class BotControlWheel : ControlWheel
     
     public IEnumerator TurnTowardsDirection(bool right)
     {
+        wheelController.IsSpinning = true;
         startAngle = wheelController.WheelData.RotationAngle;
         yield return MoveTowardsDirection(right);
+        wheelController.IsSpinning = false;
     }
 
     private IEnumerator MoveTowardsDirection(bool right)
