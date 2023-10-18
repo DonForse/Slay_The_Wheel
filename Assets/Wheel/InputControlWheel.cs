@@ -1,5 +1,6 @@
 using System;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 public class InputControlWheel : ControlWheel, IControlWheel
 {
@@ -25,6 +26,8 @@ public class InputControlWheel : ControlWheel, IControlWheel
         if (!_enabled) return;
         if (!_isRotating && Input.GetMouseButtonDown(0))
         {
+            if (EventSystem.current.IsPointerOverGameObject())
+                return;
             startAngle = wheelController.WheelData.RotationAngle;
             _isRotating = true;
         }

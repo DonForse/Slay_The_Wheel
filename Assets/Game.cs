@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using JetBrains.Annotations;
 using UnityEngine;
 using UnityEngine.Serialization;
 
@@ -109,7 +110,7 @@ public class Game : MonoBehaviour
         yield return ApplyAfterHitEffect(attackerCard, defenderWheelController);
         if (defenderWheelController.AllUnitsDead())
         {
-            Debug.Log("LOST");
+            Debug.Log(defenderWheelController == enemyWheelController? "Win":"LOST");
             _acting = false;
             yield break;
         }
@@ -204,11 +205,13 @@ public class Game : MonoBehaviour
         turn++;
         _actions = 0;
         
-        if (turn % 2 == 0)
+        if (IsPlayerTurn())
             StartPlayerTurn();
         else
             PlayBotTurn();
     }
+
+    private bool IsPlayerTurn() => turn % 2 == 0;
 
     private void PlayBotTurn()
     {
@@ -232,5 +235,27 @@ public class Game : MonoBehaviour
     {
         enemyWheelController.LockWheel();
         playerWheelController.UnlockWheel();
+    }
+
+    [UsedImplicitly]
+    public void SkipTurn()
+    {
+        if (IsPlayerTurn()) 
+            ChangeTurn();
+    }
+    
+    
+    [UsedImplicitly]
+    public void Spin()
+    {
+        if (IsPlayerTurn()) 
+            ChangeTurn();
+    }
+    
+    [UsedImplicitly]
+    public void Shuffle()
+    {
+        if (IsPlayerTurn()) 
+            ChangeTurn();
     }
 }
