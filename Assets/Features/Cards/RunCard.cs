@@ -45,16 +45,6 @@ namespace Features.Cards
                 ValueChanged?.Invoke(this, this);
             }
         }
-    
-        public List<Ability> Effects
-        {
-            get => _effects;
-            set
-            {
-                _effects = value;
-                ValueChanged?.Invoke(this, this);
-            }
-        }
 
         public AttackType AttackType { get; set; }
         public bool IsDead => Hp <= 0;
@@ -66,7 +56,6 @@ namespace Features.Cards
         private Ability[] _abilities;
         private int _hp;
         private string _cardName;
-        private List<Ability> _effects;
 
         public RunCard(BaseCardScriptableObject heroCardDb)
         {
@@ -74,7 +63,6 @@ namespace Features.Cards
             _hp = heroCardDb.hp;
             _attack = heroCardDb.attack;
             _abilities = heroCardDb.abilities;
-            _effects = new();
             baseCard = heroCardDb;
             AttackType = heroCardDb.attackType;
         }

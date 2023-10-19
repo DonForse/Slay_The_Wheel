@@ -155,8 +155,6 @@ namespace Features.Battles
                 if (ability == Ability.RotateLeft)
                     yield return defenderWheelController.RotateLeft();
             }
-
-            yield return defenderWheelController.PutAliveUnitAtFront(true);
         }
 
         private IEnumerator ApplyFrontCardAttack(InPlayCard attackerCard, WheelController defenderWheelController)
@@ -182,23 +180,27 @@ namespace Features.Battles
         private IEnumerator ApplyDamage(int damage, InPlayCard defender, WheelController defenderWheelController,
             Ability? source)
         {
+            yield return WaitApplyDamage();
+
             _applyingDamage = true;
 
-            var defenderCard = defender.GetCard();
-            if (defender.IsDead) yield break;
+            Debug.Log($"Damage: <color=yellow>{defender.CardName}.{source}</color>");
 
-            StartCoroutine(defender.PlayGetHitAnimation(damage, source));
+            var defenderCard = defender.GetCard();
+            yield return defender.PlayGetHitAnimation(damage, source);
             defenderCard.Hp -= damage;
             if (defenderCard.Hp > 0)
             {
+                Debug.Log($"Damage Alive: <color=red>{defender.CardName}</color>");
                 _applyingDamage = false;
                 yield break;
             }
-
-            StartCoroutine(defender.SetDead());
+            Debug.Log($"Damage Dead: <color=orange>{defender.CardName}</color>");
+            yield return defender.SetDead();
             
             yield return defenderWheelController.PutAliveUnitAtFront(true);
             yield return WaitSpinning();
+            Debug.Log($"Damage Spin Complete: <color=orange>{defender.CardName}</color>");
             var deck = defenderWheelController == enemyWheelController ? _enemiesDeck : _playerBattleDeck;
             var discardPile = defenderWheelController == enemyWheelController ? new List<RunCard>() : _playerDiscardPile;
             if (deck.Count> 0)
@@ -214,7 +216,7 @@ namespace Features.Battles
             {
                 yield return EndBattle(defenderWheelController);
             }
-
+            Debug.Log($"Damage Complete: <color=green>{defender.CardName}</color>");
             _applyingDamage = false;
         }
 
@@ -239,13 +241,13 @@ namespace Features.Battles
             {
                 if (ability == Ability.Burn)
                 {
-                    defenderWheelController.GetFrontCard().GetCard().Effects.Add(Ability.Burn);
+                    defenderWheelController.GetFrontCard().Effects.Add(Ability.Burn);
                 }
                 if (ability == Ability.BurnAll)
                 {
                     foreach (var card in defenderWheelController.Cards)
                     {
-                        card.GetCard().Effects.Add(Ability.Burn);
+                        card.Effects.Add(Ability.Burn);
                     }
                 }
                 if (ability == Ability.AddAtkLeft)
@@ -284,13 +286,12 @@ namespace Features.Battles
         {
             foreach (var card in wheelController.Cards)
             {
-                var cardActiveEffects = card.GetCard().Effects;
+                var cardActiveEffects = card.Effects;
                 var burns = cardActiveEffects.Count(a => a == Ability.Burn);
                 if (burns > 0)
-                {
-                    yield return WaitApplyDamage();
+                {    
+                    card.Effects.Remove(Ability.Burn);
                     yield return ApplyDamage(burns, card, wheelController, Ability.Burn);
-                    card.GetCard().Effects.Remove(Ability.Burn);
                 }
             }
         }
@@ -319,10 +320,16 @@ namespace Features.Battles
         {
             for (int i = 0; i < 3; i++)
             {
+                yield return WaitSpinning();
+                yield return WaitApplyDamage();
                 while (_actions < i || _acting)
-                    yield return new WaitForSeconds(0.1f);
+                {
+                    yield return WaitSpinning();
+                    yield return WaitApplyDamage();
+                }
                 yield return botControlWheel.TurnTowardsDirection(Random.Range(0, 2) == 1);
-                yield return new WaitForSeconds(0.2f);
+                yield return WaitSpinning();
+                yield return WaitApplyDamage();
             }
         }
 

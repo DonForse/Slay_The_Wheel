@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 using Features.Battles;
 using MoreMountains.Feedbacks;
@@ -36,7 +37,7 @@ namespace Features.Cards
 
         public int Shield;
         public int Attack;
-
+        public List<Ability> Effects = new();
         public string CardName => _card.CardName;
 
         private void OnEnable()
@@ -127,6 +128,7 @@ namespace Features.Cards
             _isDead = true;
             hpText.text = "0";
             atkText.text = "0";
+            Effects.Clear();
             spriteRenderer.sprite = cardBack;
             return deadFeedback.PlayFeedbacksCoroutine(this.transform.position);
         }

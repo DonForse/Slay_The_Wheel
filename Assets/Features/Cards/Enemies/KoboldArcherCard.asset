@@ -10,9 +10,11 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 00bda76894bf4bd385081e8db8a5b6fb, type: 3}
-  m_Name: SkeletonArcherCard
+  m_Name: KoboldArcherCard
   m_EditorClassIdentifier: 
-  cardName: Skeleton Archer
-  hp: 3
-  attack: 2
-  abilities: 00000000
+  cardName: Kobold Archer
+  hp: 30
+  attack: 5
+  abilities: 
+  cardSprite: {fileID: 0}
+  attackType: 1

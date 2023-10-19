@@ -61,13 +61,15 @@ namespace Features.Battles.Wheel
 
         public IEnumerator PutAliveUnitAtFront(bool toTheRight)
         {
+            yield return new WaitUntil(() => !IsSpinning);
             IsSpinning = true;
             while (Cards[frontCardIndex].IsDead)
             {
                 if (AllUnitsDead())
+                {
+                    IsSpinning = false;
                     yield break;
-                Debug.Log(
-                    $"Turn {(toTheRight ? "Right" : "Left")}: Put Alive. Index:{Cards[frontCardIndex].CardName}. IsDead: {Cards[frontCardIndex].IsDead}");
+                }
                 yield return wheelMovement.TurnTowardsDirection(toTheRight);
                 yield return new WaitForSeconds(0.1f);
             }
@@ -80,7 +82,6 @@ namespace Features.Battles.Wheel
             frontCardIndex--;
             if (frontCardIndex < 0)
                 frontCardIndex = Cards.Count - 1;
-            Debug.Log($"Decrement: <color=yellow>{Cards[frontCardIndex].CardName}. {frontCardIndex}</color>");
         }
 
         private void IncrementFrontCardIndex()
@@ -88,7 +89,6 @@ namespace Features.Battles.Wheel
             frontCardIndex++;
             if (frontCardIndex > Cards.Count - 1)
                 frontCardIndex = 0;
-            Debug.Log($"Increment: <color=yellow>{Cards[frontCardIndex].CardName}</color>");
         }
 
         private void AddInPlayCardsToWheel()
@@ -205,19 +205,26 @@ namespace Features.Battles.Wheel
 
         public IEnumerator RotateRight()
         {
+            yield return new WaitUntil(() => !IsSpinning);
+
             IsSpinning = true;
             Debug.Log("Turn Right: Rotate");
             yield return wheelMovement.TurnTowardsDirection(true);
-            yield return new WaitForSeconds(.2f);
             IsSpinning = false;
+            yield return PutAliveUnitAtFront(true);
+            
         }
 
         public IEnumerator RotateLeft()
         {
+            yield return new WaitUntil(() => !IsSpinning);
+
             IsSpinning = true;
             Debug.Log("Turn Right: Rotate");
             yield return wheelMovement.TurnTowardsDirection(false);
+            yield return new WaitForSeconds(.2f);
             IsSpinning = false;
+            yield return PutAliveUnitAtFront(false);
         }
     }
 }

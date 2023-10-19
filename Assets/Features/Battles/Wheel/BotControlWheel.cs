@@ -11,6 +11,7 @@ namespace Features.Battles.Wheel
     
         public IEnumerator TurnTowardsDirection(bool right)
         {
+            yield return new WaitUntil(() => !wheelController.IsSpinning);
             wheelController.IsSpinning = true;
             startAngle = wheelController.WheelData.RotationAngle;
             yield return MoveTowardsDirection(right);

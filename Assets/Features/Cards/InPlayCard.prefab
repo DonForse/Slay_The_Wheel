@@ -196,6 +196,11 @@ MonoBehaviour:
   container: {fileID: 1920387090359156846}
   fireIndicatorPrefab: {fileID: 6206021556773077456, guid: 041beb099c005b84395df6fb405c5dc2, type: 3}
   turnIndicatorPrefab: {fileID: 2971843293548022519, guid: a18beabd2c189964aac6b86a4d3ff87a, type: 3}
+  burnAllIndicatorPrefab: {fileID: 6206021556773077456, guid: f8f14d6d20a16144385d14084321f177, type: 3}
+  atkLeftIndicatorPrefab: {fileID: 2971843293548022519, guid: 4876d76b378b0ca449ce14937980b58f, type: 3}
+  atkRightIndicatorPrefab: {fileID: 2971843293548022519, guid: db466114c9f020b4fb16614e7cdaf287, type: 3}
+  addShieldLeftIndicatorPrefab: {fileID: 2971843293548022519, guid: d1684d1ed11ab7a4c84079a3e73bc0e9, type: 3}
+  addShieldRightIndicatorPrefab: {fileID: 2971843293548022519, guid: c9863b6208173d246af40e025dbf3f6d, type: 3}
   Shield: 0
   Attack: 0
 --- !u!95 &8524329497729110065
