@@ -22,6 +22,7 @@ namespace Features.Battles
         private List<RunCard> _playerBattleDeck;
         private List<RunCard> _playerDiscardPile;
         private List<RunCard> _enemiesDeck;
+        private bool _applyingDamage;
         public event EventHandler<bool> BattleFinished;
 
         // Start is called before the first frame update
@@ -41,6 +42,14 @@ namespace Features.Battles
             enemyWheelController.Acted += OnEnemyActed;
             playerWheelController.WheelTurn += OnPlayerWheelMoved;
             enemyWheelController.WheelTurn += OnEnemyWheelMoved;
+        }
+
+        private void OnDestroy()
+        {
+            playerWheelController.Acted -= OnPlayerActed;
+            enemyWheelController.Acted -= OnEnemyActed;
+            playerWheelController.WheelTurn -= OnPlayerWheelMoved;
+            enemyWheelController.WheelTurn -= OnEnemyWheelMoved;
         }
 
         private List<RunCard> DrawCards(int amountToDraw, List<RunCard> deck, List<RunCard> discardPile)
@@ -129,7 +138,7 @@ namespace Features.Battles
         {
             yield return new WaitUntil(() => !playerWheelController.IsSpinning);
             yield return new WaitUntil(() => !enemyWheelController.IsSpinning);
-            yield return new WaitForSeconds(0.1f);
+            yield return new WaitForSeconds(0.3f);
         }
 
         private IEnumerator SpinWheel(WheelController wheelController)
@@ -173,17 +182,23 @@ namespace Features.Battles
         private IEnumerator ApplyDamage(int damage, InPlayCard defender, WheelController defenderWheelController,
             Ability? source)
         {
+            _applyingDamage = true;
+
             var defenderCard = defender.GetCard();
             if (defender.IsDead) yield break;
 
-            yield return defender.PlayGetHitAnimation(damage, source);
+            StartCoroutine(defender.PlayGetHitAnimation(damage, source));
             defenderCard.Hp -= damage;
-            if (defenderCard.Hp > 0) yield break;
+            if (defenderCard.Hp > 0)
+            {
+                _applyingDamage = false;
+                yield break;
+            }
 
-            yield return defender.SetDead();
+            StartCoroutine(defender.SetDead());
             
             yield return defenderWheelController.PutAliveUnitAtFront(true);
-            
+            yield return WaitSpinning();
             var deck = defenderWheelController == enemyWheelController ? _enemiesDeck : _playerBattleDeck;
             var discardPile = defenderWheelController == enemyWheelController ? new List<RunCard>() : _playerDiscardPile;
             if (deck.Count> 0)
@@ -199,11 +214,19 @@ namespace Features.Battles
             {
                 yield return EndBattle(defenderWheelController);
             }
+
+            _applyingDamage = false;
+        }
+
+        private IEnumerator WaitApplyDamage()
+        {
+            yield return new WaitUntil(() => !_applyingDamage);
         }
 
         private IEnumerator EndBattle(WheelController defenderWheelController)
         {
             _acting = false;
+            _applyingDamage = false;
             yield return new WaitForSeconds(.5f);
             BattleFinished?.Invoke(this, defenderWheelController == enemyWheelController);
             
@@ -265,6 +288,7 @@ namespace Features.Battles
                 var burns = cardActiveEffects.Count(a => a == Ability.Burn);
                 if (burns > 0)
                 {
+                    yield return WaitApplyDamage();
                     yield return ApplyDamage(burns, card, wheelController, Ability.Burn);
                     card.GetCard().Effects.Remove(Ability.Burn);
                 }

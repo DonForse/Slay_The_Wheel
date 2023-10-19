@@ -15,6 +15,8 @@ namespace Features
 
         private List<RunCard> _deck;
         private int _currentLevel = 0;
+        private Battle _battleGo;
+        private Map _mapGo;
 
         // Start is called before the first frame update
         IEnumerator Start()
@@ -60,30 +62,42 @@ namespace Features
 
         private int GetEnemyWheelSize()
         {
-            if (_currentLevel == 0)
+            switch (_currentLevel)
             {
-                return 3;
+                case 0:
+                    return 3;
+                case 1:
+                    return 4;
+                case 2:
+                case 3:
+                    return 3;
+                default:
+                    return 3;
             }
-
-            return 0;
         }
 
         private List<RunCard> GetBattleEnemies()
         {
-            var enemy3 = cardsDb.cards.FirstOrDefault(x => x.cardName.Contains("Slime"));
-            var enemy1 = cardsDb.cards.FirstOrDefault(x => x.cardName.Contains("Zombie"));
-            var enemy2 = cardsDb.cards.FirstOrDefault(x => x.cardName.Contains("Spider"));
-            if (_currentLevel == 0)
+            var slime = cardsDb.cards.FirstOrDefault(x => x.cardName.Contains("Slime"));
+            var zombie = cardsDb.cards.FirstOrDefault(x => x.cardName.Contains("Zombie"));
+            var spider = cardsDb.cards.FirstOrDefault(x => x.cardName.Contains("Spider"));
+            return _currentLevel switch
             {
-                return new List<RunCard>() { new RunCard(enemy1), new RunCard(enemy2), new RunCard(enemy3) };
-            }
-            return new List<RunCard>() { new RunCard(enemy1), new RunCard(enemy2), new RunCard(enemy3) };    
-
+                0 => new List<RunCard>() { new RunCard(slime), new RunCard(slime), new RunCard(slime) },
+                1 => new List<RunCard>()
+                {
+                    new RunCard(slime), new RunCard(slime), new RunCard(slime), new RunCard(zombie),
+                },
+                2 => new List<RunCard>() { new RunCard(zombie), new RunCard(spider), new RunCard(slime) },
+                _ => new List<RunCard>() { new RunCard(spider), new RunCard(spider), new RunCard(spider) }
+            };
         }
 
         private void BattleComplete(object sender, bool playerWin)
         {
+            
             _currentLevel++;
+            Debug.Log($"<color=cyan>{_currentLevel}</color>");
             if (!playerWin)
                 return;
             StartCoroutine(LoadMapSceneCoroutine());
@@ -98,23 +112,32 @@ namespace Features
 
         private IEnumerator LoadBattleSceneCoroutine()
         {
+            if (_mapGo != null)
+                _mapGo.SelectedUpgradeCard -= OnMapStageComplete;
+            
             ShuffleDeck();
-
             SceneManager.LoadScene("Battle");
             yield return new WaitForSeconds(.5f);
-            var battleGo = GameObject.Find("Battle").GetComponent<Battle>();
-            yield return battleGo.Initialize(_deck,GetBattleEnemies(), 5, GetEnemyWheelSize());
-            battleGo.BattleFinished += BattleComplete;
+            _battleGo = GameObject.Find("Battle").GetComponent<Battle>();
+            yield return _battleGo.Initialize(_deck,GetBattleEnemies(), 5, GetEnemyWheelSize());
+            
+            if (_battleGo != null)
+                _battleGo.BattleFinished += BattleComplete;
         }
 
         private IEnumerator LoadMapSceneCoroutine()
         {
+            if (_battleGo != null)
+                _battleGo.BattleFinished -= BattleComplete;
+            
             SceneManager.LoadScene("Map");
             yield return new WaitForSeconds(.5f);
-            var mapGo = GameObject.Find("Map").GetComponent<Map>();
-            mapGo.Initialize(_currentLevel);
+            _mapGo = GameObject.Find("Map").GetComponent<Map>();
+            _mapGo.Initialize(_currentLevel);
             RemoveDeadCardsFromDeck();
-            mapGo.SelectedUpgradeCard += OnMapStageComplete;
+            
+            if (_mapGo != null)
+                _mapGo.SelectedUpgradeCard += OnMapStageComplete;
         }
     }
 }

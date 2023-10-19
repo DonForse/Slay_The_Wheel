@@ -21,8 +21,12 @@ namespace Features.Cards
         [SerializeField] private Transform container;
 
         [SerializeField] private GameObject fireIndicatorPrefab;
-
         [SerializeField] private GameObject turnIndicatorPrefab;
+        [SerializeField] private GameObject burnAllIndicatorPrefab;
+        [SerializeField] private GameObject atkLeftIndicatorPrefab;
+        [SerializeField] private GameObject atkRightIndicatorPrefab;
+        [SerializeField] private GameObject addShieldLeftIndicatorPrefab;
+        [SerializeField] private GameObject addShieldRightIndicatorPrefab;
 
         private MMF_FloatingText _feedbackFloatingText;
 
@@ -71,19 +75,34 @@ namespace Features.Cards
         private void SetEffectIcons(RunCard runCard)
         {
             var burns = runCard.baseCard.abilities.Count(x => x == Ability.Burn);
-
             for (int i = 0; i < burns; i++)
                 Instantiate(fireIndicatorPrefab, container);
 
             var rotateR = runCard.baseCard.abilities.Count(x => x == Ability.RotateRight);
-
             for (int i = 0; i < rotateR; i++)
                 Instantiate(turnIndicatorPrefab, container);
 
             var rotateL = runCard.baseCard.abilities.Count(x => x == Ability.RotateLeft);
-
             for (int i = 0; i < rotateL; i++)
                 Instantiate(turnIndicatorPrefab, container);
+            
+            var burnAll = runCard.baseCard.abilities.Count(x => x == Ability.BurnAll);
+            for (int i = 0; i < burnAll; i++)
+                Instantiate(burnAllIndicatorPrefab, container);
+            
+            var addAtkLeft = runCard.baseCard.abilities.Count(x => x == Ability.AddAtkLeft);
+            for (int i = 0; i < addAtkLeft; i++)
+                Instantiate(atkLeftIndicatorPrefab, container);
+            var addAtkRight = runCard.baseCard.abilities.Count(x => x == Ability.AddAtkRight);
+            for (int i = 0; i < addAtkRight; i++)
+                Instantiate(atkRightIndicatorPrefab, container);
+            var addShieldLeft = runCard.baseCard.abilities.Count(x => x == Ability.AddShieldLeft);
+            for (int i = 0; i < addShieldLeft; i++)
+                Instantiate(addShieldLeftIndicatorPrefab, container);
+            var addShieldRight = runCard.baseCard.abilities.Count(x => x == Ability.AddShieldRight);
+            for (int i = 0; i < addShieldRight; i++)
+                Instantiate(addShieldRightIndicatorPrefab, container);
+
         }
 
         private void UpdateCardValues(object sender, RunCard e)
@@ -95,7 +114,7 @@ namespace Features.Cards
             }
 
             hpText.text = e.Hp.ToString();
-            atkText.text = e.Attack.ToString();
+            atkText.text =Attack.ToString();
         }
 
         public RunCard GetCard()
