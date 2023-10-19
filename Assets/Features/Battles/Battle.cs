@@ -26,7 +26,8 @@ namespace Features.Battles
         public event EventHandler<bool> BattleFinished;
 
         // Start is called before the first frame update
-        public IEnumerator Initialize(List<RunCard> deck, List<RunCard> enemies, int playerWheelSize, int enemyWheelSize)
+        public IEnumerator Initialize(List<RunCard> deck, List<RunCard> enemies, int playerWheelSize,
+            int enemyWheelSize)
         {
             _playerBattleDeck = deck.ToList();
             _playerDiscardPile = new();
@@ -162,18 +163,18 @@ namespace Features.Battles
             if (attackerCard.GetCard().AttackType == AttackType.Front)
             {
                 var defender = defenderWheelController.GetFrontCard();
-                yield return ApplyDamage(attackerCard.Attack, defender, defenderWheelController,null);
+                yield return ApplyDamage(attackerCard.Attack, defender, defenderWheelController, null);
             }
             else if (attackerCard.GetCard().AttackType == AttackType.All)
             {
                 foreach (var defender in defenderWheelController.Cards)
-                    yield return ApplyDamage(attackerCard.Attack, defender, defenderWheelController,null);
+                    yield return ApplyDamage(attackerCard.Attack, defender, defenderWheelController, null);
             }
             else if (attackerCard.GetCard().AttackType == AttackType.FrontAndSides)
             {
                 var defenders = defenderWheelController.GetFrontNeighborsCards(0, 2).ToList();
                 foreach (var defender in defenders)
-                    yield return ApplyDamage(attackerCard.Attack, defender, defenderWheelController,null);
+                    yield return ApplyDamage(attackerCard.Attack, defender, defenderWheelController, null);
             }
         }
 
@@ -187,7 +188,7 @@ namespace Features.Battles
             Debug.Log($"Damage: <color=yellow>{defender.CardName}.{source}</color>");
 
             var defenderCard = defender.GetCard();
-            yield return defender.PlayGetHitAnimation(damage, source);
+            defender.PlayGetHitAnimation(damage, source);
             defenderCard.Hp -= damage;
             if (defenderCard.Hp > 0)
             {
@@ -195,15 +196,18 @@ namespace Features.Battles
                 _applyingDamage = false;
                 yield break;
             }
+
             Debug.Log($"Damage Dead: <color=orange>{defender.CardName}</color>");
-            yield return defender.SetDead();
-            
+            defender.SetDead();
+
             yield return defenderWheelController.PutAliveUnitAtFront(true);
             yield return WaitSpinning();
             Debug.Log($"Damage Spin Complete: <color=orange>{defender.CardName}</color>");
             var deck = defenderWheelController == enemyWheelController ? _enemiesDeck : _playerBattleDeck;
-            var discardPile = defenderWheelController == enemyWheelController ? new List<RunCard>() : _playerDiscardPile;
-            if (deck.Count> 0)
+            var discardPile = defenderWheelController == enemyWheelController
+                ? new List<RunCard>()
+                : _playerDiscardPile;
+            if (deck.Count > 0)
             {
                 var cards = DrawCards(1, deck, discardPile);
                 if (cards == null || cards.Count == 0)
@@ -211,11 +215,12 @@ namespace Features.Battles
                 else
                     yield return defender.SetCard(cards.First());
             }
-            
+
             if (deck.Count == 0 && discardPile.Count == 0 && defenderWheelController.AllUnitsDead())
             {
                 yield return EndBattle(defenderWheelController);
             }
+
             Debug.Log($"Damage Complete: <color=green>{defender.CardName}</color>");
             _applyingDamage = false;
         }
@@ -231,25 +236,30 @@ namespace Features.Battles
             _applyingDamage = false;
             yield return new WaitForSeconds(.5f);
             BattleFinished?.Invoke(this, defenderWheelController == enemyWheelController);
-            
         }
 
-        private static void ApplyFrontCardEffect(WheelController attackerWheelController, WheelController defenderWheelController)
+        private static void ApplyFrontCardEffect(WheelController attackerWheelController,
+            WheelController defenderWheelController)
         {
             var attackerCard = attackerWheelController.GetFrontCard().GetCard();
             foreach (var ability in attackerCard.Abilities)
             {
                 if (ability == Ability.Burn)
                 {
-                    defenderWheelController.GetFrontCard().Effects.Add(Ability.Burn);
+                    var affectedCard = defenderWheelController.GetFrontCard();
+                    if (!affectedCard.IsDead)
+                        affectedCard.Effects.Add(Ability.Burn);
                 }
+
                 if (ability == Ability.BurnAll)
                 {
                     foreach (var card in defenderWheelController.Cards)
                     {
-                        card.Effects.Add(Ability.Burn);
+                        if (!card.IsDead)
+                            card.Effects.Add(Ability.Burn);
                     }
                 }
+
                 if (ability == Ability.AddAtkLeft)
                 {
                     var neighbors = attackerWheelController.GetFrontNeighborsCards(1, 2);
@@ -257,7 +267,7 @@ namespace Features.Battles
                     if (!leftNeighbor.IsDead)
                         leftNeighbor.Attack += 1;
                 }
-                
+
                 if (ability == Ability.AddAtkRight)
                 {
                     var neighbors = attackerWheelController.GetFrontNeighborsCards(1, 2);
@@ -265,6 +275,7 @@ namespace Features.Battles
                     if (!rightNeighbor.IsDead)
                         rightNeighbor.Attack += 1;
                 }
+
                 if (ability == Ability.AddShieldLeft)
                 {
                     var neighbors = attackerWheelController.GetFrontNeighborsCards(1, 2);
@@ -272,6 +283,7 @@ namespace Features.Battles
                     if (!leftNeighbor.IsDead)
                         leftNeighbor.Shield += 1;
                 }
+
                 if (ability == Ability.AddShieldRight)
                 {
                     var neighbors = attackerWheelController.GetFrontNeighborsCards(1, 2);
@@ -289,7 +301,7 @@ namespace Features.Battles
                 var cardActiveEffects = card.Effects;
                 var burns = cardActiveEffects.Count(a => a == Ability.Burn);
                 if (burns > 0)
-                {    
+                {
                     card.Effects.Remove(Ability.Burn);
                     yield return ApplyDamage(burns, card, wheelController, Ability.Burn);
                 }
@@ -327,6 +339,7 @@ namespace Features.Battles
                     yield return WaitSpinning();
                     yield return WaitApplyDamage();
                 }
+
                 yield return botControlWheel.TurnTowardsDirection(Random.Range(0, 2) == 1);
                 yield return WaitSpinning();
                 yield return WaitApplyDamage();

@@ -123,23 +123,23 @@ namespace Features.Cards
             return _card;
         }
 
-        public IEnumerator SetDead()
+        public void SetDead()
         {
             _isDead = true;
             hpText.text = "0";
             atkText.text = "0";
             Effects.Clear();
             spriteRenderer.sprite = cardBack;
-            return deadFeedback.PlayFeedbacksCoroutine(this.transform.position);
+            deadFeedback.PlayFeedbacks(this.transform.position);
         }
 
-        public IEnumerator PlayGetHitAnimation(int damage, Ability? source = null)
+        public void PlayGetHitAnimation(int damage, Ability? source = null)
         {
             _feedbackFloatingText.Value = damage.ToString();
             SetAnimationTextColor(source);
 
             // _player.PlayFeedbacks(this.transform.position, damage);
-            return damageFeedback.PlayFeedbacksCoroutine(this.transform.position, damage);
+            damageFeedback.PlayFeedbacks(this.transform.position, damage);
         }
 
         private void SetAnimationTextColor(Ability? source)
