@@ -32,7 +32,7 @@ namespace Features.Battles
             _playerBattleDeck = deck.ToList();
             _playerDiscardPile = new();
             _enemiesDeck = enemies.Skip(enemyWheelSize).ToList();
-            var cards = DrawCards(playerWheelSize, _playerBattleDeck, _playerDiscardPile);
+            var cards = DrawCards(playerWheelSize,ref _playerBattleDeck,ref _playerDiscardPile);
             yield return playerWheelController.InitializeWheel(true, playerWheelSize, cards);
             yield return enemyWheelController.InitializeWheel(false, enemyWheelSize, enemies);
 
@@ -53,7 +53,7 @@ namespace Features.Battles
             enemyWheelController.WheelTurn -= OnEnemyWheelMoved;
         }
 
-        private List<RunCard> DrawCards(int amountToDraw, List<RunCard> deck, List<RunCard> discardPile)
+        private List<RunCard> DrawCards(int amountToDraw,ref List<RunCard> deck, ref List<RunCard> discardPile)
         {
             discardPile = discardPile.Where(x => !x.IsDead).ToList();
             if (deck.Count < amountToDraw)
@@ -63,7 +63,6 @@ namespace Features.Battles
             }
 
             var cards = deck.Take(amountToDraw).ToList();
-            discardPile = discardPile.Concat(cards).ToList();
             deck = deck.Skip(amountToDraw).ToList();
             return cards;
         }
@@ -209,7 +208,7 @@ namespace Features.Battles
                 : _playerDiscardPile;
             if (deck.Count > 0)
             {
-                var cards = DrawCards(1, deck, discardPile);
+                var cards = DrawCards(1, ref deck, ref discardPile);
                 if (cards == null || cards.Count == 0)
                     yield return EndBattle(defenderWheelController);
                 else
@@ -370,8 +369,23 @@ namespace Features.Battles
         [UsedImplicitly]
         public void Shuffle()
         {
-            if (IsPlayerTurn())
+            if (!IsPlayerTurn()) return;
+            _actions++;
+            StartCoroutine(ShuffleCoroutine());
+            if (_actions == 3)
                 ChangeTurn();
+        }
+
+        private IEnumerator ShuffleCoroutine()
+        {
+            var slots = playerWheelController.Cards.Count;
+            var cards = DrawCards(slots, ref _playerBattleDeck,ref  _playerDiscardPile);
+            var cardsInWheel = playerWheelController.Cards.Select(x => x.GetCard());
+            _playerDiscardPile=_playerDiscardPile.Concat(cardsInWheel).ToList();
+            for (int i = 0; i < slots; i++)
+            {
+                yield return playerWheelController.Cards[i].SetCard(cards[i]);
+            }
         }
     }
 }
