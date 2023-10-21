@@ -32,7 +32,7 @@ namespace Features.Battles
             _playerBattleDeck = deck.ToList();
             _playerDiscardPile = new();
             _enemiesDeck = enemies.Skip(enemyWheelSize).ToList();
-            var cards = DrawCards(playerWheelSize,ref _playerBattleDeck,ref _playerDiscardPile);
+            var cards = DrawCards(playerWheelSize, ref _playerBattleDeck, ref _playerDiscardPile);
             yield return playerWheelController.InitializeWheel(true, playerWheelSize, cards);
             yield return enemyWheelController.InitializeWheel(false, enemyWheelSize, enemies);
 
@@ -53,7 +53,7 @@ namespace Features.Battles
             enemyWheelController.WheelTurn -= OnEnemyWheelMoved;
         }
 
-        private List<RunCard> DrawCards(int amountToDraw,ref List<RunCard> deck, ref List<RunCard> discardPile)
+        private List<RunCard> DrawCards(int amountToDraw, ref List<RunCard> deck, ref List<RunCard> discardPile)
         {
             discardPile = discardPile.Where(x => !x.IsDead).ToList();
             if (deck.Count < amountToDraw)
@@ -246,16 +246,14 @@ namespace Features.Battles
                 if (ability == Ability.Burn)
                 {
                     var affectedCard = defenderWheelController.GetFrontCard();
-                    if (!affectedCard.IsDead)
-                        affectedCard.Effects.Add(Ability.Burn);
+                    affectedCard.AddEffect(Ability.Burn);
                 }
 
                 if (ability == Ability.BurnAll)
                 {
                     foreach (var card in defenderWheelController.Cards)
                     {
-                        if (!card.IsDead)
-                            card.Effects.Add(Ability.Burn);
+                        card.AddEffect(Ability.Burn);
                     }
                 }
 
@@ -301,7 +299,7 @@ namespace Features.Battles
                 var burns = cardActiveEffects.Count(a => a == Ability.Burn);
                 if (burns > 0)
                 {
-                    card.Effects.Remove(Ability.Burn);
+                    card.RemoveEffect(Ability.Burn);
                     yield return ApplyDamage(burns, card, wheelController, Ability.Burn);
                 }
             }
@@ -379,9 +377,9 @@ namespace Features.Battles
         private IEnumerator ShuffleCoroutine()
         {
             var slots = playerWheelController.Cards.Count;
-            var cards = DrawCards(slots, ref _playerBattleDeck,ref  _playerDiscardPile);
+            var cards = DrawCards(slots, ref _playerBattleDeck, ref _playerDiscardPile);
             var cardsInWheel = playerWheelController.Cards.Select(x => x.GetCard());
-            _playerDiscardPile=_playerDiscardPile.Concat(cardsInWheel).ToList();
+            _playerDiscardPile = _playerDiscardPile.Concat(cardsInWheel).ToList();
             for (int i = 0; i < slots; i++)
             {
                 yield return playerWheelController.Cards[i].SetCard(cards[i]);

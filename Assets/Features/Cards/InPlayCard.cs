@@ -5,6 +5,7 @@ using Features.Battles;
 using MoreMountains.Feedbacks;
 using TMPro;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace Features.Cards
 {
@@ -19,8 +20,8 @@ namespace Features.Cards
         [SerializeField] private MMF_Player damageFeedback;
         [SerializeField] private MMF_Player deadFeedback;
         [SerializeField] private MMF_Player showCardFeedback;
-        [SerializeField] private Transform container;
-
+        [SerializeField] private Transform abilitiesContainer;
+        [SerializeField] private Transform effectsContainer;
         [SerializeField] private GameObject fireIndicatorPrefab;
         [SerializeField] private GameObject turnIndicatorPrefab;
         [SerializeField] private GameObject burnAllIndicatorPrefab;
@@ -37,7 +38,9 @@ namespace Features.Cards
 
         public int Shield;
         public int Attack;
-        public List<Ability> Effects = new();
+
+        public List<Ability> Effects = new List<Ability>();
+
         public string CardName => _card.CardName;
 
         private void OnEnable()
@@ -61,49 +64,49 @@ namespace Features.Cards
             
             spriteRenderer.sprite = runCard.baseCard.cardSprite;
 
-            foreach (Transform child in container)
-            {
-                Destroy(child.gameObject);
-            }
-
-            SetEffectIcons(runCard);
+            SetEffectIcons(runCard.Abilities, abilitiesContainer);
+            SetEffectIcons(Effects.ToArray(), effectsContainer);
 
             _card.ValueChanged += UpdateCardValues;
             UpdateCardValues(null, _card);
             yield return showCardFeedback.PlayFeedbacksCoroutine(this.transform.position);
         }
 
-        private void SetEffectIcons(RunCard runCard)
+        private void SetEffectIcons(Ability[] abilities, Transform container)
         {
-            var burns = runCard.baseCard.abilities.Count(x => x == Ability.Burn);
+            foreach (Transform child in container)
+            {
+                Destroy(child.gameObject);
+            }
+            var burns = abilities.Count(x => x == Ability.Burn);
             for (int i = 0; i < burns; i++)
                 Instantiate(fireIndicatorPrefab, container);
 
-            var rotateR = runCard.baseCard.abilities.Count(x => x == Ability.RotateRight);
+            var rotateR = abilities.Count(x => x == Ability.RotateRight);
             for (int i = 0; i < rotateR; i++)
                 Instantiate(turnIndicatorPrefab, container);
 
-            var rotateL = runCard.baseCard.abilities.Count(x => x == Ability.RotateLeft);
+            var rotateL = abilities.Count(x => x == Ability.RotateLeft);
             for (int i = 0; i < rotateL; i++)
                 Instantiate(turnIndicatorPrefab, container);
             
-            var burnAll = runCard.baseCard.abilities.Count(x => x == Ability.BurnAll);
+            var burnAll = abilities.Count(x => x == Ability.BurnAll);
             for (int i = 0; i < burnAll; i++)
                 Instantiate(burnAllIndicatorPrefab, container);
             
-            var addAtkLeft = runCard.baseCard.abilities.Count(x => x == Ability.AddAtkLeft);
+            var addAtkLeft = abilities.Count(x => x == Ability.AddAtkLeft);
             for (int i = 0; i < addAtkLeft; i++)
                 Instantiate(atkLeftIndicatorPrefab, container);
-            var addAtkRight = runCard.baseCard.abilities.Count(x => x == Ability.AddAtkRight);
+            var addAtkRight = abilities.Count(x => x == Ability.AddAtkRight);
             for (int i = 0; i < addAtkRight; i++)
                 Instantiate(atkRightIndicatorPrefab, container);
-            var addShieldLeft = runCard.baseCard.abilities.Count(x => x == Ability.AddShieldLeft);
+            var addShieldLeft = abilities.Count(x => x == Ability.AddShieldLeft);
             for (int i = 0; i < addShieldLeft; i++)
                 Instantiate(addShieldLeftIndicatorPrefab, container);
-            var addShieldRight = runCard.baseCard.abilities.Count(x => x == Ability.AddShieldRight);
+            var addShieldRight = abilities.Count(x => x == Ability.AddShieldRight);
             for (int i = 0; i < addShieldRight; i++)
                 Instantiate(addShieldRightIndicatorPrefab, container);
-
+            container.gameObject.SetActive(container.childCount>0);
         }
 
         private void UpdateCardValues(object sender, RunCard e)
@@ -112,7 +115,10 @@ namespace Features.Cards
             {
                 hpText.text = "0";
                 atkText.text = "0";
+                SetEffectIcons(Effects?.ToArray(), effectsContainer);
             }
+
+            SetEffectIcons(Effects?.ToArray(), effectsContainer);
 
             hpText.text = e.Hp.ToString();
             atkText.text =Attack.ToString();
@@ -128,7 +134,7 @@ namespace Features.Cards
             _isDead = true;
             hpText.text = "0";
             atkText.text = "0";
-            Effects.Clear();
+            Effects = new List<Ability>();
             spriteRenderer.sprite = cardBack;
             deadFeedback.PlayFeedbacks(this.transform.position);
         }
@@ -198,6 +204,19 @@ namespace Features.Cards
                     new GradientColorKey(Color.yellow, 1f)
                 }
             };
+        }
+
+        public void RemoveEffect(Ability effect)
+        {
+            Effects.Remove(effect);
+            UpdateCardValues(this, GetCard());
+        }
+
+        public void AddEffect(Ability effect)
+        {
+            if (!IsDead)
+                Effects.Add(effect);
+            UpdateCardValues(this, GetCard());
         }
     }
 }
