@@ -19,8 +19,6 @@ namespace Features.Battles.Wheel
 
         // private List<RunCard> _cardsToAdd;
         private int frontCardIndex;
-
-        public bool IsSpinning;
         public event EventHandler<InPlayCard> Acted;
         public event EventHandler<InPlayCard> WheelTurn;
 
@@ -54,27 +52,21 @@ namespace Features.Battles.Wheel
         private void SetSize(int value)
         {
             WheelData.Size = value;
-            AddInPlayCardsToWheel();
         }
     
         public bool AllUnitsDead() => Cards.All(x => x.IsDead);
 
         public IEnumerator PutAliveUnitAtFront(bool toTheRight)
         {
-            yield return new WaitUntil(() => !IsSpinning);
-            IsSpinning = true;
             while (Cards[frontCardIndex].IsDead)
             {
                 if (AllUnitsDead())
                 {
-                    IsSpinning = false;
                     yield break;
                 }
                 yield return wheelMovement.TurnTowardsDirection(toTheRight);
                 yield return new WaitForSeconds(0.1f);
             }
-
-            IsSpinning = false;
         }
 
         private void DecrementFrontCardIndex()
@@ -91,37 +83,24 @@ namespace Features.Battles.Wheel
                 frontCardIndex = 0;
         }
 
-        private void AddInPlayCardsToWheel()
-        {
-            for (var i = 0; i < WheelData.Size; i++)
-            {
-                // Create and position the object
-                var go = Instantiate(inPlayCardPrefab, this.transform);
-                Cards.Add(go);
-            }
-        }
-
         private void OnTurnLeftAction(object sender, EventArgs e)
         {
-            Debug.Log("Acted Left");
             if (AllUnitsDead())
                 return;
             IncrementFrontCardIndex();
-            StartCoroutine(TurnLeftUntilAliveAndSendEvent(true, false));
+            Acted?.Invoke(this, Cards[frontCardIndex]);
         }
 
         private void OnTurnRightAction(object sender, EventArgs e)
         {
-            Debug.Log("Acted Right");
             if (AllUnitsDead())
                 return;
             DecrementFrontCardIndex();
-            StartCoroutine(TurnRightUntilAliveAndSendEvent(true, false));
+            Acted?.Invoke(this, Cards[frontCardIndex]);
         }
 
         private void OnTurnLeft(object sender, EventArgs e)
         {
-            Debug.Log($"Turn left");
             if (AllUnitsDead())
                 return;
             IncrementFrontCardIndex();
@@ -130,31 +109,10 @@ namespace Features.Battles.Wheel
 
         private void OnTurnRight(object sender, EventArgs e)
         {
-            Debug.Log($"Turn Right");
             if (AllUnitsDead())
                 return;
             DecrementFrontCardIndex();
             WheelTurn?.Invoke(this, Cards[frontCardIndex]);
-        }
-
-        private IEnumerator TurnLeftUntilAliveAndSendEvent(bool sendAction, bool sendMovement)
-        {
-            yield return PutAliveUnitAtFront(false);
-
-            if (sendAction)
-                Acted?.Invoke(this, Cards[frontCardIndex]);
-            if (sendMovement)
-                WheelTurn?.Invoke(this, Cards[frontCardIndex]);
-        }
-
-        private IEnumerator TurnRightUntilAliveAndSendEvent(bool sendAction, bool sendMovement)
-        {
-            yield return PutAliveUnitAtFront(true);
-
-            if (sendAction)
-                Acted?.Invoke(this, Cards[frontCardIndex]);
-            if (sendMovement)
-                WheelTurn?.Invoke(this, Cards[frontCardIndex]);
         }
 
         private IEnumerator SetRunCards(bool player, List<RunCard>cards)
@@ -162,9 +120,11 @@ namespace Features.Battles.Wheel
             var amountToSet = Mathf.Min(WheelData.Size, cards.Count);
             for (int i = 0; i < amountToSet; i++)
             {
-                Cards[i].SetPlayer(player);
-                Cards[i].transform.localPosition = Positions[i];
-                yield return Cards[i].SetCard(cards[i]);
+                var inPlayCard = Instantiate(inPlayCardPrefab, this.transform);
+                Cards.Add(inPlayCard);
+                inPlayCard.SetPlayer(player);
+                inPlayCard.transform.localPosition = Positions[i];
+                yield return inPlayCard.SetCard(cards[i]);
             }
         }
 
@@ -205,25 +165,18 @@ namespace Features.Battles.Wheel
 
         public IEnumerator RotateRight()
         {
-            yield return new WaitUntil(() => !IsSpinning);
+            Debug.Log($"<color=green>{"RotateRight"}</color>");
 
-            IsSpinning = true;
-            Debug.Log("Turn Right: Rotate");
             yield return wheelMovement.TurnTowardsDirection(true);
-            IsSpinning = false;
             yield return PutAliveUnitAtFront(true);
-            
+
         }
 
         public IEnumerator RotateLeft()
         {
-            yield return new WaitUntil(() => !IsSpinning);
-
-            IsSpinning = true;
-            Debug.Log("Turn Right: Rotate");
+            Debug.Log($"<color=green>{"RotateLeft"}</color>");
+            
             yield return wheelMovement.TurnTowardsDirection(false);
-            yield return new WaitForSeconds(.2f);
-            IsSpinning = false;
             yield return PutAliveUnitAtFront(false);
         }
     }

@@ -15,14 +15,13 @@ namespace Features.Battles
         [SerializeField] private WheelController playerWheelController;
         [SerializeField] private WheelController enemyWheelController;
         [SerializeField] private BotControlWheel botControlWheel;
-
+        [SerializeField] private BusQueue _busQueue;
+        [SerializeField] private TurnMessage turnMessage;
         private int _actions;
         private int turn = 0;
-        private bool _acting;
         private List<RunCard> _playerBattleDeck;
         private List<RunCard> _playerDiscardPile;
         private List<RunCard> _enemiesDeck;
-        private bool _applyingDamage;
         public event EventHandler<bool> BattleFinished;
 
         // Start is called before the first frame update
@@ -33,8 +32,8 @@ namespace Features.Battles
             _playerDiscardPile = new();
             _enemiesDeck = enemies.Skip(enemyWheelSize).ToList();
             var cards = DrawCards(playerWheelSize, ref _playerBattleDeck, ref _playerDiscardPile);
+            StartCoroutine(enemyWheelController.InitializeWheel(false, enemyWheelSize, enemies));
             yield return playerWheelController.InitializeWheel(true, playerWheelSize, cards);
-            yield return enemyWheelController.InitializeWheel(false, enemyWheelSize, enemies);
 
             enemyWheelController.LockWheel();
             playerWheelController.UnlockWheel();
@@ -69,18 +68,18 @@ namespace Features.Battles
 
         private void OnEnemyWheelMoved(object sender, InPlayCard e)
         {
-            StartCoroutine(SpinWheel(enemyWheelController));
+            _busQueue.EnqueueInterruptAction(SpinWheel(enemyWheelController));
         }
 
         private void OnPlayerWheelMoved(object sender, InPlayCard e)
         {
-            StartCoroutine(SpinWheel(playerWheelController));
+            _busQueue.EnqueueInterruptAction(SpinWheel(playerWheelController));
         }
 
         private void OnEnemyActed(object sender, InPlayCard attacker)
         {
             _actions++;
-            StartCoroutine(Act(attacker,
+            _busQueue.EnqueueAction(Act(attacker,
                 enemyWheelController,
                 playerWheelController));
         }
@@ -88,7 +87,7 @@ namespace Features.Battles
         private void OnPlayerActed(object sender, InPlayCard attacker)
         {
             _actions++;
-            StartCoroutine(Act(attacker,
+            _busQueue.EnqueueAction(Act(attacker,
                 playerWheelController,
                 enemyWheelController));
         }
@@ -96,49 +95,51 @@ namespace Features.Battles
         private IEnumerator Act(InPlayCard attacker, WheelController attackerWheelController,
             WheelController defenderWheelController)
         {
-            _acting = true;
-            attackerWheelController.LockWheel();
             var attackerCard = attacker.GetCard();
-
-            yield return ApplyWheelMovementEffect(attackerWheelController);
-            yield return WaitSpinning();
-            if (attacker.IsDead) //own unit dead on movement
+            _busQueue.EnqueueAction(ActStartCoroutine(attackerWheelController));
+            _busQueue.EnqueueAction(ApplyWheelMovementEffect(attackerWheelController));
+            if (attacker.IsDead)
             {
-                if (attackerWheelController.AllUnitsDead())
-                    yield return EndBattle(attackerWheelController);
-                if (_actions == 3)
-                {
-                    yield return WaitSpinning();
-                    ChangeTurn();
-                    _acting = false;
-                    yield break;
-                }
-
-                _acting = false;
+                _busQueue.EnqueueAction(ProcessAttackerDiedInWheel(attacker, attackerWheelController));
+                Debug.Log($"<color=green>{"ACT-END"}</color>");
                 yield break;
             }
-
-            ApplyFrontCardEffect(attackerWheelController, defenderWheelController);
-            yield return ApplyFrontCardAttack(attacker, defenderWheelController);
-            yield return WaitSpinning();
-            yield return ApplyAfterHitEffect(attackerCard, defenderWheelController);
-            yield return WaitSpinning();
+            _busQueue.EnqueueAction(ApplyFrontCardEffect(attackerWheelController, defenderWheelController));
+            _busQueue.EnqueueAction(ApplyFrontCardAttack(attacker, defenderWheelController));
+            _busQueue.EnqueueAction(ApplyAfterHitEffect(attackerCard, defenderWheelController));
             if (_actions == 3)
             {
-                ChangeTurn();
-                _acting = false;
+                _busQueue.EnqueueAction(ChangeTurn());
+                Debug.Log($"<color=green>{"ACT-END"}</color>");
                 yield break;
             }
 
-            attackerWheelController.UnlockWheel();
-            _acting = false;
+            _busQueue.EnqueueAction(ActEndCoroutine(attackerWheelController));
         }
 
-        private IEnumerator WaitSpinning()
+        private IEnumerator ActEndCoroutine(WheelController attackerWheelController)
         {
-            yield return new WaitUntil(() => !playerWheelController.IsSpinning);
-            yield return new WaitUntil(() => !enemyWheelController.IsSpinning);
-            yield return new WaitForSeconds(0.3f);
+            attackerWheelController.UnlockWheel();
+            yield return null;
+        }
+
+        private IEnumerator ActStartCoroutine(WheelController attackerWheelController)
+        {
+            attackerWheelController.LockWheel();
+            yield return null;
+        }
+
+        private IEnumerator ProcessAttackerDiedInWheel(InPlayCard attacker, WheelController attackerWheelController)
+        {
+            Debug.Log($"<color=green>{"ProcessAttackerDiedInWheel"}</color>");
+            if (attackerWheelController.AllUnitsDead())
+                yield return EndBattle(attackerWheelController);
+            if (_actions == 3)
+            {
+                _busQueue.EnqueueAction(ChangeTurn());
+                yield break; // yield break;
+            }
+            yield break;
         }
 
         private IEnumerator SpinWheel(WheelController wheelController)
@@ -148,13 +149,17 @@ namespace Features.Battles
 
         private IEnumerator ApplyAfterHitEffect(RunCard attackerCard, WheelController defenderWheelController)
         {
+            Debug.Log($"<color=green>{"ApplyAfterHitEffect"}</color>");
+
             foreach (var ability in attackerCard.Abilities)
             {
                 if (ability == Ability.RotateRight)
-                    yield return defenderWheelController.RotateRight();
+                    _busQueue.EnqueueAction(defenderWheelController.RotateRight());
                 if (ability == Ability.RotateLeft)
-                    yield return defenderWheelController.RotateLeft();
+                    _busQueue.EnqueueAction(defenderWheelController.RotateLeft());
             }
+
+            yield return null;
         }
 
         private IEnumerator ApplyFrontCardAttack(InPlayCard attackerCard, WheelController defenderWheelController)
@@ -162,46 +167,38 @@ namespace Features.Battles
             if (attackerCard.GetCard().AttackType == AttackType.Front)
             {
                 var defender = defenderWheelController.GetFrontCard();
-                yield return ApplyDamage(attackerCard.Attack, defender, defenderWheelController, null);
+
+                ApplyDamage(attackerCard.Attack, defender, defenderWheelController, null);
             }
             else if (attackerCard.GetCard().AttackType == AttackType.All)
             {
                 foreach (var defender in defenderWheelController.Cards)
-                    yield return ApplyDamage(attackerCard.Attack, defender, defenderWheelController, null);
+                    ApplyDamage(attackerCard.Attack, defender, defenderWheelController, null);
             }
             else if (attackerCard.GetCard().AttackType == AttackType.FrontAndSides)
             {
                 var defenders = defenderWheelController.GetFrontNeighborsCards(0, 2).ToList();
                 foreach (var defender in defenders)
-                    yield return ApplyDamage(attackerCard.Attack, defender, defenderWheelController, null);
+                    ApplyDamage(attackerCard.Attack, defender, defenderWheelController, null);
             }
+
+            yield return null;
         }
 
-        private IEnumerator ApplyDamage(int damage, InPlayCard defender, WheelController defenderWheelController,
+        private void ApplyDamage(int damage, InPlayCard defender, WheelController defenderWheelController,
             Ability? source)
         {
-            yield return WaitApplyDamage();
-
-            _applyingDamage = true;
-
-            Debug.Log($"Damage: <color=yellow>{defender.CardName}.{source}</color>");
-
             var defenderCard = defender.GetCard();
             defender.PlayGetHitAnimation(damage, source);
             defenderCard.Hp -= damage;
             if (defenderCard.Hp > 0)
             {
-                Debug.Log($"Damage Alive: <color=red>{defender.CardName}</color>");
-                _applyingDamage = false;
-                yield break;
+                return;
             }
 
-            Debug.Log($"Damage Dead: <color=orange>{defender.CardName}</color>");
             defender.SetDead();
 
-            yield return defenderWheelController.PutAliveUnitAtFront(true);
-            yield return WaitSpinning();
-            Debug.Log($"Damage Spin Complete: <color=orange>{defender.CardName}</color>");
+            _busQueue.EnqueueAction(defenderWheelController.PutAliveUnitAtFront(true));
             var deck = defenderWheelController == enemyWheelController ? _enemiesDeck : _playerBattleDeck;
             var discardPile = defenderWheelController == enemyWheelController
                 ? new List<RunCard>()
@@ -210,34 +207,25 @@ namespace Features.Battles
             {
                 var cards = DrawCards(1, ref deck, ref discardPile);
                 if (cards == null || cards.Count == 0)
-                    yield return EndBattle(defenderWheelController);
+                    _busQueue.EnqueueAction(EndBattle(defenderWheelController));
                 else
-                    yield return defender.SetCard(cards.First());
+                    _busQueue.EnqueueAction(defender.SetCard(cards.First()));
             }
 
             if (deck.Count == 0 && discardPile.Count == 0 && defenderWheelController.AllUnitsDead())
             {
-                yield return EndBattle(defenderWheelController);
+                _busQueue.EnqueueAction(EndBattle(defenderWheelController));
             }
-
-            Debug.Log($"Damage Complete: <color=green>{defender.CardName}</color>");
-            _applyingDamage = false;
-        }
-
-        private IEnumerator WaitApplyDamage()
-        {
-            yield return new WaitUntil(() => !_applyingDamage);
         }
 
         private IEnumerator EndBattle(WheelController defenderWheelController)
         {
-            _acting = false;
-            _applyingDamage = false;
+            _busQueue.Clear();
             yield return new WaitForSeconds(.5f);
             BattleFinished?.Invoke(this, defenderWheelController == enemyWheelController);
         }
 
-        private static void ApplyFrontCardEffect(WheelController attackerWheelController,
+        private static IEnumerator ApplyFrontCardEffect(WheelController attackerWheelController,
             WheelController defenderWheelController)
         {
             var attackerCard = attackerWheelController.GetFrontCard().GetCard();
@@ -289,10 +277,13 @@ namespace Features.Battles
                         rightNeighbor.Shield += 1;
                 }
             }
+
+            yield return null;
         }
 
         private IEnumerator ApplyWheelMovementEffect(WheelController wheelController)
         {
+            Debug.Log($"<color=green>{"ApplyWheelMovementEffect"}</color>");
             foreach (var card in wheelController.Cards)
             {
                 var cardActiveEffects = card.Effects;
@@ -300,26 +291,32 @@ namespace Features.Battles
                 if (burns > 0)
                 {
                     card.RemoveEffect(Ability.Burn);
-                    yield return ApplyDamage(burns, card, wheelController, Ability.Burn);
+                    ApplyDamage(burns, card, wheelController, Ability.Burn);
                 }
             }
+
+            yield break;
         }
 
-        private void ChangeTurn()
+        private IEnumerator ChangeTurn()
         {
+            Debug.Log($"<color=green>{"ChangeTurn"}</color>");
+
             turn++;
             _actions = 0;
 
             if (IsPlayerTurn())
-                StartPlayerTurn();
+                _busQueue.EnqueueAction(StartPlayerTurn());
             else
-                PlayBotTurn();
+                _busQueue.EnqueueAction(PlayBotTurn());
+            yield return null;
         }
 
         private bool IsPlayerTurn() => turn % 2 == 0;
 
-        private void PlayBotTurn()
+        private IEnumerator PlayBotTurn()
         {
+            yield return turnMessage.Show(false);
             playerWheelController.LockWheel();
             enemyWheelController.UnlockWheel();
             StartCoroutine(BotAction());
@@ -329,22 +326,14 @@ namespace Features.Battles
         {
             for (int i = 0; i < 3; i++)
             {
-                yield return WaitSpinning();
-                yield return WaitApplyDamage();
-                while (_actions < i || _acting)
-                {
-                    yield return WaitSpinning();
-                    yield return WaitApplyDamage();
-                }
-
-                yield return botControlWheel.TurnTowardsDirection(Random.Range(0, 2) == 1);
-                yield return WaitSpinning();
-                yield return WaitApplyDamage();
+                _busQueue.EnqueueAction(botControlWheel.TurnTowardsDirection(Random.Range(0, 2) == 1));
+                yield return new WaitForSeconds(3f);
             }
         }
 
-        private void StartPlayerTurn()
+        private IEnumerator StartPlayerTurn()
         {
+            yield return turnMessage.Show(true);
             enemyWheelController.LockWheel();
             playerWheelController.UnlockWheel();
         }
@@ -361,7 +350,8 @@ namespace Features.Battles
         public void Spin()
         {
             if (IsPlayerTurn())
-                ChangeTurn();
+                return;
+            // _busQueue.EnqueueAction(ChangeTurn());
         }
 
         [UsedImplicitly]
@@ -369,7 +359,7 @@ namespace Features.Battles
         {
             if (!IsPlayerTurn()) return;
             _actions++;
-            StartCoroutine(ShuffleCoroutine());
+            _busQueue.EnqueueAction(ShuffleCoroutine());
             if (_actions == 3)
                 ChangeTurn();
         }
