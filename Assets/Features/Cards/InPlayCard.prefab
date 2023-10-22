@@ -194,6 +194,7 @@ MonoBehaviour:
   damageFeedback: {fileID: 8020572161793104433}
   deadFeedback: {fileID: 6663796213429632327}
   showCardFeedback: {fileID: 3532881214213100316}
+  atkCardFeedback: {fileID: 1998337621731687830}
   abilitiesContainer: {fileID: 1920387090359156846}
   effectsContainer: {fileID: 7748168679159865282}
   fireIndicatorPrefab: {fileID: 6206021556773077456, guid: 041beb099c005b84395df6fb405c5dc2, type: 3}
@@ -5917,7 +5918,7 @@ MonoBehaviour:
         AnimateRotationDuration: 0.2
         RemapCurveZero: 0
         RemapCurveOne: 360
-        AnimateX: 1
+        AnimateX: 0
         AnimateRotationTweenX:
           MMTweenDefinitionType: 1
           MMTweenCurve: 4
@@ -5955,7 +5956,7 @@ MonoBehaviour:
             m_PostInfinity: 2
             m_RotationOrder: 4
           Initialized: 0
-        AnimateY: 1
+        AnimateY: 0
         AnimateRotationTweenY:
           MMTweenDefinitionType: 1
           MMTweenCurve: 4

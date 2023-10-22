@@ -178,7 +178,7 @@ namespace Features.Battles
                 foreach (var defender in defenders)
                     ApplyDamage(attackerCard.Attack, defender, defenderWheelController, null);
             }
-
+            attackerCard.PlayAct();
             yield return null;
         }
 

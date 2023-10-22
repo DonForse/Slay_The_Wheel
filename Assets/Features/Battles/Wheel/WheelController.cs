@@ -40,11 +40,7 @@ namespace Features.Battles.Wheel
             input.SetTurnLeftAction(OnTurnLeftAction);
             wheelMovement.SetTurnLeftAction(OnTurnLeft);
             wheelMovement.SetTurnRightAction(OnTurnRight);
-            // input.TurnRight += OnTurnRightAction;
-            // input.TurnLeft += OnTurnLeftAction;
             input.Enable();
-            // wheelMovement.TurnRight += OnTurnRight;
-            // wheelMovement.TurnLeft += OnTurnLeft;
         }
 
         public void LockWheel() => input.Disable();

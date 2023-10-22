@@ -20,6 +20,7 @@ namespace Features.Cards
         [SerializeField] private MMF_Player damageFeedback;
         [SerializeField] private MMF_Player deadFeedback;
         [SerializeField] private MMF_Player showCardFeedback;
+        [SerializeField] private MMF_Player atkCardFeedback;
         [SerializeField] private Transform abilitiesContainer;
         [SerializeField] private Transform effectsContainer;
         [SerializeField] private GameObject fireIndicatorPrefab;
@@ -217,6 +218,12 @@ namespace Features.Cards
             if (!IsDead)
                 Effects.Add(effect);
             UpdateCardValues(this, GetCard());
+        }
+
+        public void PlayAct()
+        {
+            if (IsDead) return;
+            atkCardFeedback.PlayFeedbacks();
         }
     }
 }
