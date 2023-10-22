@@ -53,11 +53,13 @@ namespace Features.Battles.Wheel
             {
                 _isRotating = false;
                 SnapToNearestPosition();
-            
+
                 if ((wheelController.WheelData.RotationAngle - startAngle) > 0)
-                    TurnRight?.Invoke(this, null);
+                    StartCoroutine(_rightCallback.Invoke());
+                // TurnRight?.Invoke(this, null);
                 else
-                    TurnLeft?.Invoke(this, null);
+                    // TurnLeft?.Invoke(this, null);
+                    StartCoroutine(_leftCallback.Invoke());
             }
         
             RotateToNewPosition();

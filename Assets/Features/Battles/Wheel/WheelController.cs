@@ -36,8 +36,11 @@ namespace Features.Battles.Wheel
             yield return SetRunCards(player, cards);
 
             frontCardIndex = 0;
-            input.TurnRight += OnTurnRightAction;
-            input.TurnLeft += OnTurnLeftAction;
+            input.SetTurnRightAction(OnTurnRightAction);
+            input.SetTurnLeftAction(OnTurnLeftAction);
+
+            // input.TurnRight += OnTurnRightAction;
+            // input.TurnLeft += OnTurnLeftAction;
             input.Enable();
             wheelMovement.TurnRight += OnTurnRight;
             wheelMovement.TurnLeft += OnTurnLeft;
@@ -83,19 +86,21 @@ namespace Features.Battles.Wheel
                 frontCardIndex = 0;
         }
 
-        private void OnTurnLeftAction(object sender, EventArgs e)
+        private IEnumerator OnTurnLeftAction()
         {
             if (AllUnitsDead())
-                return;
+                yield break;
             IncrementFrontCardIndex();
+            yield return PutAliveUnitAtFront(false);
             Acted?.Invoke(this, Cards[frontCardIndex]);
         }
 
-        private void OnTurnRightAction(object sender, EventArgs e)
+        private IEnumerator OnTurnRightAction()
         {
             if (AllUnitsDead())
-                return;
+                yield break;
             DecrementFrontCardIndex();
+            yield return PutAliveUnitAtFront(true);
             Acted?.Invoke(this, Cards[frontCardIndex]);
         }
 
@@ -165,19 +170,16 @@ namespace Features.Battles.Wheel
 
         public IEnumerator RotateRight()
         {
-            Debug.Log($"<color=green>{"RotateRight"}</color>");
-
             yield return wheelMovement.TurnTowardsDirection(true);
             yield return PutAliveUnitAtFront(true);
-
+            yield return new WaitForSeconds(0.1f);
         }
 
         public IEnumerator RotateLeft()
         {
-            Debug.Log($"<color=green>{"RotateLeft"}</color>");
-            
             yield return wheelMovement.TurnTowardsDirection(false);
             yield return PutAliveUnitAtFront(false);
+            yield return new WaitForSeconds(0.1f);
         }
     }
 }

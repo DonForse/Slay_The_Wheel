@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using UnityEngine;
 
 namespace Features.Battles.Wheel
@@ -8,12 +9,23 @@ namespace Features.Battles.Wheel
         [SerializeField] protected float rotationSpeed = 5;
         [SerializeField] protected WheelController wheelController;
         protected float startAngle;
+        protected Func<IEnumerator> _rightCallback;
+        protected Func<IEnumerator> _leftCallback;
         public abstract event EventHandler TurnRight;
         public abstract event EventHandler TurnLeft;
 
         public virtual void Enable() => this.enabled = true;
 
         public virtual void Disable() => this.enabled = false;
+        public void SetTurnRightAction(Func<IEnumerator> callback)
+        {
+            _rightCallback = callback;
+        }
+
+        public void SetTurnLeftAction(Func<IEnumerator> callback)
+        {
+            _leftCallback = callback;
+        }
 
         internal void SnapToNearestPosition()
         {

@@ -27,10 +27,12 @@ namespace Features.Battles.Wheel
                 yield return new WaitForEndOfFrame();
             }
             SnapToNearestPosition();
-    
+
             if ((wheelController.WheelData.RotationAngle - startAngle) > 0)
-                TurnRight?.Invoke(this, null);
+                // yield return _rightCallback.Invoke();
+            TurnRight?.Invoke(this, null);
             else
+                // yield return _leftCallback.Invoke();
                 TurnLeft?.Invoke(this, null);
         }
     

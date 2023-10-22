@@ -68,11 +68,13 @@ namespace Features.Battles
 
         private void OnEnemyWheelMoved(object sender, InPlayCard e)
         {
+            Debug.Log($"<color=yelow>{"OnEnemyWheelMoved"}</color>");
             _busQueue.EnqueueInterruptAction(SpinWheel(enemyWheelController));
         }
 
         private void OnPlayerWheelMoved(object sender, InPlayCard e)
         {
+            Debug.Log($"<color=yelow>{"OnPlayerWheelMoved"}</color>");
             _busQueue.EnqueueInterruptAction(SpinWheel(playerWheelController));
         }
 
@@ -101,7 +103,6 @@ namespace Features.Battles
             if (attacker.IsDead)
             {
                 _busQueue.EnqueueAction(ProcessAttackerDiedInWheel(attacker, attackerWheelController));
-                Debug.Log($"<color=green>{"ACT-END"}</color>");
                 yield break;
             }
             _busQueue.EnqueueAction(ApplyFrontCardEffect(attackerWheelController, defenderWheelController));
@@ -110,7 +111,6 @@ namespace Features.Battles
             if (_actions == 3)
             {
                 _busQueue.EnqueueAction(ChangeTurn());
-                Debug.Log($"<color=green>{"ACT-END"}</color>");
                 yield break;
             }
 
@@ -119,6 +119,7 @@ namespace Features.Battles
 
         private IEnumerator ActEndCoroutine(WheelController attackerWheelController)
         {
+            Debug.Log($"<color=green>{"ACT-END"}</color>");
             attackerWheelController.UnlockWheel();
             yield return null;
         }
@@ -131,7 +132,6 @@ namespace Features.Battles
 
         private IEnumerator ProcessAttackerDiedInWheel(InPlayCard attacker, WheelController attackerWheelController)
         {
-            Debug.Log($"<color=green>{"ProcessAttackerDiedInWheel"}</color>");
             if (attackerWheelController.AllUnitsDead())
                 yield return EndBattle(attackerWheelController);
             if (_actions == 3)
@@ -149,16 +149,13 @@ namespace Features.Battles
 
         private IEnumerator ApplyAfterHitEffect(RunCard attackerCard, WheelController defenderWheelController)
         {
-            Debug.Log($"<color=green>{"ApplyAfterHitEffect"}</color>");
-
             foreach (var ability in attackerCard.Abilities)
             {
                 if (ability == Ability.RotateRight)
-                    _busQueue.EnqueueAction(defenderWheelController.RotateRight());
+                    _busQueue.EnqueueInterruptAction(defenderWheelController.RotateRight());
                 if (ability == Ability.RotateLeft)
-                    _busQueue.EnqueueAction(defenderWheelController.RotateLeft());
+                    _busQueue.EnqueueInterruptAction(defenderWheelController.RotateLeft());
             }
-
             yield return null;
         }
 
@@ -283,7 +280,6 @@ namespace Features.Battles
 
         private IEnumerator ApplyWheelMovementEffect(WheelController wheelController)
         {
-            Debug.Log($"<color=green>{"ApplyWheelMovementEffect"}</color>");
             foreach (var card in wheelController.Cards)
             {
                 var cardActiveEffects = card.Effects;
@@ -294,14 +290,11 @@ namespace Features.Battles
                     ApplyDamage(burns, card, wheelController, Ability.Burn);
                 }
             }
-
             yield break;
         }
 
         private IEnumerator ChangeTurn()
         {
-            Debug.Log($"<color=green>{"ChangeTurn"}</color>");
-
             turn++;
             _actions = 0;
 

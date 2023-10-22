@@ -30,9 +30,9 @@ namespace Features.Battles.Wheel
             SnapToNearestPosition();
 
             if ((wheelController.WheelData.RotationAngle - startAngle) > 0)
-                TurnRight?.Invoke(this, null);
+                yield return _rightCallback.Invoke();
             else
-                TurnLeft?.Invoke(this, null);
+                yield return _leftCallback.Invoke();
         }
     }
 }

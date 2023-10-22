@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 
 namespace Features.Battles.Wheel
 {
@@ -8,5 +9,7 @@ namespace Features.Battles.Wheel
         event EventHandler TurnLeft;
         void Enable();
         void Disable();
+        void SetTurnRightAction(Func<IEnumerator> callback);
+        void SetTurnLeftAction(Func<IEnumerator> callback);
     }
 }
