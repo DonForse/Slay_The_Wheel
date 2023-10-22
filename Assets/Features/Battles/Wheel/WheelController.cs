@@ -38,12 +38,13 @@ namespace Features.Battles.Wheel
             frontCardIndex = 0;
             input.SetTurnRightAction(OnTurnRightAction);
             input.SetTurnLeftAction(OnTurnLeftAction);
-
+            wheelMovement.SetTurnLeftAction(OnTurnLeft);
+            wheelMovement.SetTurnRightAction(OnTurnRight);
             // input.TurnRight += OnTurnRightAction;
             // input.TurnLeft += OnTurnLeftAction;
             input.Enable();
-            wheelMovement.TurnRight += OnTurnRight;
-            wheelMovement.TurnLeft += OnTurnLeft;
+            // wheelMovement.TurnRight += OnTurnRight;
+            // wheelMovement.TurnLeft += OnTurnLeft;
         }
 
         public void LockWheel() => input.Disable();
@@ -104,18 +105,18 @@ namespace Features.Battles.Wheel
             Acted?.Invoke(this, Cards[frontCardIndex]);
         }
 
-        private void OnTurnLeft(object sender, EventArgs e)
+        private IEnumerator OnTurnLeft()
         {
             if (AllUnitsDead())
-                return;
+                yield break;
             IncrementFrontCardIndex();
             WheelTurn?.Invoke(this, Cards[frontCardIndex]);
         }
 
-        private void OnTurnRight(object sender, EventArgs e)
+        private IEnumerator OnTurnRight()
         {
             if (AllUnitsDead())
-                return;
+                yield break;
             DecrementFrontCardIndex();
             WheelTurn?.Invoke(this, Cards[frontCardIndex]);
         }

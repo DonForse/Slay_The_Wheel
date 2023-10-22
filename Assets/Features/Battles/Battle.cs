@@ -68,13 +68,13 @@ namespace Features.Battles
 
         private void OnEnemyWheelMoved(object sender, InPlayCard e)
         {
-            Debug.Log($"<color=yelow>{"OnEnemyWheelMoved"}</color>");
+            Debug.Log($"<color=yellow>{"OnEnemyWheelMoved"}</color>");
             _busQueue.EnqueueInterruptAction(SpinWheel(enemyWheelController));
         }
 
         private void OnPlayerWheelMoved(object sender, InPlayCard e)
         {
-            Debug.Log($"<color=yelow>{"OnPlayerWheelMoved"}</color>");
+            Debug.Log($"<color=yellow>{"OnPlayerWheelMoved"}</color>");
             _busQueue.EnqueueInterruptAction(SpinWheel(playerWheelController));
         }
 
@@ -295,6 +295,7 @@ namespace Features.Battles
 
         private IEnumerator ChangeTurn()
         {
+            Debug.Log($"<color=cyan>{"ACT-END"}</color>");
             turn++;
             _actions = 0;
 

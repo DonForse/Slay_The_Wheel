@@ -8,7 +8,7 @@ namespace Features.Battles.Wheel
     {
         public override event EventHandler TurnRight;
         public override event EventHandler TurnLeft;
-    
+
         public IEnumerator TurnTowardsDirection(bool right)
         {
             startAngle = wheelController.WheelData.RotationAngle;
@@ -26,17 +26,18 @@ namespace Features.Battles.Wheel
                 RotateToNewPosition();
                 yield return new WaitForEndOfFrame();
             }
+
             SnapToNearestPosition();
 
             if ((wheelController.WheelData.RotationAngle - startAngle) > 0)
-                // yield return _rightCallback.Invoke();
-            TurnRight?.Invoke(this, null);
+                yield return _rightCallback.Invoke();
+                // TurnRight?.Invoke(this, null);
             else
-                // yield return _leftCallback.Invoke();
-                TurnLeft?.Invoke(this, null);
+                yield return _leftCallback.Invoke();
+                // TurnLeft?.Invoke(this, null);
         }
-    
-        public void Test (bool right)
+
+        public void Test(bool right)
         {
             StartCoroutine(TurnTowardsDirection(right));
         }
