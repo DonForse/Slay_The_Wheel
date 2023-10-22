@@ -52,14 +52,12 @@ namespace Features.Battles.Wheel
             if (Mathf.Abs(wheelController.WheelData.RotationAngle - startAngle) >= anglePerItem)
             {
                 _isRotating = false;
-                SnapToNearestPosition();
 
                 if ((wheelController.WheelData.RotationAngle - startAngle) > 0)
                     StartCoroutine(_rightCallback.Invoke());
-                // TurnRight?.Invoke(this, null);
                 else
-                    // TurnLeft?.Invoke(this, null);
                     StartCoroutine(_leftCallback.Invoke());
+                SnapToNearestPosition();
             }
         
             RotateToNewPosition();

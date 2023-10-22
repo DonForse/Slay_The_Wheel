@@ -75,10 +75,14 @@ namespace Features.Cards
 
         private void SetEffectIcons(Ability[] abilities, Transform container)
         {
-            foreach (Transform child in container)
+            if (container != null)
             {
-                Destroy(child.gameObject);
+                foreach (Transform child in container)
+                {
+                    Destroy(child.gameObject);
+                }
             }
+
             var burns = abilities.Count(x => x == Ability.Burn);
             for (int i = 0; i < burns; i++)
                 Instantiate(fireIndicatorPrefab, container);

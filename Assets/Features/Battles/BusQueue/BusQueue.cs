@@ -49,7 +49,7 @@ public class BusQueue : MonoBehaviour
             yield return action;
 
             // Wait for the current action to complete (you can customize this)
-            yield return new WaitForSeconds(0.2f);
+            yield return new WaitForSeconds(0.05f);
         }
 
         isProcessingActions = false;
