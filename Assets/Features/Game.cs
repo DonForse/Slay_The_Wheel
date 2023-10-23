@@ -11,12 +11,15 @@ namespace Features
 {
     public class Game : MonoBehaviour
     {
-        [SerializeField] private BaseCardsScriptableObject cardsDb;
+        [SerializeField] private BaseCardsScriptableObject unitsDb;
+        [SerializeField] private BaseCardsScriptableObject enemiesDb;
+        [SerializeField] private BaseCardsScriptableObject heroesDb;
 
         private List<RunCard> _deck;
         private int _currentLevel = 0;
         private Battle _battleGo;
         private Map _mapGo;
+        private RunCard _heroCard;
 
         // Start is called before the first frame update
         IEnumerator Start()
@@ -30,12 +33,11 @@ namespace Features
         private void AddInitialCards()
         {
             _deck = new List<RunCard>();
-            var heroCardDb = cardsDb.cards.FirstOrDefault(x => x.cardName.Contains("Kael Fireforge"));
-            var heroCard = new RunCard(heroCardDb);
-            _deck.Add(heroCard);
-            var recruits = cardsDb.cards.FirstOrDefault(x => x.cardName.Contains("Fireborn Recruit"));
-            var warrior = cardsDb.cards.FirstOrDefault(x => x.cardName.Contains("Fireborn Warrior"));
-            var sorceress = cardsDb.cards.FirstOrDefault(x => x.cardName.Contains("Firestorm Sorceress"));
+            var heroCardDb = heroesDb.cards.FirstOrDefault(x => x.cardName.Contains("Kael Fireforge"));
+            _heroCard = new RunCard(heroCardDb);
+            var recruits = unitsDb.cards.FirstOrDefault(x => x.cardName.Contains("Fireborn Recruit"));
+            var warrior = unitsDb.cards.FirstOrDefault(x => x.cardName.Contains("Fireborn Warrior"));
+            var sorceress = unitsDb.cards.FirstOrDefault(x => x.cardName.Contains("Firestorm Sorceress"));
 
             for (var i = 0; i < 12; i++)
             {
@@ -78,9 +80,9 @@ namespace Features
 
         private List<RunCard> GetBattleEnemies()
         {
-            var slime = cardsDb.cards.FirstOrDefault(x => x.cardName.Contains("Slime"));
-            var zombie = cardsDb.cards.FirstOrDefault(x => x.cardName.Contains("Zombie"));
-            var spider = cardsDb.cards.FirstOrDefault(x => x.cardName.Contains("Spider"));
+            var slime = enemiesDb.cards.FirstOrDefault(x => x.cardName.Contains("Slime"));
+            var zombie = enemiesDb.cards.FirstOrDefault(x => x.cardName.Contains("Zombie"));
+            var spider = enemiesDb.cards.FirstOrDefault(x => x.cardName.Contains("Spider"));
             return _currentLevel switch
             {
                 0 => new List<RunCard>() { new RunCard(slime), new RunCard(slime), new RunCard(slime) },
@@ -119,7 +121,7 @@ namespace Features
             SceneManager.LoadScene("Battle");
             yield return new WaitForSeconds(.5f);
             _battleGo = GameObject.Find("Battle").GetComponent<Battle>();
-            yield return _battleGo.Initialize(_deck,GetBattleEnemies(), 5, GetEnemyWheelSize());
+            yield return _battleGo.Initialize(_deck,GetBattleEnemies(), 5, GetEnemyWheelSize(), _heroCard);
             
             if (_battleGo != null)
                 _battleGo.BattleFinished += BattleComplete;

@@ -1084,7 +1084,10 @@ MonoBehaviour:
   - {fileID: 1390196750}
   virtualCamera: {fileID: 1876884427}
   shop: {fileID: 2582435810264017659}
-  cardsDb: {fileID: 11400000, guid: dfbe68cbcfa8d974b83a94816166b1df, type: 2}
+  packs:
+  - {fileID: 11400000, guid: 62426f435ffb1ce44aae921673a567ca, type: 2}
+  - {fileID: 11400000, guid: 5f04bea5235f2b741a86044aa058e92a, type: 2}
+  - {fileID: 11400000, guid: e922eb68846d7b5489c03f8ec68bdd98, type: 2}
 --- !u!4 &1429207044
 Transform:
   m_ObjectHideFlags: 0
@@ -1318,9 +1321,17 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 170505837465107952, guid: f711d7418759ecc42b548fdca2a2d3ef, type: 3}
+      propertyPath: m_LocalScale.x
+      value: -0.582
+      objectReference: {fileID: 0}
     - target: {fileID: 1283612003781037939, guid: f711d7418759ecc42b548fdca2a2d3ef, type: 3}
       propertyPath: m_Name
       value: Shop
+      objectReference: {fileID: 0}
+    - target: {fileID: 4021126900896666628, guid: f711d7418759ecc42b548fdca2a2d3ef, type: 3}
+      propertyPath: m_LocalScale.x
+      value: -0.582
       objectReference: {fileID: 0}
     - target: {fileID: 5773192641510987141, guid: f711d7418759ecc42b548fdca2a2d3ef, type: 3}
       propertyPath: m_RootOrder
@@ -1365,6 +1376,22 @@ PrefabInstance:
     - target: {fileID: 5773192641510987141, guid: f711d7418759ecc42b548fdca2a2d3ef, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6668650835164313420, guid: f711d7418759ecc42b548fdca2a2d3ef, type: 3}
+      propertyPath: m_LocalScale.x
+      value: -0.582
+      objectReference: {fileID: 0}
+    - target: {fileID: 6992287806804945680, guid: f711d7418759ecc42b548fdca2a2d3ef, type: 3}
+      propertyPath: m_LocalScale.x
+      value: -0.582
+      objectReference: {fileID: 0}
+    - target: {fileID: 7508985909446990562, guid: f711d7418759ecc42b548fdca2a2d3ef, type: 3}
+      propertyPath: m_LocalScale.x
+      value: -0.582
+      objectReference: {fileID: 0}
+    - target: {fileID: 8930411133353412035, guid: f711d7418759ecc42b548fdca2a2d3ef, type: 3}
+      propertyPath: amountOfPacks
+      value: 3
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

@@ -149,7 +149,7 @@ GameObject:
   - component: {fileID: 2093962637141408670}
   - component: {fileID: 2537325601614038748}
   m_Layer: 5
-  m_Name: ShopCard
+  m_Name: ShopPack
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -271,4 +271,5 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   button: {fileID: 2093962637141408670}
+  image: {fileID: 6629151998246178577}
   cardNameText: {fileID: 108250547337570459}

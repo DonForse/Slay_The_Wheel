@@ -304,4 +304,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e83cf7a188a6e964eb1694c6af3e55f8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  cardsDb: {fileID: 11400000, guid: dfbe68cbcfa8d974b83a94816166b1df, type: 2}
+  unitsDb: {fileID: 11400000, guid: dfbe68cbcfa8d974b83a94816166b1df, type: 2}
+  enemiesDb: {fileID: 11400000, guid: 0b71d7b583473e94b87c0a4a4abbce8d, type: 2}
+  heroesDb: {fileID: 11400000, guid: 749a77f1d58dc3248928835f771a1bca, type: 2}

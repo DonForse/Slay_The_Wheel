@@ -26,7 +26,7 @@ namespace Features.Battles
 
         // Start is called before the first frame update
         public IEnumerator Initialize(List<RunCard> deck, List<RunCard> enemies, int playerWheelSize,
-            int enemyWheelSize)
+            int enemyWheelSize, RunCard heroCard)
         {
             _playerBattleDeck = deck.ToList();
             _playerDiscardPile = new();

@@ -11,8 +11,8 @@ namespace Features.Maps
     {
         [SerializeField] List<GameObject> levels;
         [SerializeField] CinemachineVirtualCamera virtualCamera;
-        [SerializeField] private Shop shop;
-        [SerializeField] private BaseCardsScriptableObject cardsDb;
+        [SerializeField] private Shop.Shop shop;
+        [SerializeField] private List<CardPackScriptableObject> packs;
     
     
         public event EventHandler<BaseCardScriptableObject> SelectedUpgradeCard;
@@ -20,13 +20,13 @@ namespace Features.Maps
         public void Initialize(int currentLevel)
         {
             virtualCamera.Follow = levels[currentLevel].transform;
-            shop.Show(cardsDb.cards.Distinct().ToList());
-            shop.CardSelected += OnCardSelected;
+            shop.Show(packs.ToList());
+            shop.PackSelected += OnPackSelected;
         }
 
-        private void OnCardSelected(object sender, BaseCardScriptableObject card)
+        private void OnPackSelected(object sender, CardPackScriptableObject pack)
         {
-            SelectedUpgradeCard?.Invoke(this, card);
+            SelectedUpgradeCard?.Invoke(this, pack.Cards.First());
         }
 
     }
