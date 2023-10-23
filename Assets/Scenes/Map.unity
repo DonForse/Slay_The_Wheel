@@ -654,7 +654,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &956038871
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -662,7 +662,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 956038870}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: de225f5ba99616442afd1b11a2b74c01, type: 3}
   m_Name: 
@@ -1413,10 +1413,6 @@ PrefabInstance:
     - target: {fileID: 5773192641510987141, guid: f711d7418759ecc42b548fdca2a2d3ef, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7577729946737627770, guid: f711d7418759ecc42b548fdca2a2d3ef, type: 3}
-      propertyPath: m_AnchoredPosition.y
-      value: 150
       objectReference: {fileID: 0}
     - target: {fileID: 8930411133353412035, guid: f711d7418759ecc42b548fdca2a2d3ef, type: 3}
       propertyPath: amountOfPacks

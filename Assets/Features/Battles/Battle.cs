@@ -22,6 +22,7 @@ namespace Features.Battles
         private List<RunCard> _playerBattleDeck;
         private List<RunCard> _playerDiscardPile;
         private List<RunCard> _enemiesDeck;
+        private RunCard _heroCard;
         public event EventHandler<bool> BattleFinished;
 
         // Start is called before the first frame update
@@ -31,7 +32,9 @@ namespace Features.Battles
             _playerBattleDeck = deck.ToList();
             _playerDiscardPile = new();
             _enemiesDeck = enemies.Skip(enemyWheelSize).ToList();
-            var cards = DrawCards(playerWheelSize, ref _playerBattleDeck, ref _playerDiscardPile);
+            _heroCard = heroCard;
+            var cards = DrawCards(playerWheelSize - 1, ref _playerBattleDeck, ref _playerDiscardPile);
+            cards = cards.Concat(new List<RunCard>() { heroCard }).ToList();
             StartCoroutine(enemyWheelController.InitializeWheel(false, enemyWheelSize, enemies));
             yield return playerWheelController.InitializeWheel(true, playerWheelSize, cards);
 
@@ -361,8 +364,10 @@ namespace Features.Battles
         private IEnumerator ShuffleCoroutine()
         {
             var slots = playerWheelController.Cards.Count;
-            var cards = DrawCards(slots, ref _playerBattleDeck, ref _playerDiscardPile);
-            var cardsInWheel = playerWheelController.Cards.Select(x => x.GetCard());
+            var cards = DrawCards(slots -1, ref _playerBattleDeck, ref _playerDiscardPile);
+            var cardsInWheel = playerWheelController.Cards.Select(x => x.GetCard()).ToList();
+            cardsInWheel.Remove(_heroCard);
+            cards = cards.Concat(new []{_heroCard}).ToList();
             _playerDiscardPile = _playerDiscardPile.Concat(cardsInWheel).ToList();
             for (int i = 0; i < slots; i++)
             {

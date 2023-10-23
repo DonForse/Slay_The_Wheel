@@ -111,7 +111,8 @@ namespace Features.Cards
             var addShieldRight = abilities.Count(x => x == Ability.AddShieldRight);
             for (int i = 0; i < addShieldRight; i++)
                 Instantiate(addShieldRightIndicatorPrefab, container);
-            container.gameObject.SetActive(container.childCount>0);
+            
+            container?.gameObject.SetActive(container.childCount>0);
         }
 
         private void UpdateCardValues(object sender, RunCard e)
