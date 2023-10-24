@@ -17,6 +17,8 @@ namespace Features.Battles
         [SerializeField] private BotControlWheel botControlWheel;
         [SerializeField] private BusQueue _busQueue;
         [SerializeField] private TurnMessage turnMessage;
+        [SerializeField] private ActionsView actionsView;
+        
         private int _actions;
         private int turn = 0;
         private List<RunCard> _playerBattleDeck;
@@ -34,7 +36,7 @@ namespace Features.Battles
             _enemiesDeck = enemies.Skip(enemyWheelSize).ToList();
             _heroCard = heroCard;
             var cards = DrawCards(playerWheelSize - 1, ref _playerBattleDeck, ref _playerDiscardPile);
-            cards = cards.Concat(new List<RunCard>() { heroCard }).ToList();
+            cards = new List<RunCard>() { heroCard }.Concat(cards).ToList();
             StartCoroutine(enemyWheelController.InitializeWheel(false, enemyWheelSize, enemies));
             yield return playerWheelController.InitializeWheel(true, playerWheelSize, cards);
 
@@ -45,6 +47,7 @@ namespace Features.Battles
             enemyWheelController.Acted += OnEnemyActed;
             playerWheelController.WheelTurn += OnPlayerWheelMoved;
             enemyWheelController.WheelTurn += OnEnemyWheelMoved;
+            SetActions(3);
         }
 
         private void OnDestroy()
@@ -83,7 +86,7 @@ namespace Features.Battles
 
         private void OnEnemyActed(object sender, InPlayCard attacker)
         {
-            _actions++;
+            SetActions(_actions - 1);
             _busQueue.EnqueueAction(Act(attacker,
                 enemyWheelController,
                 playerWheelController));
@@ -91,7 +94,7 @@ namespace Features.Battles
 
         private void OnPlayerActed(object sender, InPlayCard attacker)
         {
-            _actions++;
+            SetActions(_actions - 1);
             _busQueue.EnqueueAction(Act(attacker,
                 playerWheelController,
                 enemyWheelController));
@@ -111,7 +114,7 @@ namespace Features.Battles
             _busQueue.EnqueueAction(ApplyFrontCardEffect(attackerWheelController, defenderWheelController));
             _busQueue.EnqueueAction(ApplyFrontCardAttack(attacker, defenderWheelController));
             _busQueue.EnqueueAction(ApplyAfterHitEffect(attackerCard, defenderWheelController));
-            if (_actions == 3)
+            if (CompletedActions())
             {
                 _busQueue.EnqueueAction(ChangeTurn());
                 yield break;
@@ -137,7 +140,7 @@ namespace Features.Battles
         {
             if (attackerWheelController.AllUnitsDead())
                 yield return EndBattle(attackerWheelController);
-            if (_actions == 3)
+            if (CompletedActions())
             {
                 _busQueue.EnqueueAction(ChangeTurn());
                 yield break; // yield break;
@@ -300,7 +303,7 @@ namespace Features.Battles
         {
             Debug.Log($"<color=cyan>{"ACT-END"}</color>");
             turn++;
-            _actions = 0;
+            SetActions(3);
 
             if (IsPlayerTurn())
                 _busQueue.EnqueueAction(StartPlayerTurn());
@@ -338,8 +341,10 @@ namespace Features.Battles
         [UsedImplicitly]
         public void SkipTurn()
         {
-            if (IsPlayerTurn())
-                ChangeTurn();
+            if (!IsPlayerTurn()) return;
+            SetActions(_actions - 1);
+            if (CompletedActions())
+                _busQueue.EnqueueAction(ChangeTurn());
         }
 
 
@@ -355,10 +360,10 @@ namespace Features.Battles
         public void Shuffle()
         {
             if (!IsPlayerTurn()) return;
-            _actions++;
+            SetActions(_actions - 1);
             _busQueue.EnqueueAction(ShuffleCoroutine());
-            if (_actions == 3)
-                ChangeTurn();
+            if (CompletedActions())
+                _busQueue.EnqueueAction(ChangeTurn());;
         }
 
         private IEnumerator ShuffleCoroutine()
@@ -367,12 +372,20 @@ namespace Features.Battles
             var cards = DrawCards(slots -1, ref _playerBattleDeck, ref _playerDiscardPile);
             var cardsInWheel = playerWheelController.Cards.Select(x => x.GetCard()).ToList();
             cardsInWheel.Remove(_heroCard);
-            cards = cards.Concat(new []{_heroCard}).ToList();
+            cards = new List<RunCard>() { _heroCard }.Concat(cards).ToList();
             _playerDiscardPile = _playerDiscardPile.Concat(cardsInWheel).ToList();
             for (int i = 0; i < slots; i++)
             {
                 yield return playerWheelController.Cards[i].SetCard(cards[i]);
             }
+        }
+
+        private bool CompletedActions() => _actions == 0;
+
+        private void SetActions(int amount)
+        {
+            _actions = amount;
+            actionsView.ShowRemaining(_actions);
         }
     }
 }
