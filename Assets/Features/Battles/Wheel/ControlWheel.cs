@@ -29,6 +29,7 @@ namespace Features.Battles.Wheel
 
         internal void SnapToNearestPosition()
         {
+            if (wheelController.WheelData.Size == 0) return;
             float anglePerItem = 2 * Mathf.PI / wheelController.WheelData.Size;
             float targetAngle = Mathf.Round(wheelController.WheelData.RotationAngle / anglePerItem) * anglePerItem;
             wheelController.WheelData.RotationAngle = targetAngle;
@@ -37,11 +38,10 @@ namespace Features.Battles.Wheel
 
         internal void RotateToNewPosition()
         {
-            for (var i = 0; i < wheelController.WheelData.Size; i++)
+            for (var i = 0; i < wheelController.Cards.Count; i++)
             {
                 var initialTheta = Mathf.Atan2(wheelController.Positions[i].y, wheelController.Positions[i].x);
                 var newTheta = initialTheta + wheelController.WheelData.RotationAngle;
-
                 var x = wheelController.WheelData.Radius * Mathf.Cos(newTheta);
                 var y = wheelController.WheelData.Radius * Mathf.Sin(newTheta);
 

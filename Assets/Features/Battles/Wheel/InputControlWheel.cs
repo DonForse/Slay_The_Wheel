@@ -42,7 +42,7 @@ namespace Features.Battles.Wheel
             }
 
             if (!_isRotating) return;
-        
+            
             var rotationInput = Mathf.Clamp(Input.GetAxis("Mouse X"), -1f,1f);
         
             wheelController.WheelData.RotationAngle += rotationInput * rotationSpeed * Time.deltaTime;
