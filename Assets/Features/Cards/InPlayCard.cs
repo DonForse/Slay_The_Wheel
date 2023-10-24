@@ -73,11 +73,11 @@ namespace Features.Cards
             yield return showCardFeedback.PlayFeedbacksCoroutine(this.transform.position);
         }
 
-        private void SetEffectIcons(Ability[] abilities, Transform container)
+        private void SetEffectIcons(Ability[] abilities, Transform effectIconContainer)
         {
-            if (container != null)
+            if (effectIconContainer != null)
             {
-                foreach (Transform child in container)
+                foreach (Transform child in effectIconContainer)
                 {
                     Destroy(child.gameObject);
                 }
@@ -85,34 +85,37 @@ namespace Features.Cards
 
             var burns = abilities.Count(x => x == Ability.Burn);
             for (int i = 0; i < burns; i++)
-                Instantiate(fireIndicatorPrefab, container);
+                Instantiate(fireIndicatorPrefab, effectIconContainer);
 
             var rotateR = abilities.Count(x => x == Ability.RotateRight);
             for (int i = 0; i < rotateR; i++)
-                Instantiate(turnIndicatorPrefab, container);
+                Instantiate(turnIndicatorPrefab, effectIconContainer);
 
             var rotateL = abilities.Count(x => x == Ability.RotateLeft);
             for (int i = 0; i < rotateL; i++)
-                Instantiate(turnIndicatorPrefab, container);
+                Instantiate(turnIndicatorPrefab, effectIconContainer);
             
             var burnAll = abilities.Count(x => x == Ability.BurnAll);
             for (int i = 0; i < burnAll; i++)
-                Instantiate(burnAllIndicatorPrefab, container);
+                Instantiate(burnAllIndicatorPrefab, effectIconContainer);
             
             var addAtkLeft = abilities.Count(x => x == Ability.AddAtkLeft);
             for (int i = 0; i < addAtkLeft; i++)
-                Instantiate(atkLeftIndicatorPrefab, container);
+                Instantiate(atkLeftIndicatorPrefab, effectIconContainer);
             var addAtkRight = abilities.Count(x => x == Ability.AddAtkRight);
             for (int i = 0; i < addAtkRight; i++)
-                Instantiate(atkRightIndicatorPrefab, container);
+                Instantiate(atkRightIndicatorPrefab, effectIconContainer);
             var addShieldLeft = abilities.Count(x => x == Ability.AddShieldLeft);
             for (int i = 0; i < addShieldLeft; i++)
-                Instantiate(addShieldLeftIndicatorPrefab, container);
+                Instantiate(addShieldLeftIndicatorPrefab, effectIconContainer);
             var addShieldRight = abilities.Count(x => x == Ability.AddShieldRight);
             for (int i = 0; i < addShieldRight; i++)
-                Instantiate(addShieldRightIndicatorPrefab, container);
-            
-            container?.gameObject.SetActive(container.childCount>0);
+                Instantiate(addShieldRightIndicatorPrefab, effectIconContainer);
+
+            if (effectIconContainer != null)
+            {
+                effectIconContainer.gameObject.SetActive(effectIconContainer.childCount > 0);
+            }
         }
 
         private void UpdateCardValues(object sender, RunCard e)

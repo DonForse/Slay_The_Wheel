@@ -65,6 +65,7 @@ namespace Features.Battles.Wheel
                     yield break;
                 }
                 yield return wheelMovement.TurnTowardsDirection(toTheRight);
+                //to solve the issue where put alive unit does not trigger damage immediately, you have to make this a part of the busqueue
                 yield return new WaitForSeconds(0.1f);
             }
         }
