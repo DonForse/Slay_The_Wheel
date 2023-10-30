@@ -57,7 +57,7 @@ namespace Features.Maps
             }
 
             var levelIndex = mapSpots.IndexOf(mapSpotSelected);
-            var levelsIndex = PlayerPrefs.GetString("LevelsCompleted").Split().Select(int.Parse).ToList();
+            var levelsIndex = PlayerPrefs.GetString("LevelsCompleted","0").Split(',').Select(int.Parse).ToList();
             levelsIndex.Add(levelIndex);
             PlayerPrefs.SetString("LevelsCompleted", string.Join(',', levelsIndex));
             PlayerPrefs.SetInt("CurrentLevel", levelIndex);
@@ -66,12 +66,14 @@ namespace Features.Maps
             {
                 case MapSpotType.Shop:
                     shop.Show(packs.ToList());
+                    Initialize();
                     break;
                 case MapSpotType.Battle:
                     LevelCompleted?.Invoke(this, levelIndex);
                     break;
                 case MapSpotType.Rest:
                     SelectedRest?.Invoke(this, null);
+                    Initialize();
                     break;
             }
         }

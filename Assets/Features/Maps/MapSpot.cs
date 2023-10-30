@@ -36,6 +36,7 @@ public class MapSpot : MonoBehaviour
 
     public void SetAvailable()
     {
+        button.interactable = true;
         button.onClick.AddListener(OnButtonPressed);
     }
 }
