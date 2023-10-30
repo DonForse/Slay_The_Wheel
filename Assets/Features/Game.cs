@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -6,6 +7,7 @@ using Features.Cards;
 using Features.Maps;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using Random = UnityEngine.Random;
 
 namespace Features
 {
@@ -16,7 +18,6 @@ namespace Features
         [SerializeField] private BaseCardsScriptableObject heroesDb;
 
         private List<RunCard> _deck;
-        private int _currentLevel = 0;
         private Battle _battleGo;
         private Map _mapGo;
         private RunCard _heroCard;
@@ -57,14 +58,14 @@ namespace Features
                 _deck.Add(playerUnit);
             }
         }
-    
+
         private void ShuffleDeck() => _deck = _deck.OrderBy(d => Random.Range(0, 100f)).ToList();
 
         private void RemoveDeadCardsFromDeck() => _deck = _deck.Where(x => !x.IsDead).ToList();
 
         private int GetEnemyWheelSize()
         {
-            switch (_currentLevel)
+            switch (PlayerPrefs.GetInt("CurrentLevel"))
             {
                 case 0:
                     return 3;
@@ -83,7 +84,7 @@ namespace Features
             var slime = enemiesDb.cards.FirstOrDefault(x => x.cardName.Contains("Slime"));
             var zombie = enemiesDb.cards.FirstOrDefault(x => x.cardName.Contains("Zombie"));
             var spider = enemiesDb.cards.FirstOrDefault(x => x.cardName.Contains("Spider"));
-            return _currentLevel switch
+            return PlayerPrefs.GetInt("CurrentLevel") switch
             {
                 0 => new List<RunCard>() { new RunCard(slime), new RunCard(slime), new RunCard(slime) },
                 1 => new List<RunCard>()
@@ -97,32 +98,35 @@ namespace Features
 
         private void BattleComplete(object sender, bool playerWin)
         {
-            
-            _currentLevel++;
-            Debug.Log($"<color=cyan>{_currentLevel}</color>");
             if (!playerWin)
                 return;
             StartCoroutine(LoadMapSceneCoroutine());
         }
 
-        private void OnMapStageComplete(object sender, BaseCardScriptableObject e)
+        private void OnShopPackObtained(object sender, List<BaseCardScriptableObject> cards)
         {
-            var runCard = new RunCard(e);
-            _deck.Add(runCard);
-            StartCoroutine(LoadBattleSceneCoroutine());
+            foreach (var card in cards)
+            {
+                var runCard = new RunCard(card);
+                _deck.Add(runCard);
+            }
         }
 
         private IEnumerator LoadBattleSceneCoroutine()
         {
             if (_mapGo != null)
-                _mapGo.SelectedUpgradeCard -= OnMapStageComplete;
-            
+            {
+                _mapGo.SelectedPack -= OnShopPackObtained;
+                _mapGo.SelectedRest -= OnSelectedRest;
+                _mapGo.LevelCompleted -= OnLevelCompleted;
+            }
+
             ShuffleDeck();
             SceneManager.LoadScene("Battle");
             yield return new WaitForSeconds(.5f);
             _battleGo = GameObject.Find("Battle").GetComponent<Battle>();
-            yield return _battleGo.Initialize(_deck,GetBattleEnemies(), 5, GetEnemyWheelSize(), _heroCard);
-            
+            yield return _battleGo.Initialize(_deck, GetBattleEnemies(), 5, GetEnemyWheelSize(), _heroCard);
+
             if (_battleGo != null)
                 _battleGo.BattleFinished += BattleComplete;
         }
@@ -131,15 +135,32 @@ namespace Features
         {
             if (_battleGo != null)
                 _battleGo.BattleFinished -= BattleComplete;
-            
+
             SceneManager.LoadScene("Map");
             yield return new WaitForSeconds(.5f);
             _mapGo = GameObject.Find("Map").GetComponent<Map>();
-            _mapGo.Initialize(_currentLevel);
+            _mapGo.Initialize();
             RemoveDeadCardsFromDeck();
-            
+
             if (_mapGo != null)
-                _mapGo.SelectedUpgradeCard += OnMapStageComplete;
+            {
+                _mapGo.SelectedPack += OnShopPackObtained;
+                _mapGo.SelectedRest += OnSelectedRest;
+                _mapGo.LevelCompleted += OnLevelCompleted;
+            }
+        }
+
+        private void OnSelectedRest(object sender, EventArgs e)
+        {
+            foreach (var card in _deck)
+            {
+                card.Hp = Math.Min(card.Hp + Mathf.FloorToInt(card.Hp * 0.2f), card.baseCard.hp);
+            }
+        }
+
+        private void OnLevelCompleted(object sender, int e)
+        {
+            StartCoroutine(LoadBattleSceneCoroutine());
         }
     }
 }

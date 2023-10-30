@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace Features.Maps
@@ -8,7 +9,7 @@ namespace Features.Maps
         // Start is called before the first frame update
         void Start()
         {
-            map.Initialize(1);
+            map.Initialize();
 
         }
     }

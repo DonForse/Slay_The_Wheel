@@ -46,6 +46,11 @@ namespace Features.Maps.Shop
             container.SetActive(true);
         }
 
+        public void Hide()
+        {
+            container.SetActive(false);
+        }
+
         private void OnPackSelected(object sender, CardPackScriptableObject e)
         {
             container.SetActive(false);
