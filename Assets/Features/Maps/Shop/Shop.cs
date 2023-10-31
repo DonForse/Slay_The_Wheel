@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Serialization;
 using UnityEngine.UI;
 using Random = UnityEngine.Random;
 
@@ -10,9 +9,12 @@ namespace Features.Maps.Shop
     public class Shop : MonoBehaviour
     {
         [SerializeField][Range(0,8)] private int amountOfPacks;
-        [SerializeField] private GameObject container;
+        [SerializeField] private GameObject packSelectionCanvas;
+        
+        [SerializeField] private GameObject packSelectionContainer;
+        
         [SerializeField] private ShopPack shopPackPrefab;
-        [SerializeField] private GameObject revealCardContainer;
+        [SerializeField] private GameObject revealCardCanvas;
         [SerializeField] private List<CardReveal> cardReveals;
         [SerializeField] private Button continueButton;
         private CardPackScriptableObject _packSelected;
@@ -31,33 +33,33 @@ namespace Features.Maps.Shop
         public void Show(List<CardPackScriptableObject> packs)
         {
             continueButton.enabled = false;
-            foreach (Transform child in container.transform)
+            foreach (Transform child in packSelectionContainer.transform)
             {
                 Destroy(child.gameObject);
             }
 
             for (int i = 0; i < amountOfPacks; i++)
             {
-                var shopPack  =Instantiate(shopPackPrefab, container.transform);
+                var shopPack  =Instantiate(shopPackPrefab, packSelectionContainer.transform);
                 shopPack.Set(packs[Random.Range(0, packs.Count)]);
                 shopPack.OnClick += OnPackSelected;
             }
 
-            container.SetActive(true);
+            packSelectionCanvas.SetActive(true);
         }
 
         public void Hide()
         {
-            this.container.SetActive(false);
-            this.revealCardContainer.SetActive(false);
+            this.packSelectionCanvas.SetActive(false);
+            this.revealCardCanvas.SetActive(false);
             this.gameObject.SetActive(false);
         }
 
         private void OnPackSelected(object sender, CardPackScriptableObject e)
         {
-            container.SetActive(false);
+            packSelectionCanvas.SetActive(false);
             _packSelected = e;
-            revealCardContainer.SetActive(true);
+            revealCardCanvas.SetActive(true);
             for (int i = 0; i < e.Cards.Count; i++)
             {
                 cardReveals[i].Set(e.Cards[i]);

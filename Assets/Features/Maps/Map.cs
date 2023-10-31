@@ -23,6 +23,7 @@ namespace Features.Maps
         private void Awake()
         {
             mapPlayerTracker.NodeSelected += OnNodeSelected;
+            mapPlayerTracker.Locked = false;
             shop.PackSelected += OnPackSelected;
         }
 
@@ -38,22 +39,29 @@ namespace Features.Maps
             {
                 case NodeType.MinorEnemy:
                     MinorEnemySelected?.Invoke(this, 1);
+                    mapPlayerTracker.Locked = false;
                     break;
                 case NodeType.EliteEnemy:
                     MinorEnemySelected?.Invoke(this, 4);
+                    mapPlayerTracker.Locked = false;
                     break;
                 case NodeType.RestSite:
                     SelectedRest?.Invoke(this, null);
+                    mapPlayerTracker.Locked = false;
                     break;
                 case NodeType.Treasure:
+                    mapPlayerTracker.Locked = false;
                     break;
                 case NodeType.Store:
                     shop.Show(packs.ToList());
                     break;
                 case NodeType.Boss:
                     MinorEnemySelected?.Invoke(this, 10);
+                    mapPlayerTracker.Locked = false;
                     break;
                 case NodeType.Mystery:
+                    mapPlayerTracker.Locked = false;
+
                     break;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(e), e, null);
@@ -63,6 +71,7 @@ namespace Features.Maps
         private void OnPackSelected(object sender, CardPackScriptableObject pack)
         {
             shop.Hide();
+            mapPlayerTracker.Locked = false;
             SelectedPack?.Invoke(this, pack.Cards);
         }
     }
