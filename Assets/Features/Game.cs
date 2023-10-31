@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Linq;
 using Features.Battles;
 using Features.Cards;
-using Features.Maps;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using Random = UnityEngine.Random;
@@ -22,15 +21,24 @@ namespace Features
         private Maps.Map _mapGo;
         private RunCard _heroCard;
 
-        // Start is called before the first frame update
-        IEnumerator Start()
+        private int minorBattlesAmount = 0;
+        private int majorBattlesAmount = 0;
+        private int bossBattlesAmount = 0;
+
+        private static void ClearRunData()
         {
             PlayerPrefs.DeleteAll();
             PlayerPrefs.Save();
+        }
+
+        IEnumerator Start()
+        {
+            ClearRunData();
+
             DontDestroyOnLoad(this.gameObject);
             AddInitialCards();
 
-            yield return LoadBattleSceneCoroutine();
+            yield return LoadMapSceneCoroutine();
         }
 
         private void AddInitialCards()
@@ -65,36 +73,41 @@ namespace Features
 
         private void RemoveDeadCardsFromDeck() => _deck = _deck.Where(x => !x.IsDead).ToList();
 
-        private int GetEnemyWheelSize()
+        private (List<RunCard>cards, int size) GetBattleEnemies(int difficulty)
         {
-            switch (PlayerPrefs.GetInt("CurrentLevel"))
+            if (difficulty == 0)
             {
-                case 0:
-                    return 3;
-                case 1:
-                    return 4;
-                case 2:
-                case 3:
-                    return 3;
-                default:
-                    return 3;
-            }
-        }
-
-        private List<RunCard> GetBattleEnemies()
-        {
-            var slime = enemiesDb.cards.FirstOrDefault(x => x.cardName.Contains("Slime"));
-            var zombie = enemiesDb.cards.FirstOrDefault(x => x.cardName.Contains("Zombie"));
-            var spider = enemiesDb.cards.FirstOrDefault(x => x.cardName.Contains("Spider"));
-            return PlayerPrefs.GetInt("CurrentLevel") switch
-            {
-                0 => new List<RunCard>() { new RunCard(slime), new RunCard(slime), new RunCard(slime) },
-                1 => new List<RunCard>()
+                var slime = enemiesDb.cards.FirstOrDefault(x => x.cardName.Contains("Slime"));
+                var zombie = enemiesDb.cards.FirstOrDefault(x => x.cardName.Contains("Zombie"));
+                var spider = enemiesDb.cards.FirstOrDefault(x => x.cardName.Contains("Spider"));
+                return minorBattlesAmount switch
                 {
-                    new RunCard(slime), new RunCard(slime), new RunCard(slime), new RunCard(zombie),
-                },
-                2 => new List<RunCard>() { new RunCard(zombie), new RunCard(spider), new RunCard(slime) },
-                _ => new List<RunCard>() { new RunCard(spider), new RunCard(spider), new RunCard(spider) }
+                    1 => (new List<RunCard>() { new RunCard(slime), new RunCard(slime), new RunCard(slime) }, 3),
+                    2 => (new List<RunCard>() { new RunCard(slime), new RunCard(slime), new RunCard(slime), new RunCard(zombie)}, 4),
+                    3 => (new List<RunCard>() { new RunCard(zombie), new RunCard(spider), new RunCard(slime) }, 3),
+                    _ => (new List<RunCard>() { new RunCard(spider), new RunCard(spider), new RunCard(spider) }, 3)
+                };
+            }
+
+            if (difficulty == 1)
+            {
+                var slime = enemiesDb.cards.FirstOrDefault(x => x.cardName.Contains("Slime"));
+                var kobold = enemiesDb.cards.FirstOrDefault(x => x.cardName.Contains("Kobold Archer"));
+                var zombie = enemiesDb.cards.FirstOrDefault(x => x.cardName.Contains("Zombie"));
+                var spider = enemiesDb.cards.FirstOrDefault(x => x.cardName.Equals("Spider"));
+                var bigSpider = enemiesDb.cards.FirstOrDefault(x => x.cardName.Equals("Big Spider"));
+                return majorBattlesAmount switch
+                {
+                    1 => (new List<RunCard>() { new RunCard(spider), new RunCard(zombie), new RunCard(spider), new RunCard(spider), new RunCard(spider), new RunCard(spider), new RunCard(bigSpider)}, 5) ,
+                    _ => (new List<RunCard>() { new RunCard(zombie), new RunCard(zombie), new RunCard(zombie), new RunCard(zombie),
+                        new RunCard(zombie), new RunCard(zombie), new RunCard(zombie), new RunCard(zombie), new RunCard(zombie), new RunCard(zombie) }, 5)
+                };
+            }
+
+            var dinosaur = enemiesDb.cards.FirstOrDefault(x => x.cardName.Contains("Cookie Dinosaur"));
+            return bossBattlesAmount switch
+            {
+                _=> (new List<RunCard>() { new RunCard(dinosaur), new RunCard(dinosaur), new RunCard(dinosaur), new RunCard(dinosaur) , new RunCard(dinosaur)},1)  
             };
         }
 
@@ -105,29 +118,22 @@ namespace Features
             StartCoroutine(LoadMapSceneCoroutine());
         }
 
-        private void OnShopPackObtained(object sender, List<BaseCardScriptableObject> cards)
-        {
-            foreach (var card in cards)
-            {
-                var runCard = new RunCard(card);
-                _deck.Add(runCard);
-            }
-        }
-
-        private IEnumerator LoadBattleSceneCoroutine()
+        private IEnumerator LoadBattleSceneCoroutine(List<RunCard> battleEnemies, int enemyWheelSize)
         {
             if (_mapGo != null)
             {
                 _mapGo.SelectedPack -= OnShopPackObtained;
                 _mapGo.SelectedRest -= OnSelectedRest;
                 _mapGo.MinorEnemySelected -= OnMinorEnemySelected;
+                _mapGo.MajorEnemySelected -= OnMajorEnemySelected;
+                _mapGo.BossEnemySelected -= OnBossEnemySelected;
             }
 
             ShuffleDeck();
             SceneManager.LoadScene("Battle");
             yield return new WaitForSeconds(.5f);
             _battleGo = GameObject.Find("Battle").GetComponent<Battle>();
-            yield return _battleGo.Initialize(_deck, GetBattleEnemies(), 5, GetEnemyWheelSize(), _heroCard);
+            yield return _battleGo.Initialize(_deck,battleEnemies, 5, enemyWheelSize, _heroCard);
 
             if (_battleGo != null)
                 _battleGo.BattleFinished += BattleComplete;
@@ -148,9 +154,19 @@ namespace Features
                 _mapGo.SelectedPack += OnShopPackObtained;
                 _mapGo.SelectedRest += OnSelectedRest;
                 _mapGo.MinorEnemySelected += OnMinorEnemySelected;
+                _mapGo.BossEnemySelected += OnBossEnemySelected;
+                _mapGo.MajorEnemySelected += OnMajorEnemySelected;
             }
         }
 
+        private void OnShopPackObtained(object sender, List<BaseCardScriptableObject> cards)
+        {
+            foreach (var card in cards)
+            {
+                var runCard = new RunCard(card);
+                _deck.Add(runCard);
+            }
+        }
         private void OnSelectedRest(object sender, EventArgs e)
         {
             foreach (var card in _deck)
@@ -161,7 +177,23 @@ namespace Features
 
         private void OnMinorEnemySelected(object sender, EventArgs e)
         {
-            StartCoroutine(LoadBattleSceneCoroutine());
+            minorBattlesAmount++;
+            var data = GetBattleEnemies(0);
+            StartCoroutine(LoadBattleSceneCoroutine(data.cards,data.size));
+        }
+
+        private void OnMajorEnemySelected(object sender, EventArgs e)
+        {
+            majorBattlesAmount++;
+            var data = GetBattleEnemies(1);
+            StartCoroutine(LoadBattleSceneCoroutine(data.cards,data.size));
+        }
+
+        private void OnBossEnemySelected(object sender, EventArgs e)
+        {
+            bossBattlesAmount++;
+            var data = GetBattleEnemies(1);
+            StartCoroutine(LoadBattleSceneCoroutine(data.cards,data.size));
         }
     }
 }

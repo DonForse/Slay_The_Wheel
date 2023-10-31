@@ -18,6 +18,8 @@ namespace Features.Maps
 
         public event EventHandler<List<BaseCardScriptableObject>> SelectedPack;
         public event EventHandler MinorEnemySelected;
+        public event EventHandler BossEnemySelected;
+        public event EventHandler MajorEnemySelected;
         public event EventHandler SelectedRest;
 
         private void Awake()
@@ -42,7 +44,7 @@ namespace Features.Maps
                     mapPlayerTracker.Locked = false;
                     break;
                 case NodeType.EliteEnemy:
-                    MinorEnemySelected?.Invoke(this, null);
+                    MajorEnemySelected?.Invoke(this, null); 
                     mapPlayerTracker.Locked = false;
                     break;
                 case NodeType.RestSite:
@@ -56,7 +58,7 @@ namespace Features.Maps
                     shop.Show(packs.ToList());
                     break;
                 case NodeType.Boss:
-                    MinorEnemySelected?.Invoke(this, null);
+                    BossEnemySelected?.Invoke(this, null);
                     mapPlayerTracker.Locked = false;
                     break;
                 case NodeType.Mystery:
