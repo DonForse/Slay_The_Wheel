@@ -4,77 +4,59 @@ using System.Linq;
 using Cinemachine;
 using Features.Cards;
 using UnityEngine;
+using UnityPackages.Slay_The_Spire_Map.Scripts;
 
 namespace Features.Maps
 {
     public class Map : MonoBehaviour
     {
-        [SerializeField] List<MapSpot> mapSpots;
         [SerializeField] CinemachineVirtualCamera virtualCamera;
         [SerializeField] private Shop.Shop shop;
         [SerializeField] private List<CardPackScriptableObject> packs;
-        [SerializeField] private MapLine mapLine;
+        [SerializeField] private MapPlayerTracker mapPlayerTracker;
         private List<MapSpot> _possibleNextPositions;
 
         public event EventHandler<List<BaseCardScriptableObject>> SelectedPack;
-        public event EventHandler<int> LevelCompleted;
+        public event EventHandler<int> MinorEnemySelected;
         public event EventHandler SelectedRest;
 
-        public void Initialize()
+        private void Awake()
         {
-            var current = PlayerPrefs.GetInt("CurrentLevel",0);
-            virtualCamera.Follow = mapSpots[current].transform;
+            mapPlayerTracker.NodeSelected += OnNodeSelected;
             shop.PackSelected += OnPackSelected;
-            
-            var levelsToSetLine = new List<Transform>();
-            var levelsIndex = PlayerPrefs.GetString("LevelsCompleted","0").Split(',').Select(int.Parse);
-            foreach (var index in levelsIndex)
-            {
-                levelsToSetLine.Add(mapSpots[index].transform);
-            }
-
-            SetLevel(mapSpots[current].PossibleNextPositions);
-// shop.LevelSelected += OnLevelSelected;
-            mapLine.SetLine(levelsToSetLine.ToArray());
         }
 
-        private void SetLevel(List<MapSpot> possibleNextPositions)
+        private void OnDestroy()
         {
-            _possibleNextPositions = possibleNextPositions;
-            foreach (var spot in _possibleNextPositions)
-            {
-                spot.Selected += OnSpotSelected;
-                spot.SetAvailable();
-            }
+            mapPlayerTracker.NodeSelected -= OnNodeSelected;
+            shop.PackSelected -= OnPackSelected;
         }
-
-        private void OnSpotSelected(object sender, MapSpotType e)
+        
+        private void OnNodeSelected(object sender, NodeType e)
         {
-            var mapSpotSelected = (MapSpot)sender;
-            foreach (var spot in _possibleNextPositions)
-            {
-                spot.Selected -= OnSpotSelected;
-            }
-
-            var levelIndex = mapSpots.IndexOf(mapSpotSelected);
-            var levelsIndex = PlayerPrefs.GetString("LevelsCompleted","0").Split(',').Select(int.Parse).ToList();
-            levelsIndex.Add(levelIndex);
-            PlayerPrefs.SetString("LevelsCompleted", string.Join(',', levelsIndex));
-            PlayerPrefs.SetInt("CurrentLevel", levelIndex);
-            
             switch (e)
             {
-                case MapSpotType.Shop:
-                    shop.Show(packs.ToList());
-                    Initialize();
+                case NodeType.MinorEnemy:
+                    MinorEnemySelected?.Invoke(this, 1);
                     break;
-                case MapSpotType.Battle:
-                    LevelCompleted?.Invoke(this, levelIndex);
+                case NodeType.EliteEnemy:
+                    MinorEnemySelected?.Invoke(this, 4);
                     break;
-                case MapSpotType.Rest:
+                case NodeType.RestSite:
                     SelectedRest?.Invoke(this, null);
-                    Initialize();
                     break;
+                case NodeType.Treasure:
+                    break;
+                case NodeType.Store:
+                    shop.Show(packs.ToList());
+                    break;
+                case NodeType.Boss:
+                    MinorEnemySelected?.Invoke(this, 10);
+                    break;
+                case NodeType.Mystery:
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(e), e, null);
             }
         }
 
@@ -83,6 +65,5 @@ namespace Features.Maps
             shop.Hide();
             SelectedPack?.Invoke(this, pack.Cards);
         }
-
     }
 }

@@ -19,12 +19,14 @@ namespace Features
 
         private List<RunCard> _deck;
         private Battle _battleGo;
-        private Map _mapGo;
+        private Maps.Map _mapGo;
         private RunCard _heroCard;
 
         // Start is called before the first frame update
         IEnumerator Start()
         {
+            PlayerPrefs.DeleteAll();
+            PlayerPrefs.Save();
             DontDestroyOnLoad(this.gameObject);
             AddInitialCards();
 
@@ -118,7 +120,7 @@ namespace Features
             {
                 _mapGo.SelectedPack -= OnShopPackObtained;
                 _mapGo.SelectedRest -= OnSelectedRest;
-                _mapGo.LevelCompleted -= OnLevelCompleted;
+                _mapGo.MinorEnemySelected -= OnMinorEnemySelected;
             }
 
             ShuffleDeck();
@@ -138,15 +140,14 @@ namespace Features
 
             SceneManager.LoadScene("Map");
             yield return new WaitForSeconds(.5f);
-            _mapGo = GameObject.Find("Map").GetComponent<Map>();
-            _mapGo.Initialize();
+            _mapGo = GameObject.Find("Map").GetComponent<Maps.Map>();
             RemoveDeadCardsFromDeck();
 
             if (_mapGo != null)
             {
                 _mapGo.SelectedPack += OnShopPackObtained;
                 _mapGo.SelectedRest += OnSelectedRest;
-                _mapGo.LevelCompleted += OnLevelCompleted;
+                _mapGo.MinorEnemySelected += OnMinorEnemySelected;
             }
         }
 
@@ -158,7 +159,7 @@ namespace Features
             }
         }
 
-        private void OnLevelCompleted(object sender, int e)
+        private void OnMinorEnemySelected(object sender, int e)
         {
             StartCoroutine(LoadBattleSceneCoroutine());
         }

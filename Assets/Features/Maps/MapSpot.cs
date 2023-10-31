@@ -1,42 +1,51 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using Features.Maps;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class MapSpot : MonoBehaviour
+namespace Features.Maps
 {
-    public List<MapSpot> PossibleNextPositions;
-    [SerializeField]private MapSpotType mapSpotType;
-    [SerializeField]private Button button;
-    [SerializeField] private Image spotImage;
-    [SerializeField] private Sprite[] icons;
-    public EventHandler<MapSpotType> Selected;
-
-    private void Awake()
+    public class MapSpot : MonoBehaviour
     {
-        SetImage();
-    }
+        public List<MapSpot> PossibleNextPositions;
+        [SerializeField]private MapSpotType mapSpotType;
+        [SerializeField]private Button button;
+        [SerializeField] private Image spotImage;
+        [SerializeField] private Sprite[] icons;
+        private LineRenderer _lineRenderer;
+        public EventHandler<MapSpotType> Selected;
 
-    private void SetImage()
-    {
-        spotImage.sprite = icons[(int)mapSpotType];
-    }
+        private void Start()
+        {
+            SetImage();
+        }
 
-    private void OnDisable()
-    {
-        button.onClick.RemoveListener(OnButtonPressed);
-    }
+        private void OnEnable()
+        {
+            _lineRenderer = GetComponent<LineRenderer>();
+            _lineRenderer.SetPositions(PossibleNextPositions.Select(x=>x.transform.position).ToArray());
+        }
 
-    private void OnButtonPressed()
-    {
-        Selected?.Invoke(this,mapSpotType);
-    }
+        private void SetImage()
+        {
+            spotImage.sprite = icons[(int)mapSpotType];
+        }
 
-    public void SetAvailable()
-    {
-        button.interactable = true;
-        button.onClick.AddListener(OnButtonPressed);
+        private void OnDisable()
+        {
+            button.onClick.RemoveListener(OnButtonPressed);
+        }
+
+        private void OnButtonPressed()
+        {
+            Selected?.Invoke(this,mapSpotType);
+        }
+
+        public void SetAvailable()
+        {
+            button.interactable = true;
+            button.onClick.AddListener(OnButtonPressed);
+        }
     }
 }
