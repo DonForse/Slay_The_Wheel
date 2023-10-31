@@ -98,7 +98,7 @@ namespace Features
                 var bigSpider = enemiesDb.cards.FirstOrDefault(x => x.cardName.Equals("Big Spider"));
                 return majorBattlesAmount switch
                 {
-                    1 => (new List<RunCard>() { new RunCard(spider), new RunCard(zombie), new RunCard(spider), new RunCard(spider), new RunCard(spider), new RunCard(spider), new RunCard(bigSpider)}, 5) ,
+                    1 => (new List<RunCard>() { new RunCard(spider), new RunCard(spider), new RunCard(spider), new RunCard(spider), new RunCard(spider), new RunCard(spider), new RunCard(bigSpider)}, 5) ,
                     _ => (new List<RunCard>() { new RunCard(zombie), new RunCard(zombie), new RunCard(zombie), new RunCard(zombie),
                         new RunCard(zombie), new RunCard(zombie), new RunCard(zombie), new RunCard(zombie), new RunCard(zombie), new RunCard(zombie) }, 5)
                 };
