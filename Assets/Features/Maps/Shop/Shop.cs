@@ -32,6 +32,7 @@ namespace Features.Maps.Shop
 
         public void Show(List<CardPackScriptableObject> packs)
         {
+            this.gameObject.SetActive(true);
             continueButton.enabled = false;
             foreach (Transform child in packSelectionContainer.transform)
             {

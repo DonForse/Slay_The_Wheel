@@ -159,7 +159,7 @@ namespace Features
             }
         }
 
-        private void OnMinorEnemySelected(object sender, int e)
+        private void OnMinorEnemySelected(object sender, EventArgs e)
         {
             StartCoroutine(LoadBattleSceneCoroutine());
         }

@@ -23,6 +23,14 @@ namespace UnityPackages.Slay_The_Spire_Map.Scripts
         [Tooltip("Prefab of the UI line between the nodes (uses scripts from Unity UI Extensions)")]
         [SerializeField] private UILineRenderer uiLinePrefab;
 
+        public void NavigateToNode(MapNode mapNode)
+        {
+            var scrollRect = GetScrollRectForMap();
+            var length = Map.DistanceBetweenFirstAndLastLayers();
+            var nodePosition = mapNode.Node.position;
+            scrollRect.normalizedPosition = nodePosition / length;
+        }
+
         protected override void ClearMap()
         {
             scrollRectHorizontal.gameObject.SetActive(false);

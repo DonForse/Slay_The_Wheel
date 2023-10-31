@@ -28,6 +28,7 @@ MonoBehaviour:
   numOfStartingNodes:
     min: 3
     max: 4
+  extraPaths: 1
   layers:
     array:
     - nodeType: 0

@@ -593,6 +593,10 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3339309021387442498, guid: f3d397d8780414037811524dd988a62e, type: 3}
+      propertyPath: virtualCamera
+      value: 
+      objectReference: {fileID: 1876884427}
+    - target: {fileID: 3339309021387442498, guid: f3d397d8780414037811524dd988a62e, type: 3}
       propertyPath: lockAfterSelecting
       value: 1
       objectReference: {fileID: 0}

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using Cinemachine;
 using DG.Tweening;
 using UnityEngine;
 
@@ -14,6 +15,7 @@ namespace UnityPackages.Slay_The_Spire_Map.Scripts
 
         [HideInInspector] public event EventHandler<NodeType> NodeSelected; 
         public static MapPlayerTracker Instance;
+        [SerializeField]private CinemachineVirtualCamera virtualCamera;
 
         public bool Locked { get; set; }
 
@@ -56,7 +58,7 @@ namespace UnityPackages.Slay_The_Spire_Map.Scripts
             view.SetAttainableNodes();
             view.SetLineColors();
             mapNode.ShowSwirlAnimation();
-
+            ((MapViewUI)view).NavigateToNode(mapNode);
             DOTween.Sequence().AppendInterval(enterNodeDelay).OnComplete(() => EnterNode(mapNode));
         }
 
