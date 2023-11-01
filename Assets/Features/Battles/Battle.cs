@@ -107,8 +107,16 @@ namespace Features.Battles
             var attackerCard = attacker.GetCard();
             _busQueue.EnqueueAction(ActStartCoroutine(attackerWheelController));
             _busQueue.EnqueueAction(ApplyWheelMovementEffect(attackerWheelController));
+            _busQueue.EnqueueAction(ProcessAct(attacker, attackerWheelController, defenderWheelController, attackerCard));
+            yield break;
+        }
+
+        private IEnumerator ProcessAct(InPlayCard attacker, WheelController attackerWheelController,
+            WheelController defenderWheelController, RunCard attackerCard)
+        {
             if (attacker.IsDead)
             {
+                _busQueue.EnqueueAction(attackerWheelController.PutAliveUnitAtFront(true));
                 _busQueue.EnqueueAction(ProcessAttackerDiedInWheel(attacker, attackerWheelController));
                 yield break;
             }
@@ -119,7 +127,7 @@ namespace Features.Battles
             if (CompletedActions())
             {
                 _busQueue.EnqueueAction(ChangeTurn());
-                yield break;
+                yield break;;
             }
 
             _busQueue.EnqueueAction(ActEndCoroutine(attackerWheelController));
