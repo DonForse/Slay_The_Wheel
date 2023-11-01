@@ -40,7 +40,6 @@ namespace UnityPackages.Slay_The_Spire_Map.Scripts
         {
             var map = MapGenerator.GetMap(config);
             CurrentMap = map;
-            Debug.Log(map.ToJson());
             view.ShowMap(map);
         }
 

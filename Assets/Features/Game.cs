@@ -192,7 +192,7 @@ namespace Features
         private void OnBossEnemySelected(object sender, EventArgs e)
         {
             bossBattlesAmount++;
-            var data = GetBattleEnemies(1);
+            var data = GetBattleEnemies(2);
             StartCoroutine(LoadBattleSceneCoroutine(data.cards,data.size));
         }
     }
