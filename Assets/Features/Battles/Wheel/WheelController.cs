@@ -19,6 +19,7 @@ namespace Features.Battles.Wheel
 
         // private List<RunCard> _cardsToAdd;
         private int frontCardIndex;
+        private Func<IEnumerator> _wheelMovedCallback;
         public event EventHandler<InPlayCard> Acted;
         public event EventHandler<InPlayCard> WheelTurn;
 
@@ -107,7 +108,7 @@ namespace Features.Battles.Wheel
             if (AllUnitsDead())
                 yield break;
             IncrementFrontCardIndex();
-            WheelTurn?.Invoke(this, Cards[frontCardIndex]);
+            yield return _wheelMovedCallback.Invoke();
         }
 
         private IEnumerator OnTurnRight()
@@ -115,7 +116,7 @@ namespace Features.Battles.Wheel
             if (AllUnitsDead())
                 yield break;
             DecrementFrontCardIndex();
-            WheelTurn?.Invoke(this, Cards[frontCardIndex]);
+            yield return _wheelMovedCallback.Invoke();
         }
 
         private IEnumerator SetRunCards(bool player, List<RunCard>cards)
@@ -166,18 +167,29 @@ namespace Features.Battles.Wheel
             return cards.Distinct().ToList();
         }
 
-        public IEnumerator RotateRight()
+        public IEnumerator RotateRight(int count)
         {
-            yield return wheelMovement.TurnTowardsDirection(true);
+            for (int i = 0; i < count; i++)
+            {
+                yield return wheelMovement.TurnTowardsDirection(true);
+            }
+
             yield return PutAliveUnitAtFront(true);
-            yield return new WaitForSeconds(0.1f);
         }
 
-        public IEnumerator RotateLeft()
+        public IEnumerator RotateLeft(int count)
         {
-            yield return wheelMovement.TurnTowardsDirection(false);
+            for (int i = 0; i < count; i++)
+            {
+                yield return wheelMovement.TurnTowardsDirection(false);
+            }
+
             yield return PutAliveUnitAtFront(false);
-            yield return new WaitForSeconds(0.1f);
+        }
+
+        public void SetWheelMovedCallback(Func<IEnumerator> onPlayerWheelMoved)
+        {
+            _wheelMovedCallback = onPlayerWheelMoved;
         }
     }
 }
