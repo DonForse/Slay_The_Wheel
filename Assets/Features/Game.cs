@@ -107,7 +107,7 @@ namespace Features
             var dinosaur = enemiesDb.cards.FirstOrDefault(x => x.cardName.Contains("Cookie Dinosaur"));
             return bossBattlesAmount switch
             {
-                _=> (new List<RunCard>() { new RunCard(dinosaur), new RunCard(dinosaur), new RunCard(dinosaur), new RunCard(dinosaur) , new RunCard(dinosaur)},1)  
+                _=> (new List<RunCard>() { new RunCard(dinosaur)},3)  
             };
         }
 
