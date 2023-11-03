@@ -129,6 +129,7 @@ namespace Features.Battles
             _busQueue.EnqueueAction(ApplyAfterHitEffect(attackerCard, defenderWheelController));
             if (CompletedActions())
             {
+                _busQueue.EnqueueAction(ActEndCoroutine(attackerWheelController));
                 _busQueue.EnqueueAction(ChangeTurn());
                 yield break;
                 ;
@@ -158,6 +159,7 @@ namespace Features.Battles
                 yield return EndBattle(attackerWheelController);
             if (CompletedActions())
             {
+                _busQueue.EnqueueAction(ActEndCoroutine(attackerWheelController));
                 _busQueue.EnqueueAction(ChangeTurn());
                 yield break; // yield break;
             }
@@ -440,7 +442,7 @@ namespace Features.Battles
             }
             else if (skillIndex == 3)
             {
-                StartCoroutine(WheelOfDeath());
+                _busQueue.EnqueueAction(WheelOfDeath());
             }
 
             SetActions(_actions - spellViews[skillIndex - 1].actionCost);
