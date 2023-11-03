@@ -18,6 +18,7 @@ namespace Features.Battles
         [SerializeField] private BusQueue _busQueue;
         [SerializeField] private TurnMessage turnMessage;
         [SerializeField] private ActionsView actionsView;
+        [SerializeField] private SpellView[] spellViews;
 
         private int _actions;
         private int turn = 0;
@@ -25,6 +26,7 @@ namespace Features.Battles
         private List<RunCard> _playerDiscardPile;
         private List<RunCard> _enemiesDeck;
         private RunCard _heroCard;
+        private bool acting;
         public event EventHandler<bool> BattleFinished;
 
         // Start is called before the first frame update
@@ -107,7 +109,8 @@ namespace Features.Battles
             var attackerCard = attacker.GetCard();
             _busQueue.EnqueueAction(ActStartCoroutine(attackerWheelController));
             _busQueue.EnqueueAction(ApplyWheelMovementEffect(attackerWheelController));
-            _busQueue.EnqueueAction(ProcessAct(attacker, attackerWheelController, defenderWheelController, attackerCard));
+            _busQueue.EnqueueAction(
+                ProcessAct(attacker, attackerWheelController, defenderWheelController, attackerCard));
             yield break;
         }
 
@@ -127,7 +130,8 @@ namespace Features.Battles
             if (CompletedActions())
             {
                 _busQueue.EnqueueAction(ChangeTurn());
-                yield break;;
+                yield break;
+                ;
             }
 
             _busQueue.EnqueueAction(ActEndCoroutine(attackerWheelController));
@@ -135,6 +139,7 @@ namespace Features.Battles
 
         private IEnumerator ActEndCoroutine(WheelController attackerWheelController)
         {
+            acting = false;
             Debug.Log($"<color=green>{"ACT-END"}</color>");
             attackerWheelController.UnlockWheel();
             yield return null;
@@ -142,6 +147,7 @@ namespace Features.Battles
 
         private IEnumerator ActStartCoroutine(WheelController attackerWheelController)
         {
+            acting = true;
             attackerWheelController.LockWheel();
             yield return null;
         }
@@ -242,7 +248,8 @@ namespace Features.Battles
                         _busQueue.EnqueueInterruptAction(defender.SetCard(cards.First()));
                 }
 
-                if (_playerBattleDeck.Count == 0 && _playerDiscardPile.Count == 0 && defenderWheelController.AllUnitsDead())
+                if (_playerBattleDeck.Count == 0 && _playerDiscardPile.Count == 0 &&
+                    defenderWheelController.AllUnitsDead())
                 {
                     _busQueue.EnqueueInterruptAction(EndBattle(defenderWheelController));
                 }
@@ -362,6 +369,11 @@ namespace Features.Battles
 
         private IEnumerator StartPlayerTurn()
         {
+            foreach (var spell in spellViews)
+            {
+                spell.ReduceCooldown();
+            }
+
             yield return turnMessage.Show(true);
             enemyWheelController.LockWheel();
             playerWheelController.UnlockWheel();
@@ -370,6 +382,7 @@ namespace Features.Battles
         [UsedImplicitly]
         public void SkipTurn()
         {
+            if (acting) return;
             if (!IsPlayerTurn()) return;
             SetActions(_actions - 1);
             if (CompletedActions())
@@ -380,6 +393,7 @@ namespace Features.Battles
         [UsedImplicitly]
         public void Spin()
         {
+            if (acting) return;
             if (IsPlayerTurn())
                 return;
             // _busQueue.EnqueueAction(ChangeTurn());
@@ -388,6 +402,7 @@ namespace Features.Battles
         [UsedImplicitly]
         public void Shuffle()
         {
+            if (acting) return;
             if (!IsPlayerTurn()) return;
             SetActions(_actions - 1);
             _busQueue.EnqueueAction(ShuffleCoroutine());
@@ -396,8 +411,61 @@ namespace Features.Battles
             ;
         }
 
+        [UsedImplicitly]
+        public void UseSkill(int skillIndex)
+        {
+            if (acting) return;
+            if (!IsPlayerTurn()) return;
+            if (_actions < spellViews[skillIndex - 1].actionCost) return;
+            spellViews[skillIndex - 1].Activate();
+            if (skillIndex == 1)
+            {
+                foreach (var card in enemyWheelController.Cards)
+                {
+                    card.AddEffect(Ability.Burn);
+                    card.AddEffect(Ability.Burn);
+                    card.AddEffect(Ability.Burn);
+                }
+            }
+            else if (skillIndex == 2)
+            {
+                foreach (var card in enemyWheelController.Cards)
+                {
+                    var totalBurns = card.Effects.Count(x => x == Ability.Burn);
+                    for (int i = 0; i < totalBurns; i++)
+                    {
+                        card.AddEffect(Ability.Burn);
+                    }
+                }
+            }
+            else if (skillIndex == 3)
+            {
+                StartCoroutine(WheelOfDeath());
+            }
+
+            SetActions(_actions - spellViews[skillIndex - 1].actionCost);
+            if (CompletedActions())
+                _busQueue.EnqueueAction(ChangeTurn());
+        }
+
+        private IEnumerator WheelOfDeath()
+        {
+            acting = true;
+            playerWheelController.LockWheel();
+            var burns = enemyWheelController.Cards.Max(x => x.Effects.Count(x => x == Ability.Burn));
+            while (burns > 0 && !enemyWheelController.AllUnitsDead())
+            {
+                if (enemyWheelController.AllUnitsDead()) yield break;
+                yield return enemyWheelController.RotateRight(burns);
+                burns = enemyWheelController.Cards.Max(x => x.Effects.Count(x => x == Ability.Burn));
+            }
+            playerWheelController.UnlockWheel();
+            acting = false;
+        }
+
         private IEnumerator ShuffleCoroutine()
         {
+            acting = true;
             var slots = playerWheelController.Cards.Count;
             var cards = DrawCards(slots - 1, ref _playerBattleDeck, ref _playerDiscardPile);
             var cardsInWheel = playerWheelController.Cards.Select(x => x.GetCard()).ToList();
@@ -408,6 +476,8 @@ namespace Features.Battles
             {
                 yield return playerWheelController.Cards[i].SetCard(cards[i]);
             }
+
+            acting = false;
         }
 
         private bool CompletedActions() => _actions == 0;
@@ -416,6 +486,10 @@ namespace Features.Battles
         {
             _actions = amount;
             actionsView.ShowRemaining(_actions);
+            foreach (var spellView in spellViews)
+            {
+                spellView.SetActivateable(spellView.actionCost <= _actions);
+            }
         }
     }
 }
