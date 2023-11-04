@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: CookieDinosaurCard
   m_EditorClassIdentifier: 
   cardName: Cookie Dinosaur
-  hp: 35
+  hp: 200
   attack: 10
   abilities: 
   cardSprite: {fileID: 21300000, guid: 7aff3f4f4f9469e40b9f489907cdd42e, type: 3}

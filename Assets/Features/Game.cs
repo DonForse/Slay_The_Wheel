@@ -78,14 +78,16 @@ namespace Features
             if (difficulty == 0)
             {
                 var slime = enemiesDb.cards.FirstOrDefault(x => x.cardName.Contains("Slime"));
+                var kobold = enemiesDb.cards.FirstOrDefault(x => x.cardName.Contains("Kobold Archer"));
+                var bigSpider = enemiesDb.cards.FirstOrDefault(x => x.cardName.Equals("Big Spider"));
                 var zombie = enemiesDb.cards.FirstOrDefault(x => x.cardName.Contains("Zombie"));
                 var spider = enemiesDb.cards.FirstOrDefault(x => x.cardName.Contains("Spider"));
                 return minorBattlesAmount switch
                 {
                     1 => (new List<RunCard>() { new RunCard(slime), new RunCard(slime), new RunCard(slime) }, 3),
                     2 => (new List<RunCard>() { new RunCard(slime), new RunCard(slime), new RunCard(slime), new RunCard(zombie)}, 4),
-                    3 => (new List<RunCard>() { new RunCard(zombie), new RunCard(spider), new RunCard(slime) }, 3),
-                    _ => (new List<RunCard>() { new RunCard(spider), new RunCard(spider), new RunCard(spider) }, 3)
+                    3 => (new List<RunCard>() { new RunCard(zombie), new RunCard(kobold), new RunCard(zombie) }, 3),
+                    _ => (new List<RunCard>() { new RunCard(spider), new RunCard(kobold), new RunCard(spider) }, 3)
                 };
             }
 
