@@ -37,7 +37,8 @@ namespace UnityPackages.Slay_The_Spire_Map.Scripts
         [Range(3, 10)]
         public int linePointsCount = 10;
         [Tooltip("Distance from the node till the line starting point")]
-        public float offsetFromNodes = 0.5f;
+        [Range(0,.4f)]
+        public float offsetFromNodes = 0.1f;
         [Header("Colors")]
         [Tooltip("Node Visited or Attainable color")]
         public Color32 visitedColor = Color.white;

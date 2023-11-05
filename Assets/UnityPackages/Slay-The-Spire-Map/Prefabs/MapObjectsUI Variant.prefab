@@ -938,7 +938,7 @@ MonoBehaviour:
   yOffset: 2
   linePrefab: {fileID: 7721379314303246883, guid: d75ab2aed486b42e6b8d4f177babbda2, type: 3}
   linePointsCount: 10
-  offsetFromNodes: 15
+  offsetFromNodes: 0.055
   visitedColor:
     serializedVersion: 2
     rgba: 4294967295

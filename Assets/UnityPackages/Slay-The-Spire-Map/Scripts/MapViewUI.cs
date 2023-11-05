@@ -174,31 +174,30 @@ namespace UnityPackages.Slay_The_Spire_Map.Scripts
         protected override void AddLineConnection(MapNode from, MapNode to)
         {
             if (uiLinePrefab == null) return;
+
+            var fromRT = from.transform as RectTransform;
+            var fromRTChildRect = ((RectTransform)fromRT.GetChild(0)).rect;
+            var fromPoint = fromRT.anchoredPosition;
+            var toRT = to.transform as RectTransform;
+            var toPoint = toRT.anchoredPosition;
+            var toChildOffset = new Vector2(0, ((RectTransform)toRT.GetChild(0)).rect.y);
             
             var lineRenderer = Instantiate(uiLinePrefab, mapParent.transform);
-            lineRenderer.transform.SetAsFirstSibling();
-            var fromRT = from.transform as RectTransform;
-            var toRT = to.transform as RectTransform;
-            var fromPoint = fromRT.anchoredPosition +
-                            (toRT.anchoredPosition - fromRT.anchoredPosition).normalized * offsetFromNodes;
-
-            var toPoint = toRT.anchoredPosition +
-                          (fromRT.anchoredPosition - toRT.anchoredPosition).normalized * offsetFromNodes;
-
-            // drawing lines in local space:
-            lineRenderer.transform.position = from.transform.position +
-                                              (Vector3) (toRT.anchoredPosition - fromRT.anchoredPosition).normalized *
-                                              offsetFromNodes;
-
+            var lineRendererTransform = lineRenderer.transform;
+            lineRendererTransform.SetAsFirstSibling();
+            lineRendererTransform.position = from.transform.position;
+            
             // line renderer with 2 points only does not handle transparency properly:
             var list = new List<Vector2>();
             for (var i = 0; i < linePointsCount; i++)
             {
-                list.Add(Vector3.Lerp(Vector3.zero, toPoint - fromPoint +
-                                                    2 * (fromRT.anchoredPosition - toRT.anchoredPosition).normalized *
-                                                    offsetFromNodes, (float) i / (linePointsCount - 1)));
+                var origin = new Vector3(0, -fromRTChildRect.y);
+                Vector3 destination = (toPoint - fromPoint) + toChildOffset;
+                var originAdditionalOffset = (destination - origin) * offsetFromNodes;
+                var destinationAdditionalOffset = (origin - destination) * offsetFromNodes;
+                var t = (float)i / (linePointsCount - 1);
+                list.Add(Vector3.Lerp(origin + originAdditionalOffset,destination + destinationAdditionalOffset,t));
             }
-            
             lineRenderer.Points = list.ToArray();
 
             var dottedLine = lineRenderer.GetComponent<DottedLineRenderer>();
