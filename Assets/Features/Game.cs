@@ -17,6 +17,7 @@ namespace Features
         [SerializeField] private BaseCardsScriptableObject heroesDb;
 
         private List<RunCard> _deck;
+        private List<Relic> _relics;
         private Battle _battleGo;
         private Maps.Map _mapGo;
         private RunCard _heroCard;

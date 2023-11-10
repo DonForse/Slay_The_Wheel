@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using Cinemachine;
 using Features.Cards;
+using Features.Maps.Relics;
+using Features.Maps.Shop;
 using UnityEngine;
 using UnityPackages.Slay_The_Spire_Map.Scripts;
 
@@ -10,10 +12,11 @@ namespace Features.Maps
 {
     public class Map : MonoBehaviour
     {
-        [SerializeField] CinemachineVirtualCamera virtualCamera;
-        [SerializeField] private Shop.Shop shop;
+        [SerializeField] private ShopNode shopNode;
         [SerializeField] private List<CardPackScriptableObject> packs;
+        [SerializeField] private List<RelicScriptableObject> relics;
         [SerializeField] private MapPlayerTracker mapPlayerTracker;
+        [SerializeField] private RelicsNode relicsNode;
         private List<MapSpot> _possibleNextPositions;
 
         public event EventHandler<List<BaseCardScriptableObject>> SelectedPack;
@@ -21,20 +24,24 @@ namespace Features.Maps
         public event EventHandler BossEnemySelected;
         public event EventHandler MajorEnemySelected;
         public event EventHandler SelectedRest;
+        public event EventHandler<Relic> SelectedRelic;
+
 
         private void Awake()
         {
             mapPlayerTracker.NodeSelected += OnNodeSelected;
             mapPlayerTracker.Locked = false;
-            shop.PackSelected += OnPackSelected;
+            shopNode.PackSelected += OnPackSelected;
+            relicsNode.RelicSelected += OnRelicSelected;
         }
 
         private void OnDestroy()
         {
             mapPlayerTracker.NodeSelected -= OnNodeSelected;
-            shop.PackSelected -= OnPackSelected;
+            shopNode.PackSelected -= OnPackSelected;
+            relicsNode.RelicSelected += OnRelicSelected;
         }
-        
+
         private void OnNodeSelected(object sender, NodeType e)
         {
             switch (e)
@@ -44,7 +51,7 @@ namespace Features.Maps
                     mapPlayerTracker.Locked = false;
                     break;
                 case NodeType.EliteEnemy:
-                    MajorEnemySelected?.Invoke(this, null); 
+                    MajorEnemySelected?.Invoke(this, null);
                     mapPlayerTracker.Locked = false;
                     break;
                 case NodeType.RestSite:
@@ -52,10 +59,12 @@ namespace Features.Maps
                     mapPlayerTracker.Locked = false;
                     break;
                 case NodeType.Treasure:
-                    mapPlayerTracker.Locked = false;
+
+                    relicsNode.Show(relics.ToList());
+                    // mapPlayerTracker.Locked = false;
                     break;
                 case NodeType.Store:
-                    shop.Show(packs.ToList());
+                    shopNode.Show(packs.ToList());
                     break;
                 case NodeType.Boss:
                     BossEnemySelected?.Invoke(this, null);
@@ -72,9 +81,16 @@ namespace Features.Maps
 
         private void OnPackSelected(object sender, CardPackScriptableObject pack)
         {
-            shop.Hide();
+            shopNode.Hide();
             mapPlayerTracker.Locked = false;
             SelectedPack?.Invoke(this, pack.Cards);
+        }
+
+        private void OnRelicSelected(object sender, Relic e)
+        {
+            relicsNode.Hide();
+            mapPlayerTracker.Locked = false;
+            SelectedRelic?.Invoke(this, e);
         }
     }
 }

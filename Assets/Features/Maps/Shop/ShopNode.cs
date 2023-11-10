@@ -6,7 +6,7 @@ using Random = UnityEngine.Random;
 
 namespace Features.Maps.Shop
 {
-    public class Shop : MonoBehaviour
+    public class ShopNode : MonoBehaviour
     {
         [SerializeField][Range(0,8)] private int amountOfPacks;
         [SerializeField] private GameObject packSelectionCanvas;
