@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Features.Battles;
 using Features.Cards;
+using Features.Maps;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using Random = UnityEngine.Random;
@@ -17,7 +18,7 @@ namespace Features
         [SerializeField] private BaseCardsScriptableObject heroesDb;
 
         private List<RunCard> _deck;
-        private List<Relic> _relics;
+        private List<Relic> _relics = new();
         private Battle _battleGo;
         private Maps.Map _mapGo;
         private RunCard _heroCard;
@@ -127,6 +128,7 @@ namespace Features
             {
                 _mapGo.SelectedPack -= OnShopPackObtained;
                 _mapGo.SelectedRest -= OnSelectedRest;
+                _mapGo.SelectedRelic -= OnSelectedRelic;
                 _mapGo.MinorEnemySelected -= OnMinorEnemySelected;
                 _mapGo.MajorEnemySelected -= OnMajorEnemySelected;
                 _mapGo.BossEnemySelected -= OnBossEnemySelected;
@@ -156,6 +158,7 @@ namespace Features
             {
                 _mapGo.SelectedPack += OnShopPackObtained;
                 _mapGo.SelectedRest += OnSelectedRest;
+                _mapGo.SelectedRelic += OnSelectedRelic;
                 _mapGo.MinorEnemySelected += OnMinorEnemySelected;
                 _mapGo.BossEnemySelected += OnBossEnemySelected;
                 _mapGo.MajorEnemySelected += OnMajorEnemySelected;
@@ -170,12 +173,49 @@ namespace Features
                 _deck.Add(runCard);
             }
         }
+
         private void OnSelectedRest(object sender, EventArgs e)
         {
             foreach (var card in _deck)
             {
                 card.Hp = Math.Min(card.Hp + Mathf.FloorToInt(card.Hp * 0.2f), card.baseCard.hp);
             }
+        }
+
+        private void OnSelectedRelic(object sender, Relic e)
+        {
+            _relics.Add(e);
+            if (e.RelicBase.id == RelicType.HealthySnack)
+            {
+                foreach (var card in _deck)
+                {
+                    card.Hp += 5;
+                }
+
+                return;
+            }
+
+            if (e.RelicBase.id == RelicType.FireChauldron)
+            {
+                foreach (var card in _deck)
+                {
+                    var abs = card.Abilities.ToList();
+                    abs.Add(Ability.Burn);
+                    card.Abilities = abs.ToArray();
+                }
+
+                return;
+            }
+
+            if (e.RelicBase.id == RelicType.GordoBachicha||e.RelicBase.id == RelicType.PerroSalchicha)
+            {
+                foreach (var card in _deck)
+                {
+                    card.Attack += 1;
+                }
+                return;
+            }
+
         }
 
         private void OnMinorEnemySelected(object sender, EventArgs e)
