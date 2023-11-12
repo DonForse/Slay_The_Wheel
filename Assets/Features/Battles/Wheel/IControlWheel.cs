@@ -11,5 +11,6 @@ namespace Features.Battles.Wheel
         void Disable();
         void SetTurnRightAction(Func<IEnumerator> callback);
         void SetTurnLeftAction(Func<IEnumerator> callback);
+        void SetOnBeforeRotation(Action<TurningOrientation> callback);
     }
 }

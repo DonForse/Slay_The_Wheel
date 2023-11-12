@@ -6,12 +6,19 @@ namespace Features.Battles.Wheel
 {
     public class BotControlWheel : ControlWheel
     {
+        private WaitForEndOfFrame _waitForEndOfFrame;
         public override event EventHandler TurnRight;
         public override event EventHandler TurnLeft;
-    
+
+        private void Start()
+        {
+            _waitForEndOfFrame = new WaitForEndOfFrame();
+        }
+
         public IEnumerator TurnTowardsDirection(bool right)
         {
             startAngle = wheelController.WheelData.RotationAngle;
+            _onBeforeRotation?.Invoke(right? TurningOrientation.TurnRight: TurningOrientation.TurnLeft);
             yield return MoveTowardsDirection(right);
         }
 
@@ -24,7 +31,7 @@ namespace Features.Battles.Wheel
             {
                 wheelController.WheelData.RotationAngle += rotationInput * rotationSpeed * Time.deltaTime;
                 RotateToNewPosition();
-                yield return new WaitForEndOfFrame();
+                yield return _waitForEndOfFrame;
             }
 
             SnapToNearestPosition();

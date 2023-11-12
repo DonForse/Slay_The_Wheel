@@ -8,15 +8,17 @@ namespace Features.Battles.Wheel
     {
         [SerializeField] protected float rotationSpeed = 5;
         [SerializeField] protected WheelController wheelController;
+        
         protected float startAngle;
         protected Func<IEnumerator> _rightCallback;
         protected Func<IEnumerator> _leftCallback;
+        protected Action<TurningOrientation> _onBeforeRotation;
+        
         public abstract event EventHandler TurnRight;
         public abstract event EventHandler TurnLeft;
-
         public virtual void Enable() => this.enabled = true;
-
         public virtual void Disable() => this.enabled = false;
+        
         public void SetTurnRightAction(Func<IEnumerator> callback)
         {
             _rightCallback = callback;
@@ -25,6 +27,11 @@ namespace Features.Battles.Wheel
         public void SetTurnLeftAction(Func<IEnumerator> callback)
         {
             _leftCallback = callback;
+        }
+
+        public void SetOnBeforeRotation(Action<TurningOrientation> callback)
+        {
+            _onBeforeRotation = callback;
         }
 
         internal void SnapToNearestPosition()

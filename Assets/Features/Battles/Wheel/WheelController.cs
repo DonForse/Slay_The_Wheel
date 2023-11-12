@@ -10,11 +10,12 @@ namespace Features.Battles.Wheel
     public class WheelController : MonoBehaviour
     {
         public WheelData WheelData = new();
-
         public InPlayCard inPlayCardPrefab;
+        public Animator rotatingVFX;
         [HideInInspector] public List<InPlayCard> Cards = new();
         [HideInInspector] public List<Vector2> Positions;
         private IControlWheel input;
+        private ControlWheel[] wheelControllers;
         private AutomaticControlWheel wheelMovement;
 
         // private List<RunCard> _cardsToAdd;
@@ -26,6 +27,7 @@ namespace Features.Battles.Wheel
         private void Awake()
         {
             input = GetComponent<IControlWheel>();
+            wheelControllers = GetComponents<ControlWheel>();
             wheelMovement = GetComponent<AutomaticControlWheel>();
         }
 
@@ -41,6 +43,10 @@ namespace Features.Battles.Wheel
             input.SetTurnLeftAction(OnTurnLeftAction);
             wheelMovement.SetTurnLeftAction(OnTurnLeft);
             wheelMovement.SetTurnRightAction(OnTurnRight);
+            foreach (var controller in wheelControllers)
+            {
+                controller.SetOnBeforeRotation(OnBeforeRotation);
+            }
             input.Enable();
         }
 
@@ -117,6 +123,11 @@ namespace Features.Battles.Wheel
                 yield break;
             DecrementFrontCardIndex();
             yield return _wheelMovedCallback.Invoke();
+        }
+        
+        private void OnBeforeRotation(TurningOrientation turningOrientation)
+        {
+            rotatingVFX.SetTrigger($"Rotate_{turningOrientation}");
         }
 
         private IEnumerator SetRunCards(bool player, List<RunCard>cards)
