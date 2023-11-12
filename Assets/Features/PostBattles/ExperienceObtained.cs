@@ -7,7 +7,7 @@ using MoreMountains.Tools;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace Features.Maps.BattleNode
+namespace Features.PostBattles
 {
     public class ExperienceObtained : MonoBehaviour
     {
@@ -15,6 +15,7 @@ namespace Features.Maps.BattleNode
         [SerializeField] private GameObject container;
         [SerializeField] private LevelUpsScriptableObject levelUpsScriptableObject;
         [SerializeField] private Button continueButton;
+        [SerializeField] private SelectLevelUpUpgrade selectUpgrade;
         public event EventHandler Completed;
 
         public void Show(HeroRunCard heroCard, int experienceObtained)
@@ -29,6 +30,7 @@ namespace Features.Maps.BattleNode
             }
             else
             {
+                heroCard.Exp += experienceObtained;
                 progressBar.UpdateBar01(Mathf.FloorToInt(heroCard.Exp + experienceObtained) / (float)info.ExpToLevel);
                 continueButton.gameObject.SetActive(true);
             }
@@ -46,8 +48,18 @@ namespace Features.Maps.BattleNode
             heroCard.Exp += expRemaining;
             info = levelUpsScriptableObject.LevelUpInformations[heroCard.Level];
             progressBar.UpdateBar01(Mathf.FloorToInt(expRemaining / (float)info.ExpToLevel));
-            continueButton.gameObject.SetActive(true);
+            container.SetActive(false);
+            selectUpgrade.Show(info.LevelUpUpgrades, heroCard);
+            selectUpgrade.Selected += OnUpgradeSelected;
+            
             yield break;
+        }
+
+        private void OnUpgradeSelected(object sender, LevelUpUpgrade e)
+        {
+            container.SetActive(true);
+            selectUpgrade.Hide();
+            continueButton.gameObject.SetActive(true);
         }
 
         [UsedImplicitly]

@@ -1,6 +1,5 @@
 using System;
 using Features.Cards;
-using Features.Maps.BattleNode;
 using UnityEngine;
 
 namespace Features.PostBattles
