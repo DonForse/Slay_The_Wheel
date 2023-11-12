@@ -14,4 +14,7 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/Map.unity
     guid: 1ea81c70426ad404180c84570d061215
+  - enabled: 1
+    path: Assets/Scenes/PostBattles.unity
+    guid: b280fc0279707344abdf43677f33decd
   m_configObjects: {}
