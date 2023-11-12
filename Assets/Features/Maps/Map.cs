@@ -18,7 +18,6 @@ namespace Features.Maps
         [SerializeField] private List<RelicScriptableObject> relics;
         [SerializeField] private MapPlayerTracker mapPlayerTracker;
         [SerializeField] private RelicsNode relicsNode;
-        [SerializeField] private ExperienceObtained experienceObtained;
         private List<MapSpot> _possibleNextPositions;
 
         public event EventHandler<List<BaseCardScriptableObject>> SelectedPack;
@@ -35,7 +34,6 @@ namespace Features.Maps
             mapPlayerTracker.Locked = false;
             shopNode.PackSelected += OnPackSelected;
             relicsNode.RelicSelected += OnRelicSelected;
-            experienceObtained.Completed += OnExperienceCompleted;
         }
 
         private void OnDestroy()
@@ -94,18 +92,6 @@ namespace Features.Maps
             relicsNode.Hide();
             mapPlayerTracker.Locked = false;
             SelectedRelic?.Invoke(this, e);
-        }
-
-        public void ShowExpObtained(HeroRunCard heroCard, int expFromBattle)
-        {
-            mapPlayerTracker.Locked = true;
-            experienceObtained.Show(heroCard, expFromBattle);
-        }
-
-        private void OnExperienceCompleted(object sender, EventArgs e)
-        {
-            mapPlayerTracker.Locked = false;
-            experienceObtained.Hide();
         }
     }
 }

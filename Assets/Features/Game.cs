@@ -5,6 +5,7 @@ using System.Linq;
 using Features.Battles;
 using Features.Cards;
 using Features.Maps;
+using Features.PostBattles;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using Random = UnityEngine.Random;
@@ -21,6 +22,7 @@ namespace Features
         private List<Relic> _relics = new();
         private Battle _battleGo;
         private Map _mapGo;
+        private PostBattle _postBattle;
         private HeroRunCard _heroCard;
 
         private int minorBattlesAmount = 0;
@@ -121,8 +123,13 @@ namespace Features
         {
             if (!playerWin)
                 return;
-            StartCoroutine(LoadMapSceneCoroutine());
+            StartCoroutine(LoadPostBattleCoroutine());
             expFromBattle = 25;
+        }
+
+        private void OnPostBattleCompleted(object sender, EventArgs e)
+        {
+            StartCoroutine(LoadMapSceneCoroutine());
         }
 
         private IEnumerator LoadBattleSceneCoroutine(List<RunCard> battleEnemies, int enemyWheelSize)
@@ -147,18 +154,28 @@ namespace Features
                 _battleGo.BattleFinished += BattleComplete;
         }
 
-        private IEnumerator LoadMapSceneCoroutine()
-        {
+        private IEnumerator LoadPostBattleCoroutine()
+        {            
+            RemoveDeadCardsFromDeck();
+
             if (_battleGo != null)
                 _battleGo.BattleFinished -= BattleComplete;
 
+            SceneManager.LoadScene("PostBattles");
+            yield return new WaitForSeconds(.5f);
+            _postBattle = GameObject.Find("PostBattle").GetComponent<PostBattle>();
+
+            _postBattle.Completed += OnPostBattleCompleted;
+            if (expFromBattle > 0)
+                _postBattle.Initialize(_heroCard,expFromBattle);
+            expFromBattle = 0;
+        }
+
+        private IEnumerator LoadMapSceneCoroutine()
+        {
             SceneManager.LoadScene("Map");
             yield return new WaitForSeconds(.5f);
             _mapGo = GameObject.Find("Map").GetComponent<Maps.Map>();
-            RemoveDeadCardsFromDeck();
-            if (expFromBattle > 0)
-                _mapGo.ShowExpObtained(_heroCard,expFromBattle);
-            expFromBattle = 0;
 
             if (_mapGo != null)
             {
