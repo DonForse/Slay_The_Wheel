@@ -27,7 +27,7 @@ RectTransform:
   m_GameObject: {fileID: 134344949853476280}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.9400001, y: 1, z: 1}
+  m_LocalScale: {x: 0, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1747152429795600319}
@@ -2898,7 +2898,7 @@ RectTransform:
   m_GameObject: {fileID: 2678716218939094875}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.9400001, y: 1, z: 1}
+  m_LocalScale: {x: 0, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1747152429795600319}
@@ -5389,7 +5389,7 @@ RectTransform:
   m_GameObject: {fileID: 4734266696442005817}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.9400001, y: 1, z: 1}
+  m_LocalScale: {x: 0, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1747152429795600319}
@@ -5517,7 +5517,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: 100%
+  m_Text: '[000%]'
 --- !u!1 &6656042398397305281
 GameObject:
   m_ObjectHideFlags: 0
@@ -5658,7 +5658,7 @@ MonoBehaviour:
   MinimumBarFillValue: 0
   MaximumBarFillValue: 1
   SetInitialFillValueOnStart: 0
-  InitialFillValue: 0.2
+  InitialFillValue: 0
   BarDirection: 0
   FillMode: 0
   TimeScale: 0
@@ -5925,7 +5925,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 7396817148577900336}
-        m_TargetAssemblyTypeName: 
+        m_TargetAssemblyTypeName: MoreMountains.Feedbacks.MMF_Player, MoreMountains.Feedbacks
         m_MethodName: PlayFeedbacks
         m_Mode: 1
         m_Arguments:
@@ -5940,7 +5940,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 1414989549315664573}
-        m_TargetAssemblyTypeName: 
+        m_TargetAssemblyTypeName: MoreMountains.Feedbacks.MMF_Player, MoreMountains.Feedbacks
         m_MethodName: PlayFeedbacks
         m_Mode: 1
         m_Arguments:
@@ -5989,16 +5989,16 @@ MonoBehaviour:
   TextFormat: 000
   DisplayTotal: 0
   TotalSeparator: ' / '
-  DebugNewTargetValue: 0.54
+  DebugNewTargetValue: 0.03
   DebugUpdateBarButton: 0
   DebugSetBarButton: 0
   TestBumpButton: 0
   Plus10PercentButton: 0
   Minus10PercentButton: 0
-  BarProgress: 0.9400001
-  BarTarget: 0.9400001
-  DelayedBarIncreasingProgress: 0.9400001
-  DelayedBarDecreasingProgress: 0.9400001
+  BarProgress: 0
+  BarTarget: 0
+  DelayedBarIncreasingProgress: 0
+  DelayedBarDecreasingProgress: 0
 --- !u!1 &8045569837178369285
 GameObject:
   m_ObjectHideFlags: 0

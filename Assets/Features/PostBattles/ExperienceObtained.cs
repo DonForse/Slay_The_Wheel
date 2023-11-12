@@ -23,6 +23,7 @@ namespace Features.PostBattles
             continueButton.gameObject.SetActive(false);
             container.SetActive(true);
             var info = levelUpsScriptableObject.LevelUpInformations[heroCard.Level];
+            progressBar.InitialFillValue = heroCard.Exp / (float)info.ExpToLevel;
             if (heroCard.Exp + experienceObtained >= info.ExpToLevel)
             {
                 progressBar.UpdateBar01(1);
@@ -30,8 +31,8 @@ namespace Features.PostBattles
             }
             else
             {
-                heroCard.Exp += experienceObtained;
                 progressBar.UpdateBar01(Mathf.FloorToInt(heroCard.Exp + experienceObtained) / (float)info.ExpToLevel);
+                heroCard.Exp += experienceObtained;
                 continueButton.gameObject.SetActive(true);
             }
             // levelUpsScriptableObject.LevelUpInformations.Firs
