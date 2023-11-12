@@ -16,6 +16,7 @@ namespace Features.Maps.BattleNode
         [SerializeField] private LevelUpsScriptableObject levelUpsScriptableObject;
         [SerializeField] private Button continueButton;
         public event EventHandler Completed;
+
         public void Show(HeroRunCard heroCard, int experienceObtained)
         {
             continueButton.gameObject.SetActive(false);
@@ -26,11 +27,10 @@ namespace Features.Maps.BattleNode
                 progressBar.UpdateBar01(1);
                 heroCard.Level++;
                 StartCoroutine(ShowLevelUp(info, heroCard, experienceObtained));
-
             }
             else
             {
-                progressBar.UpdateBar01(Mathf.FloorToInt(heroCard.Exp + experienceObtained)/(float)info.ExpToLevel);
+                progressBar.UpdateBar01(Mathf.FloorToInt(heroCard.Exp + experienceObtained) / (float)info.ExpToLevel);
                 continueButton.gameObject.SetActive(true);
             }
             // levelUpsScriptableObject.LevelUpInformations.Firs
@@ -46,7 +46,7 @@ namespace Features.Maps.BattleNode
             heroCard.Exp = 0;
             heroCard.Exp += expRemaining;
             info = levelUpsScriptableObject.LevelUpInformations[heroCard.Level];
-            progressBar.UpdateBar01(Mathf.FloorToInt(expRemaining/(float)info.ExpToLevel));
+            progressBar.UpdateBar01(Mathf.FloorToInt(expRemaining / (float)info.ExpToLevel));
             continueButton.gameObject.SetActive(true);
             yield break;
         }
