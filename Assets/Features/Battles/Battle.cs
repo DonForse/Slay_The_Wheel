@@ -129,7 +129,6 @@ namespace Features.Battles
             _busQueue.EnqueueAction(ApplyAfterHitEffect(attackerCard, defenderWheelController));
             if (CompletedActions())
             {
-                _busQueue.EnqueueAction(ActEndCoroutine(attackerWheelController));
                 _busQueue.EnqueueAction(ChangeTurn());
                 yield break;
                 ;

@@ -20,7 +20,7 @@ namespace Features
         private List<RunCard> _deck;
         private List<Relic> _relics = new();
         private Battle _battleGo;
-        private Maps.Map _mapGo;
+        private Map _mapGo;
         private RunCard _heroCard;
 
         private int minorBattlesAmount = 0;
