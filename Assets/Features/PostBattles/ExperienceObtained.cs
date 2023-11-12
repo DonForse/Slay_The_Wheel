@@ -25,7 +25,6 @@ namespace Features.Maps.BattleNode
             if (heroCard.Exp + experienceObtained >= info.ExpToLevel)
             {
                 progressBar.UpdateBar01(1);
-                heroCard.Level++;
                 StartCoroutine(ShowLevelUp(info, heroCard, experienceObtained));
             }
             else
