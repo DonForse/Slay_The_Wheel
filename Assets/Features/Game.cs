@@ -21,11 +21,13 @@ namespace Features
         private List<Relic> _relics = new();
         private Battle _battleGo;
         private Map _mapGo;
-        private RunCard _heroCard;
+        private HeroRunCard _heroCard;
 
         private int minorBattlesAmount = 0;
         private int majorBattlesAmount = 0;
         private int bossBattlesAmount = 0;
+
+        private int expFromBattle = 0;
 
         private static void ClearRunData()
         {
@@ -47,7 +49,7 @@ namespace Features
         {
             _deck = new List<RunCard>();
             var heroCardDb = heroesDb.cards.FirstOrDefault(x => x.cardName.Contains("Kael Fireforge"));
-            _heroCard = new RunCard(heroCardDb);
+            _heroCard = new HeroRunCard(heroCardDb);
             var recruits = unitsDb.cards.FirstOrDefault(x => x.cardName.Contains("Fireborn Recruit"));
             var warrior = unitsDb.cards.FirstOrDefault(x => x.cardName.Contains("Fireborn Warrior"));
             var sorceress = unitsDb.cards.FirstOrDefault(x => x.cardName.Contains("Firestorm Sorceress"));
@@ -120,6 +122,7 @@ namespace Features
             if (!playerWin)
                 return;
             StartCoroutine(LoadMapSceneCoroutine());
+            expFromBattle = 25;
         }
 
         private IEnumerator LoadBattleSceneCoroutine(List<RunCard> battleEnemies, int enemyWheelSize)
@@ -153,6 +156,9 @@ namespace Features
             yield return new WaitForSeconds(.5f);
             _mapGo = GameObject.Find("Map").GetComponent<Maps.Map>();
             RemoveDeadCardsFromDeck();
+            if (expFromBattle > 0)
+                _mapGo.ShowExpObtained(_heroCard,expFromBattle);
+            expFromBattle = 0;
 
             if (_mapGo != null)
             {

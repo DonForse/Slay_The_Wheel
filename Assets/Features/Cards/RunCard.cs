@@ -69,10 +69,4 @@ namespace Features.Cards
 
         public event EventHandler<RunCard> ValueChanged;
     }
-
-    public enum ActionEnum
-    {
-        Attack,
-        Skip,
-    }
 }
