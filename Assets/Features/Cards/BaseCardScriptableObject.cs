@@ -12,5 +12,6 @@ namespace Features.Cards
         public Ability[] abilities;
         public Sprite cardSprite;
         public AttackType attackType;
+        public int actCost;
     }
 }

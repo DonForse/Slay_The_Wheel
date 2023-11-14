@@ -48,6 +48,7 @@ namespace Features.Cards
 
         public AttackType AttackType { get; set; }
         public bool IsDead => Hp <= 0;
+        public int ActCost => baseCard.actCost;
 
 
         public readonly BaseCardScriptableObject baseCard;

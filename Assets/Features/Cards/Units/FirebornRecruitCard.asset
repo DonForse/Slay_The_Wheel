@@ -18,3 +18,4 @@ MonoBehaviour:
   abilities: 00000000
   cardSprite: {fileID: 21300000, guid: 1f6617523fa86cb4cb3de712c076203c, type: 3}
   attackType: 0
+  actCost: 1

@@ -97,10 +97,24 @@ namespace Features.Battles
 
         private void OnPlayerActed(object sender, InPlayCard attacker)
         {
-            SetActions(_actions - 1);
+            var actCost = attacker.GetCard().ActCost;
+            if (actCost> _actions)
+            {
+                _busQueue.EnqueueAction(RevertAction());
+                return;
+            }
+
+            SetActions(_actions - actCost);
+            
             _busQueue.EnqueueAction(Act(attacker,
                 playerWheelController,
                 enemyWheelController));
+        }
+
+        private IEnumerator RevertAction()
+        {
+            yield break;
+            // throw new NotImplementedException();
         }
 
         private IEnumerator Act(InPlayCard attacker, WheelController attackerWheelController,
