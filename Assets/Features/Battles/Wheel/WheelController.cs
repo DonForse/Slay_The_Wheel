@@ -21,6 +21,7 @@ namespace Features.Battles.Wheel
         // private List<RunCard> _cardsToAdd;
         private int frontCardIndex;
         private Func<IEnumerator> _wheelMovedCallback;
+        private bool _lastAction;
         public event EventHandler<InPlayCard> Acted;
         public event EventHandler<InPlayCard> WheelTurn;
 
@@ -71,7 +72,7 @@ namespace Features.Battles.Wheel
                 {
                     yield break;
                 }
-                yield return wheelMovement.TurnTowardsDirection(toTheRight);
+                yield return wheelMovement.TurnTowardsDirection(toTheRight, true);
                 //to solve the issue where put alive unit does not trigger damage immediately, you have to make this a part of the busqueue
                 yield return new WaitForSeconds(0.1f);
             }
@@ -104,6 +105,9 @@ namespace Features.Battles.Wheel
         {
             if (AllUnitsDead())
                 yield break;
+
+            _lastAction = true; 
+            
             DecrementFrontCardIndex();
             yield return PutAliveUnitAtFront(true);
             Acted?.Invoke(this, Cards[frontCardIndex]);
@@ -113,6 +117,9 @@ namespace Features.Battles.Wheel
         {
             if (AllUnitsDead())
                 yield break;
+            
+            _lastAction = false;
+            
             IncrementFrontCardIndex();
             yield return _wheelMovedCallback.Invoke();
         }
@@ -182,7 +189,7 @@ namespace Features.Battles.Wheel
         {
             for (int i = 0; i < count; i++)
             {
-                yield return wheelMovement.TurnTowardsDirection(true);
+                yield return wheelMovement.TurnTowardsDirection(true, true);
             }
 
             yield return PutAliveUnitAtFront(true);
@@ -192,7 +199,7 @@ namespace Features.Battles.Wheel
         {
             for (int i = 0; i < count; i++)
             {
-                yield return wheelMovement.TurnTowardsDirection(false);
+                yield return wheelMovement.TurnTowardsDirection(false, true);
             }
 
             yield return PutAliveUnitAtFront(false);
@@ -201,6 +208,16 @@ namespace Features.Battles.Wheel
         public void SetWheelMovedCallback(Func<IEnumerator> onPlayerWheelMoved)
         {
             _wheelMovedCallback = onPlayerWheelMoved;
+        }
+
+        public IEnumerator RevertLastMovement()
+        {
+            
+            yield return wheelMovement.TurnTowardsDirection(!_lastAction, false);
+            if (_lastAction)
+                DecrementFrontCardIndex();
+            else
+                IncrementFrontCardIndex();
         }
     }
 }

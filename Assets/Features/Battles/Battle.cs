@@ -89,7 +89,14 @@ namespace Features.Battles
 
         private void OnEnemyActed(object sender, InPlayCard attacker)
         {
-            SetActions(_actions - 1);
+            var actCost = attacker.GetCard().ActCost;
+            if (actCost> _actions)
+            {
+                _busQueue.EnqueueAction(RevertAction(enemyWheelController));
+                return;
+            }
+            
+            SetActions(_actions - actCost);
             _busQueue.EnqueueAction(Act(attacker,
                 enemyWheelController,
                 playerWheelController));
@@ -100,7 +107,7 @@ namespace Features.Battles
             var actCost = attacker.GetCard().ActCost;
             if (actCost> _actions)
             {
-                _busQueue.EnqueueAction(RevertAction());
+                _busQueue.EnqueueAction(RevertAction(playerWheelController));
                 return;
             }
 
@@ -111,21 +118,13 @@ namespace Features.Battles
                 enemyWheelController));
         }
 
-        private IEnumerator RevertAction()
+        private IEnumerator RevertAction(WheelController wheelController)
         {
+            _busQueue.EnqueueAction(ActStartCoroutine(wheelController));
+            _busQueue.EnqueueAction(RevertWheelPosition(wheelController));
+            _busQueue.EnqueueAction(ActEndCoroutine(wheelController));
             yield break;
             // throw new NotImplementedException();
-        }
-
-        private IEnumerator Act(InPlayCard attacker, WheelController attackerWheelController,
-            WheelController defenderWheelController)
-        {
-            var attackerCard = attacker.GetCard();
-            _busQueue.EnqueueAction(ActStartCoroutine(attackerWheelController));
-            _busQueue.EnqueueAction(ApplyWheelMovementEffect(attackerWheelController));
-            _busQueue.EnqueueAction(
-                ProcessAct(attacker, attackerWheelController, defenderWheelController, attackerCard));
-            yield break;
         }
 
         private IEnumerator ProcessAct(InPlayCard attacker, WheelController attackerWheelController,
@@ -197,6 +196,17 @@ namespace Features.Battles
             }
 
             yield return null;
+        }
+
+        private IEnumerator Act(InPlayCard attacker, WheelController attackerWheelController,
+            WheelController defenderWheelController)
+        {
+            var attackerCard = attacker.GetCard();
+            _busQueue.EnqueueAction(ActStartCoroutine(attackerWheelController));
+            _busQueue.EnqueueAction(ApplyWheelMovementEffect(attackerWheelController));
+            _busQueue.EnqueueAction(
+                ProcessAct(attacker, attackerWheelController, defenderWheelController, attackerCard));
+            yield break;
         }
 
         private IEnumerator ApplyFrontCardAttack(InPlayCard attackerCard, WheelController defenderWheelController)
@@ -332,6 +342,11 @@ namespace Features.Battles
             }
 
             yield return null;
+        }
+
+        private IEnumerator RevertWheelPosition(WheelController wheelController)
+        {
+            yield return wheelController.RevertLastMovement();
         }
 
         private IEnumerator ApplyWheelMovementEffect(WheelController wheelController)
