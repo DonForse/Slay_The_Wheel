@@ -21,7 +21,7 @@ namespace Features.Battles.Wheel
         // private List<RunCard> _cardsToAdd;
         private int frontCardIndex;
         private Func<IEnumerator> _wheelMovedCallback;
-        private bool _lastAction;
+        private bool _lastActionWasRight;
         public event EventHandler<InPlayCard> Acted;
         public event EventHandler<InPlayCard> WheelTurn;
 
@@ -96,9 +96,8 @@ namespace Features.Battles.Wheel
         {
             if (AllUnitsDead())
                 yield break;
-            _lastAction = false;
+            _lastActionWasRight = false;
             IncrementFrontCardIndex();
-            yield return PutAliveUnitAtFront(false);
             Acted?.Invoke(this, Cards[frontCardIndex]);
         }
 
@@ -107,10 +106,9 @@ namespace Features.Battles.Wheel
             if (AllUnitsDead())
                 yield break;
 
-            _lastAction = true; 
+            _lastActionWasRight = true; 
             
             DecrementFrontCardIndex();
-            yield return PutAliveUnitAtFront(true);
             Acted?.Invoke(this, Cards[frontCardIndex]);
         }
 
@@ -119,7 +117,7 @@ namespace Features.Battles.Wheel
             if (AllUnitsDead())
                 yield break;
             
-            _lastAction = false;
+            _lastActionWasRight = false;
             
             IncrementFrontCardIndex();
             yield return _wheelMovedCallback.Invoke();
@@ -213,12 +211,18 @@ namespace Features.Battles.Wheel
 
         public IEnumerator RevertLastMovement()
         {
-            
-            yield return wheelMovement.TurnTowardsDirection(!_lastAction, false);
-            if (!_lastAction)
+            yield return wheelMovement.TurnTowardsDirection(!_lastActionWasRight, false);
+            if (!_lastActionWasRight)
                 DecrementFrontCardIndex();
             else
                 IncrementFrontCardIndex();
+        }
+
+        public IEnumerator RepeatActMove()
+        {
+            yield return wheelMovement.TurnTowardsDirection(_lastActionWasRight, true);
+
+            Acted?.Invoke(this, Cards[frontCardIndex]);
         }
     }
 }

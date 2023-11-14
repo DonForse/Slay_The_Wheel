@@ -7,6 +7,7 @@ public class BusQueue : MonoBehaviour
 {
     private Queue<IEnumerator> actionQueue = new Queue<IEnumerator>();
     private bool isProcessingActions = false;
+    private int TestCount;
 
     public void EnqueueAction(IEnumerator action)
     {
@@ -23,6 +24,7 @@ public class BusQueue : MonoBehaviour
     {
         // Insert the interrupt action at the beginning of the queue.
         var tempQueue = new Queue<IEnumerator>();
+        TestCount = actionQueue.Count;
         tempQueue.Enqueue(interruptAction);
 
         while (actionQueue.Count > 0)
@@ -43,9 +45,11 @@ public class BusQueue : MonoBehaviour
     {
         isProcessingActions = true;
 
+        TestCount = actionQueue.Count;
         while (actionQueue.Count > 0)
         {
             var action = actionQueue.Dequeue();
+            TestCount = actionQueue.Count;
             yield return action;
 
             // Wait for the current action to complete (you can customize this)

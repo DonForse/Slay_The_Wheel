@@ -61,20 +61,6 @@ namespace Features.Battles
             enemyWheelController.Acted -= OnEnemyActed;
         }
 
-        private List<RunCard> DrawCards(int amountToDraw, ref List<RunCard> deck, ref List<RunCard> discardPile)
-        {
-            discardPile = discardPile.Where(x => !x.IsDead).ToList();
-            if (deck.Count < amountToDraw)
-            {
-                deck = deck.Concat(discardPile).ToList();
-                discardPile.Clear();
-            }
-
-            var cards = deck.Take(amountToDraw).ToList();
-            deck = deck.Skip(amountToDraw).ToList();
-            return cards;
-        }
-
         private IEnumerator OnEnemyWheelMoved()
         {
             Debug.Log($"<color=yellow>{"OnEnemyWheelMoved"}</color>");
@@ -89,14 +75,14 @@ namespace Features.Battles
 
         private void OnEnemyActed(object sender, InPlayCard attacker)
         {
-            var actCost = attacker.GetCard().ActCost;
-            if (actCost> _actions)
+            var attackerCard = attacker.GetCard();
+            var actCost = attackerCard.ActCost;
+
+            if (_actions  > 0 && actCost> _actions )
             {
                 _busQueue.EnqueueAction(RevertAction(enemyWheelController));
                 return;
             }
-            
-            SetActions(_actions - actCost);
             _busQueue.EnqueueAction(Act(attacker,
                 enemyWheelController,
                 playerWheelController));
@@ -104,15 +90,15 @@ namespace Features.Battles
 
         private void OnPlayerActed(object sender, InPlayCard attacker)
         {
-            var actCost = attacker.GetCard().ActCost;
-            if (actCost> _actions)
+            var attackerCard = attacker.GetCard();
+            var actCost = attackerCard.ActCost;
+            
+            if (_actions  > 0 && actCost> _actions )
             {
                 _busQueue.EnqueueAction(RevertAction(playerWheelController));
                 return;
             }
 
-            SetActions(_actions - actCost);
-            
             _busQueue.EnqueueAction(Act(attacker,
                 playerWheelController,
                 enemyWheelController));
@@ -144,7 +130,6 @@ namespace Features.Battles
             {
                 _busQueue.EnqueueAction(ChangeTurn());
                 yield break;
-                ;
             }
 
             _busQueue.EnqueueAction(ActEndCoroutine(attackerWheelController));
@@ -156,6 +141,20 @@ namespace Features.Battles
             Debug.Log($"<color=green>{"ACT-END"}</color>");
             attackerWheelController.UnlockWheel();
             yield return null;
+        }
+
+        private List<RunCard> DrawCards(int amountToDraw, ref List<RunCard> deck, ref List<RunCard> discardPile)
+        {
+            discardPile = discardPile.Where(x => !x.IsDead).ToList();
+            if (deck.Count < amountToDraw)
+            {
+                deck = deck.Concat(discardPile).ToList();
+                discardPile.Clear();
+            }
+
+            var cards = deck.Take(amountToDraw).ToList();
+            deck = deck.Skip(amountToDraw).ToList();
+            return cards;
         }
 
         private IEnumerator ActStartCoroutine(WheelController attackerWheelController)
@@ -175,7 +174,6 @@ namespace Features.Battles
                 _busQueue.EnqueueAction(ChangeTurn());
                 yield break; // yield break;
             }
-
             yield break;
         }
 
@@ -202,7 +200,15 @@ namespace Features.Battles
             WheelController defenderWheelController)
         {
             var attackerCard = attacker.GetCard();
+            SetActions(_actions - (attackerCard.IsDead ? 1 : attackerCard.ActCost));
+
             _busQueue.EnqueueAction(ActStartCoroutine(attackerWheelController));
+            if (attackerCard.IsDead)
+            {
+                _busQueue.EnqueueAction(attackerWheelController.RepeatActMove());
+                _busQueue.EnqueueAction(ActEndCoroutine(attackerWheelController));
+                yield break; 
+            }
             _busQueue.EnqueueAction(ApplyWheelMovementEffect(attackerWheelController));
             _busQueue.EnqueueAction(
                 ProcessAct(attacker, attackerWheelController, defenderWheelController, attackerCard));
@@ -392,9 +398,17 @@ namespace Features.Battles
         {
             for (int i = 0; i < 3; i++)
             {
-                _busQueue.EnqueueAction(botControlWheel.TurnTowardsDirection(Random.Range(0, 2) == 1));
+                _busQueue.EnqueueAction(TryExecuteBotAction());
                 yield return new WaitForSeconds(3f);
             }
+        }
+
+        private IEnumerator TryExecuteBotAction()
+        {
+            if (IsPlayerTurn()) yield break;
+            if (_actions <=0)
+                yield break;
+            yield return botControlWheel.TurnTowardsDirection(Random.Range(0, 2) == 1);
         }
 
         private IEnumerator StartPlayerTurn()
@@ -510,11 +524,13 @@ namespace Features.Battles
             acting = false;
         }
 
-        private bool CompletedActions() => _actions == 0;
+        private bool CompletedActions() => _actions <= 0;
 
         private void SetActions(int amount)
         {
             _actions = amount;
+            if (_actions < 0)
+                _actions = Mathf.Min(_actions, 0);
             actionsView.ShowRemaining(_actions);
             foreach (var spellView in spellViews)
             {
