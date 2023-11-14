@@ -96,6 +96,7 @@ namespace Features.Battles.Wheel
         {
             if (AllUnitsDead())
                 yield break;
+            _lastAction = false;
             IncrementFrontCardIndex();
             yield return PutAliveUnitAtFront(false);
             Acted?.Invoke(this, Cards[frontCardIndex]);
@@ -214,7 +215,7 @@ namespace Features.Battles.Wheel
         {
             
             yield return wheelMovement.TurnTowardsDirection(!_lastAction, false);
-            if (_lastAction)
+            if (!_lastAction)
                 DecrementFrontCardIndex();
             else
                 IncrementFrontCardIndex();
