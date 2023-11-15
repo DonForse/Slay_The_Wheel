@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using Features.Battles.Core.OnActEffects;
 using Features.Battles.Wheel;
 using Features.Cards;
 using JetBrains.Annotations;
@@ -31,9 +32,22 @@ namespace Features.Battles
         public Turn Turn => IsPlayerTurn() ? Turn.Player : Turn.Enemy;
         public int Actions => _actions;
 
+        private List<IOnHitEffectStrategy> OnHitEffectStrategies = new();
+        private List<IOnActEffectStrategy> OnActEffectStrategies = new(); 
+        
+
         public IEnumerator Initialize(List<RunCard> deck, List<RunCard> enemies, int playerWheelSize,
             int enemyWheelSize, RunCard heroCard)
         {
+
+            OnHitEffectStrategies = new List<IOnHitEffectStrategy>() { 
+                new BurnOnHitEffectStrategy(),
+                new BurnAllOnHitEffectStrategy() };
+            OnActEffectStrategies = new List<IOnActEffectStrategy>() {
+                new AddAtkLeftOnActEffectStrategy(), 
+                new AddAtkRightOnActEffectStrategy(),
+                new AddShieldLeftOnActEffectStrategy(),
+                new AddShieldRightOnActEffectStrategy() };
             _playerBattleDeck = deck.ToList();
             _playerDiscardPile = new();
             _enemiesDeck = enemies.Skip(enemyWheelSize).ToList();
@@ -53,6 +67,7 @@ namespace Features.Battles
 
             SetActions(3);
         }
+        
 
         private void OnDestroy()
         {
@@ -108,7 +123,7 @@ namespace Features.Battles
                 _busQueue.EnqueueAction(ProcessAttackerDiedActing(attackerWheelController));
                 yield break;
             }
-
+            _busQueue.EnqueueAction(ApplyOnActCardEffect(attackerWheelController, defenderWheelController));
             _busQueue.EnqueueAction(ApplyFrontCardAttack(attacker, defenderWheelController));
             _busQueue.EnqueueAction(ApplyFrontCardEffect(attackerWheelController, defenderWheelController));
             _busQueue.EnqueueAction(ApplyAfterHitEffect(attackerCard, defenderWheelController));
@@ -119,6 +134,21 @@ namespace Features.Battles
             }
 
             _busQueue.EnqueueAction(ActEndCoroutine(attackerWheelController));
+        }
+
+        private IEnumerator ApplyOnActCardEffect(WheelController attackerWheelController, WheelController defenderWheelController)
+        {
+            var attackerCard = attackerWheelController.GetFrontCard().GetCard();
+            foreach (var ability in attackerCard.Abilities)
+            {
+                foreach (var strategy in OnActEffectStrategies)
+                {
+                    if (strategy.IsValid(ability))
+                        strategy.Execute(defenderWheelController, attackerWheelController);
+                }
+            }
+
+            yield return null;
         }
 
         private IEnumerator ActEndCoroutine(WheelController attackerWheelController)
@@ -291,56 +321,16 @@ namespace Features.Battles
             BattleFinished?.Invoke(this, defenderWheelController == enemyWheelController);
         }
 
-        private static IEnumerator ApplyFrontCardEffect(WheelController attackerWheelController,
+        private IEnumerator ApplyFrontCardEffect(WheelController attackerWheelController,
             WheelController defenderWheelController)
         {
             var attackerCard = attackerWheelController.GetFrontCard().GetCard();
             foreach (var ability in attackerCard.Abilities)
             {
-                if (ability == Ability.Burn)
+                foreach (var strategy in OnHitEffectStrategies)
                 {
-                    var affectedCard = defenderWheelController.GetFrontCard();
-                    affectedCard.AddEffect(Ability.Burn);
-                }
-
-                if (ability == Ability.BurnAll)
-                {
-                    foreach (var card in defenderWheelController.Cards)
-                    {
-                        card.AddEffect(Ability.Burn);
-                    }
-                }
-
-                if (ability == Ability.AddAtkLeft)
-                {
-                    var neighbors = attackerWheelController.GetFrontNeighborsCards(1, 2);
-                    var leftNeighbor = neighbors[0];
-                    if (!leftNeighbor.IsDead)
-                        leftNeighbor.Attack += 1;
-                }
-
-                if (ability == Ability.AddAtkRight)
-                {
-                    var neighbors = attackerWheelController.GetFrontNeighborsCards(1, 2);
-                    var rightNeighbor = neighbors[1];
-                    if (!rightNeighbor.IsDead)
-                        rightNeighbor.Attack += 1;
-                }
-
-                if (ability == Ability.AddShieldLeft)
-                {
-                    var neighbors = attackerWheelController.GetFrontNeighborsCards(1, 2);
-                    var leftNeighbor = neighbors[0];
-                    if (!leftNeighbor.IsDead)
-                        leftNeighbor.Shield += 1;
-                }
-
-                if (ability == Ability.AddShieldRight)
-                {
-                    var neighbors = attackerWheelController.GetFrontNeighborsCards(1, 2);
-                    var rightNeighbor = neighbors[1];
-                    if (!rightNeighbor.IsDead)
-                        rightNeighbor.Shield += 1;
+                    if (strategy.IsValid(ability))
+                        strategy.Execute(defenderWheelController);
                 }
             }
 
@@ -427,7 +417,6 @@ namespace Features.Battles
                 yield break;
             yield return botControlWheel.TurnTowardsDirection(Random.Range(0, 2) == 1);
         }
-
         
         
         [UsedImplicitly]
