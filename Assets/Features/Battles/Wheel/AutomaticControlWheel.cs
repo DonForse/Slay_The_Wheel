@@ -9,15 +9,15 @@ namespace Features.Battles.Wheel
         public override event EventHandler TurnRight;
         public override event EventHandler TurnLeft;
 
-        public IEnumerator TurnTowardsDirection(bool right, bool executeCallback)
+        public IEnumerator TurnTowardsDirection(ActDirection actDirection, bool executeCallback)
         {
             startAngle = wheelController.WheelData.RotationAngle;
-            yield return MoveTowardsDirection(right, executeCallback);
+            yield return MoveTowardsDirection(actDirection, executeCallback);
         }
 
-        private IEnumerator MoveTowardsDirection(bool right, bool executeCallback)
+        private IEnumerator MoveTowardsDirection(ActDirection actDirection, bool executeCallback)
         {
-            var rotationInput = right ? 1 : -1;
+            var rotationInput = actDirection == ActDirection.Right ? 1 : -1;
             var anglePerItem = (1.5f * Mathf.PI) / (wheelController.WheelData.Size);
 
             while (Mathf.Abs(wheelController.WheelData.RotationAngle - startAngle) < anglePerItem)
@@ -39,7 +39,7 @@ namespace Features.Battles.Wheel
                 // TurnLeft?.Invoke(this, null);
         }
 
-        public void Test(bool right)
+        public void Test(ActDirection right)
         {
             StartCoroutine(TurnTowardsDirection(right, true));
         }

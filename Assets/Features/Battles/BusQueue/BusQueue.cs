@@ -60,4 +60,6 @@ public class BusQueue : MonoBehaviour
     }
 
     public void Clear() => actionQueue.Clear();
+
+    public bool HasPendingActions() => actionQueue.Count > 0;
 }

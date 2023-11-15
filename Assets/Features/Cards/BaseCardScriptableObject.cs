@@ -10,8 +10,13 @@ namespace Features.Cards
         public int hp;
         public int attack;
         public Ability[] abilities;
-        public Sprite cardSprite;
+        public Ability[] onHitAbilities;
+        public Ability[] onSpinAbilities;
+        public Ability[] onTurnStartAbilities;
+        public Ability[] onTurnEndAbilities;
+        public Ability[] onActAbilities;
         public AttackType attackType;
+        public Sprite cardSprite;
         public int actCost;
     }
 }

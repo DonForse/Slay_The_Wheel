@@ -21,7 +21,7 @@ namespace Features.Battles.Wheel
         // private List<RunCard> _cardsToAdd;
         private int frontCardIndex;
         private Func<IEnumerator> _wheelMovedCallback;
-        private bool _lastActionWasRight;
+        private ActDirection _lastActionDirection;
         public event EventHandler<InPlayCard> Acted;
         public event EventHandler<InPlayCard> WheelTurn;
 
@@ -64,7 +64,7 @@ namespace Features.Battles.Wheel
     
         public bool AllUnitsDead() => Cards.All(x => x.IsDead);
 
-        public IEnumerator PutAliveUnitAtFront(bool toTheRight)
+        public IEnumerator PutAliveUnitAtFront(ActDirection toTheRight)
         {
             while (Cards[frontCardIndex].IsDead)
             {
@@ -96,7 +96,7 @@ namespace Features.Battles.Wheel
         {
             if (AllUnitsDead())
                 yield break;
-            _lastActionWasRight = false;
+            _lastActionDirection = ActDirection.Left;
             IncrementFrontCardIndex();
             Acted?.Invoke(this, Cards[frontCardIndex]);
         }
@@ -106,7 +106,7 @@ namespace Features.Battles.Wheel
             if (AllUnitsDead())
                 yield break;
 
-            _lastActionWasRight = true; 
+            _lastActionDirection = ActDirection.Right; 
             
             DecrementFrontCardIndex();
             Acted?.Invoke(this, Cards[frontCardIndex]);
@@ -116,8 +116,6 @@ namespace Features.Battles.Wheel
         {
             if (AllUnitsDead())
                 yield break;
-            
-            _lastActionWasRight = false;
             
             IncrementFrontCardIndex();
             yield return _wheelMovedCallback.Invoke();
@@ -184,24 +182,14 @@ namespace Features.Battles.Wheel
             return cards.Distinct().ToList();
         }
 
-        public IEnumerator RotateRight(int count)
+        public IEnumerator Rotate(ActDirection direction, int count)
         {
             for (int i = 0; i < count; i++)
             {
-                yield return wheelMovement.TurnTowardsDirection(true, true);
+                yield return wheelMovement.TurnTowardsDirection(direction, true);
             }
 
-            yield return PutAliveUnitAtFront(true);
-        }
-
-        public IEnumerator RotateLeft(int count)
-        {
-            for (int i = 0; i < count; i++)
-            {
-                yield return wheelMovement.TurnTowardsDirection(false, true);
-            }
-
-            yield return PutAliveUnitAtFront(false);
+            yield return PutAliveUnitAtFront(direction);
         }
 
         public void SetWheelMovedCallback(Func<IEnumerator> onPlayerWheelMoved)
@@ -211,8 +199,8 @@ namespace Features.Battles.Wheel
 
         public IEnumerator RevertLastMovement()
         {
-            yield return wheelMovement.TurnTowardsDirection(!_lastActionWasRight, false);
-            if (!_lastActionWasRight)
+            yield return wheelMovement.TurnTowardsDirection(_lastActionDirection == ActDirection.Left ? ActDirection.Right : ActDirection.Left, false);
+            if (_lastActionDirection == ActDirection.Left)
                 DecrementFrontCardIndex();
             else
                 IncrementFrontCardIndex();
@@ -220,7 +208,7 @@ namespace Features.Battles.Wheel
 
         public IEnumerator RepeatActMove()
         {
-            yield return wheelMovement.TurnTowardsDirection(_lastActionWasRight, true);
+            yield return wheelMovement.TurnTowardsDirection(_lastActionDirection, true);
 
             Acted?.Invoke(this, Cards[frontCardIndex]);
         }
