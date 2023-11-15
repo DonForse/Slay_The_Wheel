@@ -1,3 +1,4 @@
+using System.Collections;
 using Features.Battles.Wheel;
 
 namespace Features.Battles
@@ -5,6 +6,6 @@ namespace Features.Battles
     public interface IOnHitEffectStrategy
     {
         bool IsValid(Ability ability);
-        void Execute(WheelController defenderWheelController);
+        IEnumerator Execute(WheelController defenderWheelController, int amount);
     }
 }

@@ -28,7 +28,7 @@ public class DebugBattle : MonoBehaviour
         var sorceress = unitsDb.cards.FirstOrDefault(x => x.cardName.Contains("Firestorm Sorceress"));
         var slime = enemiesDb.cards.FirstOrDefault(x => x.cardName.Contains("Slime"));
         
-        for (var i = 0; i < 12; i++)
+        for (var i = 0; i < 5; i++)
         {
             var playerUnit = new RunCard(recruits);
             _deck.Add(playerUnit);

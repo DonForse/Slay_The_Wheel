@@ -42,7 +42,10 @@ namespace Features.Battles
 
             OnHitEffectStrategies = new List<IOnHitEffectStrategy>() { 
                 new BurnOnHitEffectStrategy(),
-                new BurnAllOnHitEffectStrategy() };
+                new BurnAllOnHitEffectStrategy(),
+                new RotateLeftOnHitEffectStrategy(),
+                new RotateRightOnHitEffectStrategy()
+            };
             OnActEffectStrategies = new List<IOnActEffectStrategy>() {
                 new AddAtkLeftOnActEffectStrategy(), 
                 new AddAtkRightOnActEffectStrategy(),
@@ -126,7 +129,6 @@ namespace Features.Battles
             _busQueue.EnqueueAction(ApplyOnActCardEffect(attackerWheelController, defenderWheelController));
             _busQueue.EnqueueAction(ApplyFrontCardAttack(attacker, defenderWheelController));
             _busQueue.EnqueueAction(ApplyFrontCardEffect(attackerWheelController, defenderWheelController));
-            _busQueue.EnqueueAction(ApplyAfterHitEffect(attackerCard, defenderWheelController));
             if (CompletedActions())
             {
                 _busQueue.EnqueueAction(ChangeTurn());
@@ -210,20 +212,7 @@ namespace Features.Battles
 
             yield break;
         }
-
-        private IEnumerator ApplyAfterHitEffect(RunCard attackerCard, WheelController defenderWheelController)
-        {
-            foreach (var group in attackerCard.Abilities.GroupBy(x => x))
-            {
-                if (group.Key == Ability.RotateRight)
-                    yield return defenderWheelController.Rotate(ActDirection.Right,group.Count());
-                if (group.Key == Ability.RotateLeft)
-                    yield return defenderWheelController.Rotate(ActDirection.Left,group.Count());
-            }
-
-            yield return null;
-        }
-
+        
         private IEnumerator Act(InPlayCard attacker, WheelController attackerWheelController,
             WheelController defenderWheelController, ActDirection actDirection)
         {
@@ -325,12 +314,13 @@ namespace Features.Battles
             WheelController defenderWheelController)
         {
             var attackerCard = attackerWheelController.GetFrontCard().GetCard();
-            foreach (var ability in attackerCard.Abilities)
+            var groupAbilities = attackerCard.Abilities.GroupBy(x => x);
+            foreach (var group in groupAbilities)
             {
                 foreach (var strategy in OnHitEffectStrategies)
                 {
-                    if (strategy.IsValid(ability))
-                        strategy.Execute(defenderWheelController);
+                    if (strategy.IsValid(group.Key))
+                         yield return strategy.Execute(defenderWheelController, group.Count());
                 }
             }
 

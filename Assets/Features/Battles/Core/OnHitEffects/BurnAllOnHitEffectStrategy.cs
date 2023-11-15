@@ -1,3 +1,4 @@
+using System.Collections;
 using Features.Battles.Wheel;
 
 namespace Features.Battles
@@ -6,12 +7,14 @@ namespace Features.Battles
     {
         public bool IsValid(Ability ability) => ability == Ability.BurnAll;
 
-        public void Execute(WheelController defenderWheelController)
+        public IEnumerator Execute(WheelController defenderWheelController, int count)
         {
             foreach (var card in defenderWheelController.Cards)
             {
-                card.AddEffect(Ability.Burn);
+                for (int i = 0; i < count; i++)
+                    card.AddEffect(Ability.Burn);
             }
+            yield break;
         }
     }
 }
