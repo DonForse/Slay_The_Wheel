@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace Features.Battles.Wheel
 {
-    public class WheelController : MonoBehaviour
+    public class PlayerController : MonoBehaviour
     {
         public WheelData WheelData = new();
         public InPlayCard inPlayCardPrefab;
@@ -32,10 +32,10 @@ namespace Features.Battles.Wheel
             wheelMovement = GetComponent<AutomaticControlWheel>();
         }
 
-        public IEnumerator InitializeWheel(bool player, int enemyWheelSize, List<RunCard> cards)
+        public IEnumerator InitializeWheel(bool player, int wheelSize, List<RunCard> cards)
         {
             Positions = new();
-            SetSize(enemyWheelSize);
+            WheelData.Size = wheelSize;
             CalculatePositions();
             yield return SetRunCards(player, cards);
 
@@ -56,12 +56,7 @@ namespace Features.Battles.Wheel
         public void UnlockWheel() => input.Enable();
 
         public InPlayCard GetFrontCard() => Cards[frontCardIndex];
-
-        private void SetSize(int value)
-        {
-            WheelData.Size = value;
-        }
-    
+        
         public bool AllUnitsDead() => Cards.All(x => x.IsDead);
 
         public IEnumerator PutAliveUnitAtFront(ActDirection toTheRight)

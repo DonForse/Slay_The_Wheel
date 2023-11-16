@@ -5,6 +5,6 @@ namespace Features.Battles
     public interface IOnActEffectStrategy
     {
         bool IsValid(Ability ability);
-        void Execute(WheelController defenderWheelController, WheelController attackerWheelController);
+        void Execute(PlayerController defenderPlayerController, PlayerController attackerPlayerController);
     }
 }

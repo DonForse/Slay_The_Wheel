@@ -13,12 +13,12 @@ namespace Features.Battles.Core.Attacks
         }
         public bool IsValid(AttackType attackType) => attackType == AttackType.Front;
 
-        public IEnumerator Execute(InPlayCard attackerCard, WheelController defenderWheelController)
+        public IEnumerator Execute(InPlayCard attackerCard, PlayerController defenderPlayerController)
         {
             attackerCard.PlayAct();
-            var defender = defenderWheelController.GetFrontCard();
+            var defender = defenderPlayerController.GetFrontCard();
 
-            _battle.ApplyDamage(attackerCard.Attack, defender, defenderWheelController, null);
+            _battle.ApplyDamage(attackerCard.Attack, defender, defenderPlayerController, null);
             yield break;
         }
     }

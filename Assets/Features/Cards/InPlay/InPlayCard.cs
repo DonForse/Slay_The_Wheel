@@ -5,6 +5,7 @@ using Features.Battles;
 using MoreMountains.Feedbacks;
 using TMPro;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace Features.Cards
 {
@@ -36,7 +37,7 @@ namespace Features.Cards
 
         public bool IsDead => _isDead;
 
-        public int Shield;
+        public int Armor;
         public int Attack;
 
         public List<Ability> Effects = new List<Ability>();
@@ -60,7 +61,7 @@ namespace Features.Cards
             _isDead = false;
             
             Attack = runCard.Attack;
-            Shield = 0;
+            Armor = 0;
             
             spriteRenderer.sprite = runCard.baseCard.cardSprite;
 

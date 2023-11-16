@@ -6,12 +6,12 @@ namespace Features.Battles.Core.OnActEffects
     {
         public bool IsValid(Ability ability) => ability == Ability.AddShieldRight;
 
-        public void Execute(WheelController defenderWheelController, WheelController attackerWheelController)
+        public void Execute(PlayerController defenderPlayerController, PlayerController attackerPlayerController)
         {
-            var neighbors = attackerWheelController.GetFrontNeighborsCards(1, 2);
+            var neighbors = attackerPlayerController.GetFrontNeighborsCards(1, 2);
             var rightNeighbor = neighbors[1];
             if (!rightNeighbor.IsDead)
-                rightNeighbor.Shield += 1;
+                rightNeighbor.Armor += 5;
         }
     }
 }

@@ -10,5 +10,8 @@ namespace Features.Battles
         AddAtkRight,
         AddShieldLeft,
         AddAtkLeft,
+        Reflect,
+        Counter,
+        GainArmor
     }
 }

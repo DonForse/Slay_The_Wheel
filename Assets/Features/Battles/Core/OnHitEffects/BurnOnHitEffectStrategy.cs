@@ -6,9 +6,9 @@ namespace Features.Battles
     public class BurnOnHitEffectStrategy : IOnHitEffectStrategy
     {
         public bool IsValid(Ability ability) => ability == Ability.Burn;
-        public IEnumerator Execute(WheelController defenderWheelController, int count)
+        public IEnumerator Execute(PlayerController defenderPlayerController, int count)
         {
-            var affectedCard = defenderWheelController.GetFrontCard();
+            var affectedCard = defenderPlayerController.GetFrontCard();
             for (int i = 0; i < count; i++)
                 affectedCard.AddEffect(Ability.Burn);
             yield break;

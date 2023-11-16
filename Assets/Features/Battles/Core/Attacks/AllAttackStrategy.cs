@@ -13,11 +13,11 @@ namespace Features.Battles.Core.Attacks
         }
         public bool IsValid(AttackType attackType) => attackType == AttackType.All;
 
-        public IEnumerator Execute(InPlayCard attackerCard, WheelController defenderWheelController)
+        public IEnumerator Execute(InPlayCard attackerCard, PlayerController defenderPlayerController)
         {
             attackerCard.PlayAct();
-            foreach (var defender in defenderWheelController.Cards)
-                _battle.ApplyDamage(attackerCard.Attack, defender, defenderWheelController, null);
+            foreach (var defender in defenderPlayerController.Cards)
+                _battle.ApplyDamage(attackerCard.Attack, defender, defenderPlayerController, null);
             yield break;
         }
     }

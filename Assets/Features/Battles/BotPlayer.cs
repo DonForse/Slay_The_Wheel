@@ -2,13 +2,14 @@ using System;
 using System.Collections;
 using Features.Battles.Wheel;
 using UnityEngine;
+using UnityEngine.Serialization;
 using Random = UnityEngine.Random;
 
 namespace Features.Battles
 {
     public class BotPlayer : MonoBehaviour
     {
-        [SerializeField] private WheelController wheelController;
+        [FormerlySerializedAs("wheelController")] [SerializeField] private PlayerController playerController;
         [SerializeField] private BotControlWheel botControlWheel;
         [SerializeField] private BusQueue busQueue;
         [SerializeField] private Battle battle;
@@ -27,7 +28,7 @@ namespace Features.Battles
                 busQueue.EnqueueAction(TryExecuteBotAction());
             }
 
-            if (wheelController.AllUnitsDead())
+            if (playerController.AllUnitsDead())
                 this.enabled = false;
         }
         private IEnumerator TryExecuteBotAction()

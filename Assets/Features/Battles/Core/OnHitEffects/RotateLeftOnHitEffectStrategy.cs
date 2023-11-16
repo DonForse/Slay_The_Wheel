@@ -10,9 +10,9 @@ namespace Features.Battles
             return ability == Ability.RotateLeft;
         }
 
-        public IEnumerator Execute(WheelController defenderWheelController, int count)
+        public IEnumerator Execute(PlayerController defenderPlayerController, int count)
         {
-            yield return defenderWheelController.Rotate(ActDirection.Left, count);
+            yield return defenderPlayerController.Rotate(ActDirection.Left, count);
         }
     }
 }

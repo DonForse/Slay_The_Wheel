@@ -6,6 +6,6 @@ namespace Features.Battles
     public interface IOnHitEffectStrategy
     {
         bool IsValid(Ability ability);
-        IEnumerator Execute(WheelController defenderWheelController, int amount);
+        IEnumerator Execute(PlayerController defenderPlayerController, int amount);
     }
 }

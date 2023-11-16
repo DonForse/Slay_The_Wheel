@@ -17,7 +17,7 @@ namespace Features.Battles.Wheel
 
         public IEnumerator TurnTowardsDirection(bool right)
         {
-            startAngle = wheelController.WheelData.RotationAngle;
+            startAngle = playerController.WheelData.RotationAngle;
             _onBeforeRotation?.Invoke(right? TurningOrientation.TurnRight: TurningOrientation.TurnLeft);
             yield return MoveTowardsDirection(right);
         }
@@ -25,18 +25,18 @@ namespace Features.Battles.Wheel
         private IEnumerator MoveTowardsDirection(bool right)
         {
             var rotationInput = right ? 1 : -1;
-            var anglePerItem = (1.5f * Mathf.PI) / (wheelController.WheelData.Size);
+            var anglePerItem = (1.5f * Mathf.PI) / (playerController.WheelData.Size);
 
-            while (Mathf.Abs(wheelController.WheelData.RotationAngle - startAngle) < anglePerItem)
+            while (Mathf.Abs(playerController.WheelData.RotationAngle - startAngle) < anglePerItem)
             {
-                wheelController.WheelData.RotationAngle += rotationInput * rotationSpeed * Time.deltaTime;
+                playerController.WheelData.RotationAngle += rotationInput * rotationSpeed * Time.deltaTime;
                 RotateToNewPosition();
                 yield return _waitForEndOfFrame;
             }
 
             SnapToNearestPosition();
 
-            if ((wheelController.WheelData.RotationAngle - startAngle) > 0)
+            if ((playerController.WheelData.RotationAngle - startAngle) > 0)
                 yield return _rightCallback.Invoke();
             else
                 yield return _leftCallback.Invoke();

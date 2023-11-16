@@ -1,13 +1,14 @@
 using System;
 using System.Collections;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace Features.Battles.Wheel
 {
     public abstract class ControlWheel :MonoBehaviour, IControlWheel
     {
         [SerializeField] protected float rotationSpeed = 5;
-        [SerializeField] protected WheelController wheelController;
+        [FormerlySerializedAs("wheelController")] [SerializeField] protected PlayerController playerController;
         
         protected float startAngle;
         protected Func<IEnumerator> _rightCallback;
@@ -36,24 +37,24 @@ namespace Features.Battles.Wheel
 
         internal void SnapToNearestPosition()
         {
-            if (wheelController.WheelData.Size == 0) return;
-            float anglePerItem = 2 * Mathf.PI / wheelController.WheelData.Size;
-            float targetAngle = Mathf.Round(wheelController.WheelData.RotationAngle / anglePerItem) * anglePerItem;
-            wheelController.WheelData.RotationAngle = targetAngle;
+            if (playerController.WheelData.Size == 0) return;
+            float anglePerItem = 2 * Mathf.PI / playerController.WheelData.Size;
+            float targetAngle = Mathf.Round(playerController.WheelData.RotationAngle / anglePerItem) * anglePerItem;
+            playerController.WheelData.RotationAngle = targetAngle;
             RotateToNewPosition();
         }
 
         internal void RotateToNewPosition()
         {
-            for (var i = 0; i < wheelController.Cards.Count; i++)
+            for (var i = 0; i < playerController.Cards.Count; i++)
             {
-                var initialTheta = Mathf.Atan2(wheelController.Positions[i].y, wheelController.Positions[i].x);
-                var newTheta = initialTheta + wheelController.WheelData.RotationAngle;
-                var x = wheelController.WheelData.Radius * Mathf.Cos(newTheta);
-                var y = wheelController.WheelData.Radius * Mathf.Sin(newTheta);
+                var initialTheta = Mathf.Atan2(playerController.Positions[i].y, playerController.Positions[i].x);
+                var newTheta = initialTheta + playerController.WheelData.RotationAngle;
+                var x = playerController.WheelData.Radius * Mathf.Cos(newTheta);
+                var y = playerController.WheelData.Radius * Mathf.Sin(newTheta);
 
                 var newPosition = new Vector2(x, y);
-                wheelController.Cards[i].transform.localPosition = newPosition;
+                playerController.Cards[i].transform.localPosition = newPosition;
             }
         }
     }

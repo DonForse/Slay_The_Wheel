@@ -30,7 +30,7 @@ namespace Features.Battles.Wheel
             {
                 if (EventSystem.current.IsPointerOverGameObject())
                     return;
-                startAngle = wheelController.WheelData.RotationAngle;
+                startAngle = playerController.WheelData.RotationAngle;
                 _isRotating = true;
             }
 
@@ -45,15 +45,15 @@ namespace Features.Battles.Wheel
             
             var rotationInput = Mathf.Clamp(Input.GetAxis("Mouse X"), -1f,1f);
         
-            wheelController.WheelData.RotationAngle += rotationInput * rotationSpeed * Time.deltaTime;
+            playerController.WheelData.RotationAngle += rotationInput * rotationSpeed * Time.deltaTime;
 
-            var anglePerItem = (1.5f * Mathf.PI) / (wheelController.WheelData.Size);
+            var anglePerItem = (1.5f * Mathf.PI) / (playerController.WheelData.Size);
 
-            if (Mathf.Abs(wheelController.WheelData.RotationAngle - startAngle) >= anglePerItem)
+            if (Mathf.Abs(playerController.WheelData.RotationAngle - startAngle) >= anglePerItem)
             {
                 _isRotating = false;
 
-                if ((wheelController.WheelData.RotationAngle - startAngle) > 0)
+                if ((playerController.WheelData.RotationAngle - startAngle) > 0)
                     StartCoroutine(_rightCallback.Invoke());
                 else
                     StartCoroutine(_leftCallback.Invoke());
@@ -63,7 +63,7 @@ namespace Features.Battles.Wheel
             RotateToNewPosition();
         }
     
-        private void RollbackPosition() => wheelController.WheelData.RotationAngle = startAngle;
+        private void RollbackPosition() => playerController.WheelData.RotationAngle = startAngle;
 
         private void OnApplicationFocus(bool hasFocus)
         {

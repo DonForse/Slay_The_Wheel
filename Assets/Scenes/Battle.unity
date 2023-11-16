@@ -1893,7 +1893,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 34ae1dc7cc5a46918015306b7028cd09, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  wheelController: {fileID: 652674504}
+  playerController: {fileID: 652674504}
   botControlWheel: {fileID: 652674506}
   busQueue: {fileID: 1627362539}
   battle: {fileID: 1689651476}
@@ -2284,7 +2284,7 @@ GameObject:
   - component: {fileID: 652674506}
   - component: {fileID: 652674507}
   m_Layer: 0
-  m_Name: EnemyWheel
+  m_Name: EnemyController
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2339,7 +2339,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   rotationSpeed: 3
-  wheelController: {fileID: 652674504}
+  playerController: {fileID: 652674504}
 --- !u!114 &652674507
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2353,7 +2353,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   rotationSpeed: 3
-  wheelController: {fileID: 652674504}
+  playerController: {fileID: 652674504}
 --- !u!1 &655113290
 GameObject:
   m_ObjectHideFlags: 0
@@ -3832,7 +3832,7 @@ GameObject:
   - component: {fileID: 1555398151}
   - component: {fileID: 1555398152}
   m_Layer: 0
-  m_Name: PlayerWheel
+  m_Name: PlayerController
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -3887,7 +3887,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   rotationSpeed: 5
-  wheelController: {fileID: 1555398149}
+  playerController: {fileID: 1555398149}
 --- !u!114 &1555398152
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3901,7 +3901,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   rotationSpeed: 3
-  wheelController: {fileID: 1555398149}
+  playerController: {fileID: 1555398149}
 --- !u!1 &1627362538
 GameObject:
   m_ObjectHideFlags: 0
@@ -3975,8 +3975,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3e8d6f1522ceebe42bc8614de457108c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  playerWheelController: {fileID: 1555398149}
-  enemyWheelController: {fileID: 652674504}
+  playerController: {fileID: 1555398149}
+  enemyController: {fileID: 652674504}
   botControlWheel: {fileID: 652674506}
   _busQueue: {fileID: 1627362539}
   turnMessage: {fileID: 1719590909}
@@ -3985,7 +3985,6 @@ MonoBehaviour:
   - {fileID: 1964174340}
   - {fileID: 1520706491}
   - {fileID: 1215910112}
-  botPlayer: {fileID: 0}
 --- !u!4 &1689651477
 Transform:
   m_ObjectHideFlags: 0

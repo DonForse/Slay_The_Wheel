@@ -7,9 +7,9 @@ namespace Features.Battles
     {
         public bool IsValid(Ability ability) => ability == Ability.BurnAll;
 
-        public IEnumerator Execute(WheelController defenderWheelController, int count)
+        public IEnumerator Execute(PlayerController defenderPlayerController, int count)
         {
-            foreach (var card in defenderWheelController.Cards)
+            foreach (var card in defenderPlayerController.Cards)
             {
                 for (int i = 0; i < count; i++)
                     card.AddEffect(Ability.Burn);

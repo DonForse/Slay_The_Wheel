@@ -7,6 +7,6 @@ namespace Features.Battles.Core.Attacks
     public interface IAttackStrategy
     {
         bool IsValid(AttackType attackType);
-        IEnumerator Execute(InPlayCard attackerCard, WheelController defenderWheelController);
+        IEnumerator Execute(InPlayCard attackerCard, PlayerController defenderPlayerController);
     }
 }
