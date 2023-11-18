@@ -17,7 +17,7 @@ namespace Features.Battles.Core.Attacks
         {
             attackerCard.PlayAct();
             foreach (var defender in defenderPlayerController.Cards)
-                _battle.ApplyDamage(attackerCard.Attack, defender, defenderPlayerController, null);
+                yield return _battle.ApplyDamage(attackerCard.Attack, defender,attackerCard, defenderPlayerController, null);
             yield break;
         }
     }

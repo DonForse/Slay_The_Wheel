@@ -222,14 +222,14 @@ namespace Features
             {
                 foreach (var card in _deck)
                 {
-                    var abs = card.OnHitAbilities.ToList();
+                    var abs = card.OnDealDamageAbilities.ToList();
                     var ability = abs.FirstOrDefault(x=>x.Type == AbilityEnum.Burn);
                     abs.Remove(ability);
                     if (ability == null)
                         ability = new Ability(){Type =  AbilityEnum.Burn, Amount = 0};
                     ability.Amount++;
                     abs.Add(ability);
-                    card.OnHitAbilities = abs.ToArray();
+                    card.OnDealDamageAbilities = abs.ToArray();
                 }
 
                 return;

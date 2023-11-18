@@ -35,17 +35,16 @@ namespace Features.Cards
                 ValueChanged?.Invoke(this, this);
             }
         }
-    
-        public Ability[] OnHitAbilities
+    //TODO: Run card shouldnt use this autoproperties, runcard should be pretty similar to base card, but with status changes, and inplaycard should have this autoproperties.
+        public Ability[] OnDealDamageAbilities
         {
-            get => _onHitAbilities;
+            get => _onDealDamageAbilities;
             set
             {
-                _onHitAbilities = value;
+                _onDealDamageAbilities = value;
                 ValueChanged?.Invoke(this, this);
             }
         }
-
         public Ability[] OnAttackAbilities
         {
             get => _onAttackAbilities;
@@ -100,7 +99,7 @@ namespace Features.Cards
         public readonly BaseCardScriptableObject baseCard;
     
         private int _attack;
-        private Ability[] _onHitAbilities;
+        private Ability[] _onDealDamageAbilities;
         private Ability[] _onAttackAbilities;
         private Ability[] _onActAbilities;
         private int _hp;
@@ -114,7 +113,7 @@ namespace Features.Cards
             _cardName = cardScriptableObject.cardName;
             _hp = cardScriptableObject.hp;
             _attack = cardScriptableObject.attack;
-            _onHitAbilities = cardScriptableObject.onHitAbilities;
+            _onDealDamageAbilities = cardScriptableObject.onDealDamageAbilities;
             _onAttackAbilities = cardScriptableObject.onAttackAbilities; 
             _onActAbilities = cardScriptableObject.onActAbilities;
             _onSpinAbilities = cardScriptableObject.onSpinAbilities;

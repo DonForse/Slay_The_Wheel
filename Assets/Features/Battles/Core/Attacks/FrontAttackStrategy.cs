@@ -18,7 +18,7 @@ namespace Features.Battles.Core.Attacks
             attackerCard.PlayAct();
             var defender = defenderPlayerController.GetFrontCard();
 
-            _battle.ApplyDamage(attackerCard.Attack, defender, defenderPlayerController, null);
+            yield return _battle.ApplyDamage(attackerCard.Attack, defender,attackerCard, defenderPlayerController, null);
             yield break;
         }
     }

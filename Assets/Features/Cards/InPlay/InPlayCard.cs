@@ -68,7 +68,7 @@ namespace Features.Cards
 
             spriteRenderer.sprite = runCard.baseCard.cardSprite;
 
-            SetEffectIcons(runCard.OnHitAbilities, abilitiesContainer);
+            SetEffectIcons(runCard.OnDealDamageAbilities, abilitiesContainer);
             SetEffectIcons(Effects.ToArray(), effectsContainer);
 
             _card.ValueChanged += UpdateCardValues;

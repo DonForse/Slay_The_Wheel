@@ -38,14 +38,14 @@ namespace Features.PostBattles
         {
             if (e == LevelUpUpgrade.Burn)
             {
-                var asd = _heroCard.OnHitAbilities.ToList();
+                var asd = _heroCard.OnDealDamageAbilities.ToList();
                 var burnAll=asd.FirstOrDefault(x => x.Type == AbilityEnum.BurnAll);
                 asd.Remove(burnAll);
                 if (burnAll == null)
                     burnAll = new Ability() { Type = AbilityEnum.BurnAll, Amount = 0 };
                 burnAll.Amount++;
                 asd.Add(burnAll);
-                _heroCard.OnHitAbilities = asd.ToArray();
+                _heroCard.OnDealDamageAbilities = asd.ToArray();
             }
             if (e == LevelUpUpgrade.Atk)
             {

@@ -20,7 +20,7 @@ namespace Features.Battles.Core.Attacks
             attackerCard.PlayAct();
             var defenders = defenderPlayerController.GetFrontNeighborsCards(0, 2).ToList();
             foreach (var defender in defenders)
-                _battle.ApplyDamage(attackerCard.Attack, defender, defenderPlayerController, null);
+                yield return _battle.ApplyDamage(attackerCard.Attack, defender, attackerCard,defenderPlayerController, null);
             yield break;
         }
     }
