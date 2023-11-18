@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Features.Battles.Core.Attacks;
 using Features.Battles.Core.OnActEffects;
+using Features.Battles.Core.OnHitEffects;
 using Features.Battles.Wheel;
 using Features.Cards;
 using JetBrains.Annotations;
@@ -35,8 +36,8 @@ namespace Features.Battles
         public Turn Turn => IsPlayerTurn() ? Turn.Player : Turn.Enemy;
         public int Actions => _actions;
 
-        private List<IOnHitEffectStrategy> _onHitEffectStrategies = new();
-        private List<IOnActEffectStrategy> _onActEffectStrategies = new();
+        private List<IOnApplyAbilityStrategy> _onHitEffectStrategies = new();
+        private List<IOnApplyAbilityStrategy> _onActEffectStrategies = new();
         private List<IAttackStrategy> _attackStrategies = new();
         // private List<IOnActEffectStrategy> OnReceiveDamageStrategies = new();
         // private List<IOnActEffectStrategy> OnEndTurnStrategies = new();
@@ -48,17 +49,17 @@ namespace Features.Battles
         {
             _onHitEffectStrategies = new()
             {
-                new BurnOnHitEffectStrategy(),
-                new BurnAllOnHitEffectStrategy(),
-                new RotateLeftOnHitEffectStrategy(),
-                new RotateRightOnHitEffectStrategy()
+                new BurnOnApplyAbilityStrategy(),
+                new BurnAllOnApplyAbilityStrategy(),
+                new RotateLeftOnApplyAbilityStrategy(),
+                new RotateRightOnApplyAbilityStrategy()
             };
             _onActEffectStrategies = new()
             {
-                new AddAtkLeftOnActEffectStrategy(),
-                new AddAtkRightOnActEffectStrategy(),
-                new AddShieldLeftOnActEffectStrategy(),
-                new AddShieldRightOnActEffectStrategy()
+                new AddAtkLeftOnApplyAbilityStrategy(),
+                new AddAtkRightOnApplyAbilityStrategy(),
+                new AddShieldLeftOnApplyAbilityStrategy(),
+                new AddShieldRightOnApplyAbilityStrategy()
             };
             _attackStrategies = new()
             {
@@ -163,8 +164,8 @@ namespace Features.Battles
             {
                 foreach (var strategy in _onActEffectStrategies)
                 {
-                    if (strategy.IsValid(ability))
-                        strategy.Execute(defenderPlayerController, attackerPlayerController);
+                    if (strategy.IsValid(ability.Type))
+                        strategy.Execute(attackerPlayerController.GetFrontCard(),ability.Amount,defenderPlayerController, attackerPlayerController);
                 }
             }
 
@@ -221,11 +222,11 @@ namespace Features.Battles
             foreach (var card in playerController.Cards)
             {
                 var cardActiveEffects = card.Effects;
-                var burns = cardActiveEffects.Count(a => a == Ability.Burn);
-                if (burns > 0)
+                var burns = cardActiveEffects.FirstOrDefault(a => a.Type == AbilityEnum.Burn);
+                if (burns != null)
                 {
-                    card.RemoveEffect(Ability.Burn);
-                    ApplyDamage(burns, card, playerController, Ability.Burn);
+                    card.UpdateEffect(AbilityEnum.Burn, -1);
+                    ApplyDamage(burns.Amount, card, playerController, AbilityEnum.Burn);
                 }
             }
 
@@ -263,7 +264,7 @@ namespace Features.Battles
         }
 
         public void ApplyDamage(int damage, InPlayCard defender, PlayerController defenderPlayerController,
-            Ability? source)
+            AbilityEnum? source)
         {
             var defenderCard = defender.GetCard();
             defender.PlayGetHitAnimation(damage, source);
@@ -290,7 +291,7 @@ namespace Features.Battles
                     if (cards == null || cards.Count == 0)
                         _busQueue.EnqueueInterruptAction(EndBattle(defenderPlayerController));
                     else
-                        _busQueue.EnqueueInterruptAction(defender.SetCard(cards.First()));
+                        _busQueue.EnqueueInterruptAction(defender.SetCard(cards.First(), defenderPlayerController));
                 }
 
                 if (_enemiesDeck.Count == 0 && defenderPlayerController.AllUnitsDead())
@@ -312,7 +313,7 @@ namespace Features.Battles
                     if (cards == null || cards.Count == 0)
                         _busQueue.EnqueueInterruptAction(EndBattle(defenderPlayerController));
                     else
-                        _busQueue.EnqueueInterruptAction(defender.SetCard(cards.First()));
+                        _busQueue.EnqueueInterruptAction(defender.SetCard(cards.First(), defenderPlayerController));
                 }
 
                 if (_playerBattleDeck.Count == 0 && _playerDiscardPile.Count == 0 &&
@@ -334,13 +335,12 @@ namespace Features.Battles
             PlayerController defenderPlayerController)
         {
             var attackerCard = attackerPlayerController.GetFrontCard().GetCard();
-            var groupAbilities = attackerCard.Abilities.GroupBy(x => x);
-            foreach (var group in groupAbilities)
+            foreach (var ability in attackerCard.Abilities)
             {
                 foreach (var strategy in _onHitEffectStrategies)
                 {
-                    if (strategy.IsValid(group.Key))
-                        yield return strategy.Execute(defenderPlayerController, group.Count());
+                    if (strategy.IsValid(ability.Type))
+                        yield return strategy.Execute(attackerPlayerController.GetFrontCard(), ability.Amount,defenderPlayerController, attackerPlayerController);
                 }
             }
 
@@ -474,20 +474,15 @@ namespace Features.Battles
             {
                 foreach (var card in enemyController.Cards)
                 {
-                    card.AddEffect(Ability.Burn);
-                    card.AddEffect(Ability.Burn);
-                    card.AddEffect(Ability.Burn);
+                    card.UpdateEffect(AbilityEnum.Burn,3);
                 }
             }
             else if (skillIndex == 2)
             {
                 foreach (var card in enemyController.Cards)
                 {
-                    var totalBurns = card.Effects.Count(x => x == Ability.Burn);
-                    for (int i = 0; i < totalBurns; i++)
-                    {
-                        card.AddEffect(Ability.Burn);
-                    }
+                    var totalBurns = card.Effects.Count(x => x.Type == AbilityEnum.Burn);
+                    card.UpdateEffect(AbilityEnum.Burn, totalBurns);
                 }
             }
             else if (skillIndex == 3)
@@ -504,12 +499,12 @@ namespace Features.Battles
         {
             acting = true;
             playerController.LockWheel();
-            var burns = enemyController.Cards.Max(x => x.Effects.Count(x => x == Ability.Burn));
+            var burns = enemyController.Cards.Max(x => x.Effects.Count(x => x.Type == AbilityEnum.Burn));
             while (burns > 0 && !enemyController.AllUnitsDead())
             {
                 if (enemyController.AllUnitsDead()) yield break;
                 yield return enemyController.Rotate(ActDirection.Right, burns);
-                burns = enemyController.Cards.Max(x => x.Effects.Count(ability => ability == Ability.Burn));
+                burns = enemyController.Cards.Max(x => x.Effects.Count(ability => ability.Type == AbilityEnum.Burn));
             }
 
             playerController.UnlockWheel();
@@ -527,7 +522,7 @@ namespace Features.Battles
             _playerDiscardPile = _playerDiscardPile.Concat(cardsInWheel).ToList();
             for (int i = 0; i < slots; i++)
             {
-                yield return playerController.Cards[i].SetCard(cards[i]);
+                yield return playerController.Cards[i].SetCard(cards[i], playerController);
             }
 
             acting = false;

@@ -4,15 +4,15 @@ using Features.Cards;
 
 namespace Features.Battles.Core.OnActEffects
 {
-    public class AddAtkLeftOnApplyAbilityStrategy : IOnApplyAbilityStrategy
+    public class AddAtkRightOnApplyAbilityStrategy : IOnApplyAbilityStrategy
     {
-        public bool IsValid(AbilityEnum abilityEnum) => abilityEnum == AbilityEnum.AddAtkLeft;
+        public bool IsValid(AbilityEnum abilityEnum) => abilityEnum == AbilityEnum.AddAtkRight;
 
         public IEnumerator Execute(InPlayCard executor, int amount, PlayerController defender,
             PlayerController attacker)
         {
             var neighbors = executor.OwnerPlayer.GetNeighborsCards(executor,1, 2);
-            var leftNeighbor = neighbors[0];
+            var leftNeighbor = neighbors[1];
             if (!leftNeighbor.IsDead)
                 leftNeighbor.Attack += 1;
             yield break;

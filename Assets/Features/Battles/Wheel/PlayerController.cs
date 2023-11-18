@@ -138,7 +138,7 @@ namespace Features.Battles.Wheel
                 Cards.Add(inPlayCard);
                 inPlayCard.SetPlayer(player);
                 inPlayCard.transform.localPosition = Positions[i];
-                yield return inPlayCard.SetCard(cards[i]);
+                yield return inPlayCard.SetCard(cards[i], this);
             }
         }
 
@@ -206,6 +206,26 @@ namespace Features.Battles.Wheel
             yield return wheelMovement.TurnTowardsDirection(_lastActionDirection, true);
 
             Acted?.Invoke(this, Cards[frontCardIndex]);
+        }
+
+        public List<InPlayCard> GetNeighborsCards(InPlayCard executor, int startLevel, int finishLevel)
+        {
+            var cards = new List<InPlayCard>();
+            var cardIndex = cards.IndexOf(executor);
+            for (int i = startLevel; i < finishLevel; i++)
+            {
+                var currentNegativeIndex = cardIndex - i;
+                if (currentNegativeIndex < 0)
+                    currentNegativeIndex += Cards.Count;
+                var currentPositiveIndex = cardIndex + i;
+                if (currentPositiveIndex > Cards.Count - 1)
+                    currentPositiveIndex -= Cards.Count();
+
+                cards.Add(Cards[currentNegativeIndex]);
+                cards.Add(Cards[currentPositiveIndex]);
+            }
+
+            return cards.Distinct().ToList();
         }
     }
 }

@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Features.Battles;
+using Features.Battles.Wheel;
 using MoreMountains.Feedbacks;
 using TMPro;
 using UnityEngine;
@@ -43,6 +44,7 @@ namespace Features.Cards
         public List<Ability> Effects = new List<Ability>();
 
         public string CardName => _card.CardName;
+        public PlayerController OwnerPlayer;
 
         private void OnEnable()
         {
@@ -55,14 +57,15 @@ namespace Features.Cards
                 viewContainer.transform.localRotation = new Quaternion(0, 0, 180, 0);
         }
 
-        public IEnumerator SetCard(RunCard runCard)
+        public IEnumerator SetCard(RunCard runCard, PlayerController owner)
         {
+            OwnerPlayer = owner;
             _card = runCard;
             _isDead = false;
-            
+
             Attack = runCard.Attack;
             Armor = 0;
-            
+
             spriteRenderer.sprite = runCard.baseCard.cardSprite;
 
             SetEffectIcons(runCard.Abilities, abilitiesContainer);
@@ -83,34 +86,48 @@ namespace Features.Cards
                 }
             }
 
-            var burns = abilities.Count(x => x == Ability.Burn);
-            for (int i = 0; i < burns; i++)
-                Instantiate(fireIndicatorPrefab, effectIconContainer);
+            var burns = abilities.FirstOrDefault(x => x.Type == AbilityEnum.Burn);
+            if (burns != null)
+            {
+                for (int i = 0; i < burns.Amount; i++)
+                    Instantiate(fireIndicatorPrefab, effectIconContainer);
+            }
 
-            var rotateR = abilities.Count(x => x == Ability.RotateRight);
-            for (int i = 0; i < rotateR; i++)
-                Instantiate(turnIndicatorPrefab, effectIconContainer);
 
-            var rotateL = abilities.Count(x => x == Ability.RotateLeft);
-            for (int i = 0; i < rotateL; i++)
-                Instantiate(turnIndicatorPrefab, effectIconContainer);
-            
-            var burnAll = abilities.Count(x => x == Ability.BurnAll);
-            for (int i = 0; i < burnAll; i++)
-                Instantiate(burnAllIndicatorPrefab, effectIconContainer);
-            
-            var addAtkLeft = abilities.Count(x => x == Ability.AddAtkLeft);
-            for (int i = 0; i < addAtkLeft; i++)
-                Instantiate(atkLeftIndicatorPrefab, effectIconContainer);
-            var addAtkRight = abilities.Count(x => x == Ability.AddAtkRight);
-            for (int i = 0; i < addAtkRight; i++)
-                Instantiate(atkRightIndicatorPrefab, effectIconContainer);
-            var addShieldLeft = abilities.Count(x => x == Ability.AddShieldLeft);
-            for (int i = 0; i < addShieldLeft; i++)
-                Instantiate(addShieldLeftIndicatorPrefab, effectIconContainer);
-            var addShieldRight = abilities.Count(x => x == Ability.AddShieldRight);
-            for (int i = 0; i < addShieldRight; i++)
-                Instantiate(addShieldRightIndicatorPrefab, effectIconContainer);
+            var rotateR = abilities.FirstOrDefault(x => x.Type == AbilityEnum.RotateRight);
+            if (rotateR != null)
+                for (int i = 0; i < rotateR.Amount; i++)
+                    Instantiate(turnIndicatorPrefab, effectIconContainer);
+
+            var rotateL = abilities.FirstOrDefault(x => x.Type == AbilityEnum.RotateLeft);
+            if (rotateL != null)
+                for (int i = 0; i < rotateL.Amount; i++)
+                    Instantiate(turnIndicatorPrefab, effectIconContainer);
+
+            var burnAll = abilities.FirstOrDefault(x => x.Type == AbilityEnum.BurnAll);
+            if (burnAll != null)
+                for (int i = 0; i < burnAll.Amount; i++)
+                    Instantiate(burnAllIndicatorPrefab, effectIconContainer);
+
+            var addAtkLeft = abilities.FirstOrDefault(x => x.Type == AbilityEnum.AddAtkLeft);
+            if (addAtkLeft != null)
+                for (int i = 0; i < addAtkLeft.Amount; i++)
+                    Instantiate(atkLeftIndicatorPrefab, effectIconContainer);
+
+            var addAtkRight = abilities.FirstOrDefault(x => x.Type == AbilityEnum.AddAtkRight);
+            if (addAtkRight != null)
+                for (int i = 0; i < addAtkRight.Amount; i++)
+                    Instantiate(atkRightIndicatorPrefab, effectIconContainer);
+
+            var addShieldLeft = abilities.FirstOrDefault(x => x.Type == AbilityEnum.AddShieldLeft);
+            if (addShieldLeft != null)
+                for (int i = 0; i < addShieldLeft.Amount; i++)
+                    Instantiate(addShieldLeftIndicatorPrefab, effectIconContainer);
+
+            var addShieldRight = abilities.FirstOrDefault(x => x.Type == AbilityEnum.AddShieldRight);
+            if (addShieldRight != null)
+                for (int i = 0; i < addShieldRight.Amount; i++)
+                    Instantiate(addShieldRightIndicatorPrefab, effectIconContainer);
 
             if (effectIconContainer != null)
             {
@@ -130,7 +147,7 @@ namespace Features.Cards
             SetEffectIcons(Effects?.ToArray(), effectsContainer);
 
             hpText.text = e.Hp.ToString();
-            atkText.text =Attack.ToString();
+            atkText.text = Attack.ToString();
         }
 
         public RunCard GetCard()
@@ -148,7 +165,7 @@ namespace Features.Cards
             deadFeedback.PlayFeedbacks(this.transform.position);
         }
 
-        public void PlayGetHitAnimation(int damage, Ability? source = null)
+        public void PlayGetHitAnimation(int damage, AbilityEnum? source = null)
         {
             _feedbackFloatingText.Value = damage.ToString();
             animator.SetTrigger($"ReceiveDamage{source?.ToString() ?? string.Empty}");
@@ -158,14 +175,14 @@ namespace Features.Cards
             damageFeedback.PlayFeedbacks(this.transform.position, damage);
         }
 
-        private void SetAnimationTextColor(Ability? source)
+        private void SetAnimationTextColor(AbilityEnum? source)
         {
             switch (source)
             {
                 case null:
                     SetNormalColor();
                     break;
-                case Ability.Burn:
+                case AbilityEnum.Burn:
                     SetFireColor();
                     break;
                 default:
@@ -216,16 +233,20 @@ namespace Features.Cards
             };
         }
 
-        public void RemoveEffect(Ability effect)
+        public void UpdateEffect(AbilityEnum effectType, int amount)
         {
-            Effects.Remove(effect);
-            UpdateCardValues(this, GetCard());
-        }
+            if (IsDead) return;
+            var effectInCard = Effects.FirstOrDefault(x => x.Type == effectType);
+            if (effectInCard != null)
+                Effects.Remove(effectInCard);
+            else
+                effectInCard = new Ability();
 
-        public void AddEffect(Ability effect)
-        {
-            if (!IsDead)
-                Effects.Add(effect);
+            effectInCard = new Ability() { Type = effectType, Amount = effectInCard.Amount + amount };
+            
+            if (effectInCard.Amount > 0)
+                Effects.Add(effectInCard);
+            
             UpdateCardValues(this, GetCard());
         }
 

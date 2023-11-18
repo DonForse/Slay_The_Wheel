@@ -1,17 +1,11 @@
+using System;
+
 namespace Features.Battles
 {
-    public enum Ability
+    [Serializable]
+    public class Ability
     {
-        Burn,
-        BurnAll,
-        RotateRight,
-        RotateLeft,
-        AddShieldRight,
-        AddAtkRight,
-        AddShieldLeft,
-        AddAtkLeft,
-        Reflect,
-        Counter,
-        GainArmor
+        public AbilityEnum Type;
+        public int Amount;
     }
 }

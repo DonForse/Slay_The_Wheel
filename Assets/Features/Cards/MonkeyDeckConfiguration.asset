@@ -1,0 +1,22 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fa0995a890c24221a72c3943fc5ce218, type: 3}
+  m_Name: MonkeyDeckConfiguration
+  m_EditorClassIdentifier: 
+  hero: {fileID: 0}
+  cards:
+  - Amount: 5
+    card: {fileID: 11400000, guid: 4142e15dc96c22e489c02b769454128e, type: 2}
+  - Amount: 2
+    card: {fileID: 11400000, guid: 1b5dc8543eb75df45a96650509638168, type: 2}
+  - Amount: 1
+    card: {fileID: 11400000, guid: 9061dc9cb70902542810ccecb6f6dd0a, type: 2}

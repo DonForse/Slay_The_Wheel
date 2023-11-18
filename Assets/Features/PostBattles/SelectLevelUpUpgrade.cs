@@ -39,7 +39,12 @@ namespace Features.PostBattles
             if (e == LevelUpUpgrade.Burn)
             {
                 var asd = _heroCard.Abilities.ToList();
-                asd.Add(Ability.BurnAll);
+                var burnAll=asd.FirstOrDefault(x => x.Type == AbilityEnum.BurnAll);
+                asd.Remove(burnAll);
+                if (burnAll == null)
+                    burnAll = new Ability() { Type = AbilityEnum.BurnAll, Amount = 0 };
+                burnAll.Amount++;
+                asd.Add(burnAll);
                 _heroCard.Abilities = asd.ToArray();
             }
             if (e == LevelUpUpgrade.Atk)
