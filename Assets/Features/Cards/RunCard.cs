@@ -55,6 +55,42 @@ namespace Features.Cards
                 ValueChanged?.Invoke(this, this);
             }
         }
+        public Ability[] OnActAbilities
+        {
+            get => _onActAbilities;
+            set
+            {
+                _onActAbilities = value;
+                ValueChanged?.Invoke(this, this);
+            }
+        }
+        public Ability[] OnSpinAbilities
+        {
+            get => _onSpinAbilities;
+            set
+            {
+                _onSpinAbilities = value;
+                ValueChanged?.Invoke(this, this);
+            }
+        }
+        public Ability[] OnTurnStartAbilities
+        {
+            get => _onTurnStartAbilities;
+            set
+            {
+                _onTurnStartAbilities = value;
+                ValueChanged?.Invoke(this, this);
+            }
+        }
+        public Ability[] OnTurnEndAbilities
+        {
+            get => _onTurnEndAbilities;
+            set
+            {
+                _onTurnEndAbilities = value;
+                ValueChanged?.Invoke(this, this);
+            }
+        }
         
         public AttackType AttackType { get; set; }
         public bool IsDead => Hp <= 0;
@@ -66,18 +102,27 @@ namespace Features.Cards
         private int _attack;
         private Ability[] _onHitAbilities;
         private Ability[] _onAttackAbilities;
+        private Ability[] _onActAbilities;
         private int _hp;
         private string _cardName;
+        private Ability[] _onSpinAbilities;
+        private Ability[] _onTurnStartAbilities;
+        private Ability[] _onTurnEndAbilities;
 
-        public RunCard(BaseCardScriptableObject heroCardDb)
+        public RunCard(BaseCardScriptableObject cardScriptableObject)
         {
-            _cardName = heroCardDb.cardName;
-            _hp = heroCardDb.hp;
-            _attack = heroCardDb.attack;
-            _onHitAbilities = heroCardDb.onHitAbilities;
-            _onAttackAbilities = heroCardDb.onAttackAbilities;
-            baseCard = heroCardDb;
-            AttackType = heroCardDb.attackType;
+            _cardName = cardScriptableObject.cardName;
+            _hp = cardScriptableObject.hp;
+            _attack = cardScriptableObject.attack;
+            _onHitAbilities = cardScriptableObject.onHitAbilities;
+            _onAttackAbilities = cardScriptableObject.onAttackAbilities; 
+            _onActAbilities = cardScriptableObject.onActAbilities;
+            _onSpinAbilities = cardScriptableObject.onSpinAbilities;
+            _onTurnStartAbilities = cardScriptableObject.onTurnStartAbilities;
+            _onTurnEndAbilities = cardScriptableObject.onTurnEndAbilities;
+
+            baseCard = cardScriptableObject;
+            AttackType = cardScriptableObject.attackType;
         }
 
         public event EventHandler<RunCard> ValueChanged;

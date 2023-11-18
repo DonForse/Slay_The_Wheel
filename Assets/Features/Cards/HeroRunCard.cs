@@ -9,7 +9,7 @@ namespace Features.Cards
     {
         public int Exp;
         public int Level;
-        public HeroRunCard(BaseCardScriptableObject heroCardDb) : base(heroCardDb)
+        public HeroRunCard(BaseCardScriptableObject cardScriptableObject) : base(cardScriptableObject)
         {
             
         }
