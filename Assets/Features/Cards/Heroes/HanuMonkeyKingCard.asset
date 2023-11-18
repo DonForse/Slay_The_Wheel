@@ -12,16 +12,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 00bda76894bf4bd385081e8db8a5b6fb, type: 3}
   m_Name: HanuMonkeyKingCard
   m_EditorClassIdentifier: 
-  cardName: 
-  hp: 0
-  attack: 0
-  abilities: 
-  onAttackAbilities: 
-  onHitAbilities: 
-  onSpinAbilities: 
-  onTurnStartAbilities: 
-  onTurnEndAbilities: 
-  onActAbilities: 
+  cardName: Hanu Monkey King
+  hp: 25
+  attack: 10
+  abilities: []
+  onAttackAbilities: []
+  onHitAbilities: []
+  onSpinAbilities: []
+  onTurnStartAbilities: []
+  onTurnEndAbilities: []
+  onActAbilities: []
   attackType: 0
   cardSprite: {fileID: 0}
   actCost: 0

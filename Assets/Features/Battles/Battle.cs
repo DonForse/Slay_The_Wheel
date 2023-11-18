@@ -36,8 +36,7 @@ namespace Features.Battles
         public Turn Turn => IsPlayerTurn() ? Turn.Player : Turn.Enemy;
         public int Actions => _actions;
 
-        private List<IOnApplyAbilityStrategy> _onHitEffectStrategies = new();
-        private List<IOnApplyAbilityStrategy> _onActEffectStrategies = new();
+        private List<IOnApplyAbilityStrategy> _applyAbilityStrategies = new();
         private List<IAttackStrategy> _attackStrategies = new();
         // private List<IOnActEffectStrategy> OnReceiveDamageStrategies = new();
         // private List<IOnActEffectStrategy> OnEndTurnStrategies = new();
@@ -47,19 +46,17 @@ namespace Features.Battles
         public IEnumerator Initialize(List<RunCard> deck, List<RunCard> enemies, int playerWheelSize,
             int enemyWheelSize, RunCard heroCard)
         {
-            _onHitEffectStrategies = new()
+            _applyAbilityStrategies = new()
             {
                 new BurnOnApplyAbilityStrategy(),
                 new BurnAllOnApplyAbilityStrategy(),
                 new RotateLeftOnApplyAbilityStrategy(),
-                new RotateRightOnApplyAbilityStrategy()
-            };
-            _onActEffectStrategies = new()
-            {
+                new RotateRightOnApplyAbilityStrategy(),
                 new AddAtkLeftOnApplyAbilityStrategy(),
                 new AddAtkRightOnApplyAbilityStrategy(),
                 new AddShieldLeftOnApplyAbilityStrategy(),
-                new AddShieldRightOnApplyAbilityStrategy()
+                new AddShieldRightOnApplyAbilityStrategy(),
+                new DealAttackDamageOnApplyAbilityStrategy(this)
             };
             _attackStrategies = new()
             {
@@ -160,9 +157,9 @@ namespace Features.Battles
             PlayerController defenderPlayerController)
         {
             var attackerCard = attackerPlayerController.GetFrontCard().GetCard();
-            foreach (var ability in attackerCard.Abilities)
+            foreach (var ability in attackerCard.OnHitAbilities)
             {
-                foreach (var strategy in _onActEffectStrategies)
+                foreach (var strategy in _applyAbilityStrategies)
                 {
                     if (strategy.IsValid(ability.Type))
                         strategy.Execute(attackerPlayerController.GetFrontCard(),ability.Amount,defenderPlayerController, attackerPlayerController);
@@ -335,9 +332,9 @@ namespace Features.Battles
             PlayerController defenderPlayerController)
         {
             var attackerCard = attackerPlayerController.GetFrontCard().GetCard();
-            foreach (var ability in attackerCard.Abilities)
+            foreach (var ability in attackerCard.OnAttackAbilities)
             {
-                foreach (var strategy in _onHitEffectStrategies)
+                foreach (var strategy in _applyAbilityStrategies)
                 {
                     if (strategy.IsValid(ability.Type))
                         yield return strategy.Execute(attackerPlayerController.GetFrontCard(), ability.Amount,defenderPlayerController, attackerPlayerController);

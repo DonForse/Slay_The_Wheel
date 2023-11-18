@@ -36,16 +36,26 @@ namespace Features.Cards
             }
         }
     
-        public Ability[] Abilities
+        public Ability[] OnHitAbilities
         {
-            get => _abilities;
+            get => _onHitAbilities;
             set
             {
-                _abilities = value;
+                _onHitAbilities = value;
                 ValueChanged?.Invoke(this, this);
             }
         }
 
+        public Ability[] OnAttackAbilities
+        {
+            get => _onAttackAbilities;
+            set
+            {
+                _onAttackAbilities = value;
+                ValueChanged?.Invoke(this, this);
+            }
+        }
+        
         public AttackType AttackType { get; set; }
         public bool IsDead => Hp <= 0;
         public int ActCost => baseCard.actCost;
@@ -54,7 +64,8 @@ namespace Features.Cards
         public readonly BaseCardScriptableObject baseCard;
     
         private int _attack;
-        private Ability[] _abilities;
+        private Ability[] _onHitAbilities;
+        private Ability[] _onAttackAbilities;
         private int _hp;
         private string _cardName;
 
@@ -63,7 +74,8 @@ namespace Features.Cards
             _cardName = heroCardDb.cardName;
             _hp = heroCardDb.hp;
             _attack = heroCardDb.attack;
-            _abilities = heroCardDb.abilities;
+            _onHitAbilities = heroCardDb.onHitAbilities;
+            _onAttackAbilities = heroCardDb.onAttackAbilities;
             baseCard = heroCardDb;
             AttackType = heroCardDb.attackType;
         }
