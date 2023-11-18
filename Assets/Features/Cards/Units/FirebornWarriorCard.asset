@@ -15,7 +15,16 @@ MonoBehaviour:
   cardName: Fireborn Warrior
   hp: 30
   attack: 3
-  abilities: 000000000200000002000000
-  cardSprite: {fileID: 21300000, guid: a93df0ac7cc608b40b5d01348b470c61, type: 3}
+  onAttackAbilities:
+  - Type: 3
+    Amount: 2
+  onHitAbilities:
+  - Type: 0
+    Amount: 1
+  onSpinAbilities: []
+  onTurnStartAbilities: []
+  onTurnEndAbilities: []
+  onActAbilities: []
   attackType: 0
+  cardSprite: {fileID: 21300000, guid: a93df0ac7cc608b40b5d01348b470c61, type: 3}
   actCost: 1

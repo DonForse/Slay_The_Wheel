@@ -15,8 +15,9 @@ MonoBehaviour:
   cardName: Hanu Monkey King
   hp: 25
   attack: 10
-  abilities: []
-  onAttackAbilities: []
+  onAttackAbilities:
+  - Type: 1
+    Amount: 3
   onHitAbilities: []
   onSpinAbilities: []
   onTurnStartAbilities: []

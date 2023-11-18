@@ -13,8 +13,7 @@ namespace Features.Battles.Core.OnHitEffects
         {
             foreach (var card in defender.Cards)
             {
-                for (int i = 0; i < amount; i++)
-                    card.UpdateEffect(AbilityEnum.Burn, 1);
+                card.UpdateEffect(AbilityEnum.Burn, amount);
             }
 
             yield break;

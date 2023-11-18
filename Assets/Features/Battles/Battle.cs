@@ -162,7 +162,7 @@ namespace Features.Battles
                 foreach (var strategy in _applyAbilityStrategies)
                 {
                     if (strategy.IsValid(ability.Type))
-                        strategy.Execute(attackerPlayerController.GetFrontCard(),ability.Amount,defenderPlayerController, attackerPlayerController);
+                        yield return strategy.Execute(attackerPlayerController.GetFrontCard(),ability.Amount,defenderPlayerController, attackerPlayerController);
                 }
             }
 
