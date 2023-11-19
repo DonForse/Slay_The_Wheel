@@ -326,12 +326,12 @@ namespace Features.Battles
         private IEnumerator ApplyOnDealDamageAbilities(InPlayCard damageDealerCard,InPlayCard damageReceiverCard)
         {
             var damageDealerRunCard = damageDealerCard.GetCard();
-            foreach (var ability in damageDealerRunCard.OnAttackAbilities)
+            foreach (var ability in damageDealerRunCard.OnDealDamageAbilities)
             {
                 foreach (var strategy in _applyAbilityStrategies)
                 {
                     if (strategy.IsValid(ability.Type))
-                        yield return strategy.Execute(damageDealerCard,ability.Amount,damageDealerCard.OwnerPlayer, damageReceiverCard.OwnerPlayer);
+                        yield return strategy.Execute(damageDealerCard,ability.Amount,damageReceiverCard.OwnerPlayer, damageDealerCard.OwnerPlayer);
                 }
             }
 

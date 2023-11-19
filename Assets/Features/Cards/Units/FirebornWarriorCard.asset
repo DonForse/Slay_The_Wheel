@@ -18,7 +18,7 @@ MonoBehaviour:
   onAttackAbilities:
   - Type: 3
     Amount: 2
-  onHitAbilities:
+  onDealDamageAbilities:
   - Type: 0
     Amount: 1
   onSpinAbilities: []

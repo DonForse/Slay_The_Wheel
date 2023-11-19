@@ -15,7 +15,14 @@ MonoBehaviour:
   cardName: Firestorm Sorceress
   hp: 30
   attack: 0
-  abilities: 0100000001000000
-  cardSprite: {fileID: 21300000, guid: d63be74bea842a84da5c6ea5f85d6a6a, type: 3}
+  onAttackAbilities: []
+  onDealDamageAbilities:
+  - Type: 1
+    Amount: 2
+  onSpinAbilities: []
+  onTurnStartAbilities: []
+  onTurnEndAbilities: []
+  onActAbilities: []
   attackType: 0
+  cardSprite: {fileID: 21300000, guid: d63be74bea842a84da5c6ea5f85d6a6a, type: 3}
   actCost: 2

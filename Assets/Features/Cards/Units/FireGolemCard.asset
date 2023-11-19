@@ -15,7 +15,14 @@ MonoBehaviour:
   cardName: Fire Golem
   hp: 70
   attack: 0
-  abilities: 
-  cardSprite: {fileID: 21300000, guid: a69b3b22629e6fd4088cfc21291aa2db, type: 3}
+  onAttackAbilities: []
+  onDealDamageAbilities: []
+  onSpinAbilities: []
+  onTurnStartAbilities: []
+  onTurnEndAbilities:
+  - Type: 10
+    Amount: 5
+  onActAbilities: []
   attackType: 0
+  cardSprite: {fileID: 21300000, guid: a69b3b22629e6fd4088cfc21291aa2db, type: 3}
   actCost: 0

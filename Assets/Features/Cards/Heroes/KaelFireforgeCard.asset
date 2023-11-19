@@ -16,7 +16,7 @@ MonoBehaviour:
   hp: 25
   attack: 1
   onAttackAbilities: []
-  onHitAbilities:
+  onDealDamageAbilities:
   - Type: 1
     Amount: 3
   onSpinAbilities: []

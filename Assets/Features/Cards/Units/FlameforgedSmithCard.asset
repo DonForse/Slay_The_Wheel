@@ -15,7 +15,20 @@ MonoBehaviour:
   cardName: FlameforgedSmith
   hp: 30
   attack: 0
-  abilities: 05000000040000000600000007000000
-  cardSprite: {fileID: 21300000, guid: 01f486da3fb17f0489d03daf072a4b12, type: 3}
+  onAttackAbilities:
+  - Type: 5
+    Amount: 2
+  - Type: 7
+    Amount: 2
+  - Type: 4
+    Amount: 4
+  - Type: 6
+    Amount: 4
+  onDealDamageAbilities: []
+  onSpinAbilities: []
+  onTurnStartAbilities: []
+  onTurnEndAbilities: []
+  onActAbilities: []
   attackType: 0
+  cardSprite: {fileID: 21300000, guid: 01f486da3fb17f0489d03daf072a4b12, type: 3}
   actCost: 1
