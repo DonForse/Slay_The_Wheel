@@ -18,7 +18,7 @@ namespace Features.Battles.Core.Abilities
         public IEnumerator Execute(InPlayCard executor, int value, PlayerController defender, PlayerController attacker)
         {
             var defenderCard = defender.GetFrontCard();
-            _battle.ApplyDamage(executor.Attack, defenderCard, executor, defender, null);
+            yield return _battle.ApplyDamage(executor.Attack, defenderCard, executor, defender, null);
             yield break;
         }
     }

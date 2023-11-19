@@ -23,7 +23,9 @@ namespace Features.Battles
         [SerializeField] private BusQueue _busQueue;
         [SerializeField] private TurnMessage turnMessage;
         [SerializeField] private ActionsView actionsView;
+
         [SerializeField] private SpellView[] spellViews;
+
         // [SerializeField] private BotPlayer botPlayer;
         // public DamageSystem damageSystem;
         private int _actions;
@@ -53,7 +55,8 @@ namespace Features.Battles
                 new AddAtkRightOnApplyAbilityStrategy(),
                 new AddShieldLeftOnApplyAbilityStrategy(),
                 new AddShieldRightOnApplyAbilityStrategy(),
-                new DealAttackDamageOnApplyAbilityStrategy(this)
+                new DealAttackDamageOnApplyAbilityStrategy(this), 
+                new MultiAttackOnApplyAbilityStrategy(this)
             };
             _attackStrategies = new()
             {
@@ -81,7 +84,7 @@ namespace Features.Battles
 
             SetActions(3);
         }
-        
+
         private void OnDestroy()
         {
             playerController.Acted -= OnPlayerActed;
@@ -140,7 +143,6 @@ namespace Features.Battles
 
             _busQueue.EnqueueAction(ApplyOnActAbilitiesEffects(attackerPlayerController, defenderPlayerController));
             _busQueue.EnqueueAction(ApplyFrontCardAttack(attacker, defenderPlayerController));
-            _busQueue.EnqueueAction(ApplyOnAttackAbilitiesEffects(attackerPlayerController, defenderPlayerController));
             if (CompletedActions())
             {
                 _busQueue.EnqueueAction(ChangeTurn());
@@ -150,24 +152,6 @@ namespace Features.Battles
             _busQueue.EnqueueAction(ActEndCoroutine(attackerPlayerController));
         }
 
-        private IEnumerator ApplyOnActAbilitiesEffects(PlayerController attackerPlayerController,
-            PlayerController defenderPlayerController)
-        {
-            foreach (var card in attackerPlayerController.Cards)
-            {
-                foreach (var ability in card.GetCard().OnActAbilities)
-                {
-                    foreach (var strategy in _applyAbilityStrategies)
-                    {
-                        if (strategy.IsValid(ability.Type))
-                            yield return strategy.Execute(attackerPlayerController.GetFrontCard(), ability.Amount,
-                                defenderPlayerController, attackerPlayerController);
-                    }
-                }
-            }
-
-            yield return null;
-        }
 
         private IEnumerator ActEndCoroutine(PlayerController attackerPlayerController)
         {
@@ -214,22 +198,6 @@ namespace Features.Battles
             yield break;
         }
 
-        private IEnumerator ApplyWheelSpinEffects(PlayerController controller)
-        {
-            foreach (var card in controller.Cards)
-            {
-                var cardActiveEffects = card.Effects;
-                var burns = cardActiveEffects.FirstOrDefault(a => a.Type == AbilityEnum.Burn);
-                if (burns != null)
-                {
-                    card.UpdateEffect(AbilityEnum.Burn, -1);
-                    yield return ApplyDamage(burns.Amount, card,null, controller, AbilityEnum.Burn);
-                }
-            }
-
-            yield break;
-        }
-
         private IEnumerator Act(InPlayCard attacker, PlayerController attackerPlayerController,
             PlayerController defenderPlayerController, ActDirection actDirection)
         {
@@ -249,33 +217,35 @@ namespace Features.Battles
             yield break;
         }
 
-        private IEnumerator ApplyFrontCardAttack(InPlayCard attackerCard, PlayerController defenderPlayerController)
+        public IEnumerator ApplyFrontCardAttack(InPlayCard attackerCard, PlayerController defender)
         {
             foreach (var attackStrategy in _attackStrategies)
             {
                 if (attackStrategy.IsValid(attackerCard.GetCard().AttackType))
-                    yield return attackStrategy.Execute(attackerCard, defenderPlayerController);
+                    yield return attackStrategy.Execute(attackerCard, defender);
             }
 
-            yield return defenderPlayerController.PutAliveUnitAtFront(ActDirection.Right);
+            yield return ApplyOnAttackAbilitiesEffects(attackerCard.OwnerPlayer, defender);
+            yield return defender.PutAliveUnitAtFront(ActDirection.Right);
         }
 
-        public IEnumerator ApplyDamage(int damage, InPlayCard damageReceiver,[CanBeNull] InPlayCard damageDealer , PlayerController defenderPlayerController,
+        public IEnumerator ApplyDamage(int damage, InPlayCard damageReceiver, [CanBeNull] InPlayCard damageDealer,
+            PlayerController defenderPlayerController,
             AbilityEnum? source)
         {
             var defenderCard = damageReceiver.GetCard();
             damageReceiver.PlayGetHitAnimation(damage, source);
-            var difDamage = Mathf.Max(damage - damageReceiver.Armor,0);
-            
+            var difDamage = Mathf.Max(damage - damageReceiver.Armor, 0);
+
             damageReceiver.Armor = Mathf.Max(0, damageReceiver.Armor - damage);
             if (difDamage > 0)
             {
                 if (damageDealer != null)
                     yield return ApplyOnDealDamageAbilities(damageDealer, damageReceiver);
-                defenderCard.Hp -= damage ;
+                defenderCard.Hp -= damage;
                 //apply receive damage.
             }
-            
+
             if (defenderCard.Hp > 0)
                 yield break;
 
@@ -290,7 +260,8 @@ namespace Features.Battles
                     if (cards == null || cards.Count == 0)
                         _busQueue.EnqueueInterruptAction(EndBattle(defenderPlayerController));
                     else
-                        _busQueue.EnqueueInterruptAction(damageReceiver.SetCard(cards.First(), defenderPlayerController));
+                        _busQueue.EnqueueInterruptAction(
+                            damageReceiver.SetCard(cards.First(), defenderPlayerController));
                 }
 
                 if (_enemiesDeck.Count == 0 && defenderPlayerController.AllUnitsDead())
@@ -303,7 +274,8 @@ namespace Features.Battles
                 if (_heroCard.IsDead)
                 {
                     _busQueue.EnqueueInterruptAction(EndBattle(defenderPlayerController));
-                    yield break;;
+                    yield break;
+                    ;
                 }
 
                 if (_playerBattleDeck.Count > 0)
@@ -312,7 +284,8 @@ namespace Features.Battles
                     if (cards == null || cards.Count == 0)
                         _busQueue.EnqueueInterruptAction(EndBattle(defenderPlayerController));
                     else
-                        _busQueue.EnqueueInterruptAction(damageReceiver.SetCard(cards.First(), defenderPlayerController));
+                        _busQueue.EnqueueInterruptAction(
+                            damageReceiver.SetCard(cards.First(), defenderPlayerController));
                 }
 
                 if (_playerBattleDeck.Count == 0 && _playerDiscardPile.Count == 0 &&
@@ -323,42 +296,11 @@ namespace Features.Battles
             }
         }
 
-        private IEnumerator ApplyOnDealDamageAbilities(InPlayCard damageDealerCard,InPlayCard damageReceiverCard)
-        {
-            var damageDealerRunCard = damageDealerCard.GetCard();
-            foreach (var ability in damageDealerRunCard.OnDealDamageAbilities)
-            {
-                foreach (var strategy in _applyAbilityStrategies)
-                {
-                    if (strategy.IsValid(ability.Type))
-                        yield return strategy.Execute(damageDealerCard,ability.Amount,damageReceiverCard.OwnerPlayer, damageDealerCard.OwnerPlayer);
-                }
-            }
-
-            yield return null;
-        }
-
         private IEnumerator EndBattle(PlayerController defenderPlayerController)
         {
             _busQueue.Clear();
             yield return new WaitForSeconds(.5f);
             BattleFinished?.Invoke(this, defenderPlayerController == enemyController);
-        }
-
-        private IEnumerator ApplyOnAttackAbilitiesEffects(PlayerController attackerPlayerController,
-            PlayerController defenderPlayerController)
-        {
-            var attackerCard = attackerPlayerController.GetFrontCard().GetCard();
-            foreach (var ability in attackerCard.OnAttackAbilities)
-            {
-                foreach (var strategy in _applyAbilityStrategies)
-                {
-                    if (strategy.IsValid(ability.Type))
-                        yield return strategy.Execute(attackerPlayerController.GetFrontCard(), ability.Amount,defenderPlayerController, attackerPlayerController);
-                }
-            }
-
-            yield return null;
         }
 
         private IEnumerator RevertWheelPosition(PlayerController playerController)
@@ -368,6 +310,9 @@ namespace Features.Battles
 
         private IEnumerator ChangeTurn()
         {
+            var playerTurn = IsPlayerTurn();
+            yield return ApplyEndTurnAbilities(playerTurn ? playerController : enemyController,
+                playerTurn ? enemyController : playerController);
             Debug.Log($"<color=cyan>{"ACT-END"}</color>");
             turn++;
             SetActions(3);
@@ -384,6 +329,7 @@ namespace Features.Battles
 
         private IEnumerator StartPlayerTurn()
         {
+            yield return ApplyStartTurnAbilities(playerController, enemyController);
             foreach (var spell in spellViews)
             {
                 spell.ReduceCooldown();
@@ -422,6 +368,7 @@ namespace Features.Battles
 
         private IEnumerator PlayBotTurn()
         {
+            yield return ApplyStartTurnAbilities(enemyController, playerController);
             yield return turnMessage.Show(false);
             playerController.LockWheel();
             enemyController.UnlockWheel();
@@ -488,7 +435,7 @@ namespace Features.Battles
             {
                 foreach (var card in enemyController.Cards)
                 {
-                    card.UpdateEffect(AbilityEnum.Burn,3);
+                    card.UpdateEffect(AbilityEnum.Burn, 3);
                 }
             }
             else if (skillIndex == 2)
@@ -540,6 +487,105 @@ namespace Features.Battles
             }
 
             acting = false;
+        }
+
+        private IEnumerator ApplyWheelSpinEffects(PlayerController controller)
+        {
+            foreach (var card in controller.Cards)
+            {
+                var cardActiveEffects = card.Effects;
+                var burns = cardActiveEffects.FirstOrDefault(a => a.Type == AbilityEnum.Burn);
+                if (burns != null)
+                {
+                    card.UpdateEffect(AbilityEnum.Burn, -1);
+                    yield return ApplyDamage(burns.Amount, card, null, controller, AbilityEnum.Burn);
+                }
+            }
+
+            yield break;
+        }
+
+        private IEnumerator ApplyEndTurnAbilities(PlayerController attacker, PlayerController defender)
+        {
+            foreach (var card in attacker.Cards)
+            {
+                foreach (var ability in card.GetCard().OnTurnEndAbilities)
+                {
+                    foreach (var strategy in _applyAbilityStrategies)
+                    {
+                        if (strategy.IsValid(ability.Type))
+                            yield return strategy.Execute(card, ability.Amount, defender, attacker);
+                    }
+                }
+            }
+        }
+
+        private IEnumerator ApplyStartTurnAbilities(PlayerController attacker, PlayerController defender)
+        {
+            foreach (var card in attacker.Cards)
+            {
+                foreach (var ability in card.GetCard().OnTurnStartAbilities)
+                {
+                    foreach (var strategy in _applyAbilityStrategies)
+                    {
+                        if (strategy.IsValid(ability.Type))
+                            yield return strategy.Execute(card, ability.Amount, defender, attacker);
+                    }
+                }
+            }
+        }
+
+        private IEnumerator ApplyOnDealDamageAbilities(InPlayCard damageDealerCard, InPlayCard damageReceiverCard)
+        {
+            var damageDealerRunCard = damageDealerCard.GetCard();
+            foreach (var ability in damageDealerRunCard.OnDealDamageAbilities)
+            {
+                foreach (var strategy in _applyAbilityStrategies)
+                {
+                    if (strategy.IsValid(ability.Type))
+                        yield return strategy.Execute(damageDealerCard, ability.Amount, damageReceiverCard.OwnerPlayer,
+                            damageDealerCard.OwnerPlayer);
+                }
+            }
+
+            yield return null;
+        }
+
+        private IEnumerator ApplyOnActAbilitiesEffects(PlayerController attackerPlayerController,
+            PlayerController defenderPlayerController)
+        {
+            foreach (var card in attackerPlayerController.Cards)
+            {
+                foreach (var ability in card.GetCard().OnActAbilities)
+                {
+                    foreach (var strategy in _applyAbilityStrategies)
+                    {
+                        if (strategy.IsValid(ability.Type))
+                            yield return strategy.Execute(card, ability.Amount,
+                                defenderPlayerController, attackerPlayerController);
+                    }
+                }
+            }
+
+            yield return null;
+        }
+
+        private IEnumerator ApplyOnAttackAbilitiesEffects(PlayerController attackerPlayerController,
+            PlayerController defenderPlayerController)
+        {
+            var attackerCard = attackerPlayerController.GetFrontCard();
+            var attackerRunCard = attackerPlayerController.GetFrontCard().GetCard();
+            foreach (var ability in attackerRunCard.OnAttackAbilities)
+            {
+                foreach (var strategy in _applyAbilityStrategies)
+                {
+                    if (strategy.IsValid(ability.Type))
+                        yield return strategy.Execute(attackerCard, ability.Amount,
+                            defenderPlayerController, attackerPlayerController);
+                }
+            }
+
+            yield return null;
         }
     }
 }

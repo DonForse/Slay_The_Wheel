@@ -14,6 +14,6 @@ namespace Features.Battles
         Counter,
         GainArmor,
         DealAttackDamage,
-        ExtraAttack,
+        MultiAttack,
     }
 }

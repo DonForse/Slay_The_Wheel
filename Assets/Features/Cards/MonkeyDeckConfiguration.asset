@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fa0995a890c24221a72c3943fc5ce218, type: 3}
   m_Name: MonkeyDeckConfiguration
   m_EditorClassIdentifier: 
-  hero: {fileID: 0}
+  hero: {fileID: 11400000, guid: 4b6264535454acb43915f2e9e6be57d2, type: 2}
   cards:
   - Amount: 5
     card: {fileID: 11400000, guid: 4142e15dc96c22e489c02b769454128e, type: 2}
@@ -20,3 +20,7 @@ MonoBehaviour:
     card: {fileID: 11400000, guid: 1b5dc8543eb75df45a96650509638168, type: 2}
   - Amount: 1
     card: {fileID: 11400000, guid: 9061dc9cb70902542810ccecb6f6dd0a, type: 2}
+  - Amount: 1
+    card: {fileID: 11400000, guid: ed93439703a74f64f834a90e45d8c592, type: 2}
+  - Amount: 1
+    card: {fileID: 11400000, guid: cebb9d5abb776694fa2e68eb1c40f71f, type: 2}

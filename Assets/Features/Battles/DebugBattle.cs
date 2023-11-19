@@ -7,8 +7,7 @@ using UnityEngine;
 
 public class DebugBattle : MonoBehaviour
 {
-    [SerializeField] private BaseCardsScriptableObject heroesDb;
-    [SerializeField] private BaseCardsScriptableObject unitsDb;
+    [SerializeField] private DeckConfigurationScriptableObject _deckConfigurationScriptableObject;
     [SerializeField] private BaseCardsScriptableObject enemiesDb;
 
     [SerializeField] private Battle battle;
@@ -21,31 +20,16 @@ public class DebugBattle : MonoBehaviour
     {
         
         _deck = new List<RunCard>();
-        var heroCardDb = heroesDb.cards.FirstOrDefault(x => x.cardName.Contains("Kael Fireforge"));
+        var heroCardDb = _deckConfigurationScriptableObject.hero;
         _heroCard = new RunCard(heroCardDb);
-        var recruits = unitsDb.cards.FirstOrDefault(x => x.cardName.Contains("Fireborn Recruit"));
-        var warrior = unitsDb.cards.FirstOrDefault(x => x.cardName.Contains("Fireborn Warrior"));
-        var sorceress = unitsDb.cards.FirstOrDefault(x => x.cardName.Contains("Firestorm Sorceress"));
+        foreach (var card in _deckConfigurationScriptableObject.cards)
+        {
+            for (int i = 0; i < card.Amount; i++)
+                _deck.Add(new RunCard(card.card));
+        }
+
         var slime = enemiesDb.cards.FirstOrDefault(x => x.cardName.Contains("Slime"));
-        
-        for (var i = 0; i < 5; i++)
-        {
-            var playerUnit = new RunCard(recruits);
-            _deck.Add(playerUnit);
-        }
-
-        for (var i = 0; i < 3; i++)
-        {
-            var playerUnit = new RunCard(warrior);
-            _deck.Add(playerUnit);
-        }
-
-        for (var i = 0; i < 2; i++)
-        {
-            var playerUnit = new RunCard(sorceress);
-            _deck.Add(playerUnit);
-        }
-
+        _deck = _deck.OrderBy(x=>Random.Range(0, 100)).ToList();
         yield return battle.Initialize(_deck,
             new List<RunCard>() { new RunCard(slime), new RunCard(slime), new RunCard(slime) }, 5, 3, _heroCard);
     }
