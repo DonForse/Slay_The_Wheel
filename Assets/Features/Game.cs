@@ -14,9 +14,8 @@ namespace Features
 {
     public class Game : MonoBehaviour
     {
-        [SerializeField] private BaseCardsScriptableObject unitsDb;
+        [SerializeField] private DeckConfigurationScriptableObject deck;
         [SerializeField] private BaseCardsScriptableObject enemiesDb;
-        [SerializeField] private BaseCardsScriptableObject heroesDb;
 
         private List<RunCard> _deck;
         private List<Relic> _relics = new();
@@ -50,28 +49,12 @@ namespace Features
         private void AddInitialCards()
         {
             _deck = new List<RunCard>();
-            var heroCardDb = heroesDb.cards.FirstOrDefault(x => x.cardName.Contains("Kael Fireforge"));
+            var heroCardDb = deck.hero;
             _heroCard = new HeroRunCard(heroCardDb);
-            var recruits = unitsDb.cards.FirstOrDefault(x => x.cardName.Contains("Fireborn Recruit"));
-            var warrior = unitsDb.cards.FirstOrDefault(x => x.cardName.Contains("Fireborn Warrior"));
-            var sorceress = unitsDb.cards.FirstOrDefault(x => x.cardName.Contains("Firestorm Sorceress"));
-
-            for (var i = 0; i < 12; i++)
+            foreach (var cardConfiguration in deck.cards)
             {
-                var playerUnit = new RunCard(recruits);
-                _deck.Add(playerUnit);
-            }
-
-            for (var i = 0; i < 3; i++)
-            {
-                var playerUnit = new RunCard(warrior);
-                _deck.Add(playerUnit);
-            }
-
-            for (var i = 0; i < 2; i++)
-            {
-                var playerUnit = new RunCard(sorceress);
-                _deck.Add(playerUnit);
+                for (int i = 0; i < cardConfiguration.Amount; i++)
+                    _deck.Add(new RunCard(cardConfiguration.card));
             }
         }
 
