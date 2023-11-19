@@ -56,7 +56,9 @@ namespace Features.Battles
                 new AddShieldLeftOnApplyAbilityStrategy(),
                 new AddShieldRightOnApplyAbilityStrategy(),
                 new DealAttackDamageOnApplyAbilityStrategy(this), 
-                new MultiAttackOnApplyAbilityStrategy(this)
+                new MultiAttackOnApplyAbilityStrategy(this),
+                new GainArmorOnApplyAbilityStrategy(),
+                new GainAttackOnApplyAbilityStrategy()
             };
             _attackStrategies = new()
             {

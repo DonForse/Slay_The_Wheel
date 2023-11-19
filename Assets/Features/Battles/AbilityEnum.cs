@@ -15,5 +15,6 @@ namespace Features.Battles
         GainArmor,
         DealAttackDamage,
         MultiAttack,
+        GainAtk
     }
 }
