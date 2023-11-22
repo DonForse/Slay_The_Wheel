@@ -2,7 +2,7 @@ using System.Collections;
 using Features.Battles.Wheel;
 using Features.Cards;
 
-namespace Features.Battles.Core.OnHitEffects
+namespace Features.Battles.Core.Abilities
 {
     public class BurnAllOnApplyAbilityStrategy : IOnApplyAbilityStrategy
     {
@@ -13,7 +13,7 @@ namespace Features.Battles.Core.OnHitEffects
         {
             foreach (var card in defender.Cards)
             {
-                card.UpdateEffect(AbilityEnum.Burn, amount);
+                card.UpdateEffect(EffectEnum.Fire, amount);
             }
 
             yield break;

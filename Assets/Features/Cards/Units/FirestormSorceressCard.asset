@@ -15,10 +15,10 @@ MonoBehaviour:
   cardName: Firestorm Sorceress
   hp: 30
   attack: 0
-  onAttackAbilities: []
-  onDealDamageAbilities:
+  onAttackAbilities:
   - Type: 1
     Amount: 2
+  onDealDamageAbilities: []
   onSpinAbilities: []
   onTurnStartAbilities: []
   onTurnEndAbilities: []

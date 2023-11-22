@@ -437,15 +437,15 @@ namespace Features.Battles
             {
                 foreach (var card in enemyController.Cards)
                 {
-                    card.UpdateEffect(AbilityEnum.Burn, 3);
+                    card.UpdateEffect(EffectEnum.Fire, 3);
                 }
             }
             else if (skillIndex == 2)
             {
                 foreach (var card in enemyController.Cards)
                 {
-                    var totalBurns = card.Effects.Count(x => x.Type == AbilityEnum.Burn);
-                    card.UpdateEffect(AbilityEnum.Burn, totalBurns);
+                    var totalBurns = card.Effects.Count(x => x.Type == EffectEnum.Fire);
+                    card.UpdateEffect(EffectEnum.Fire, totalBurns);
                 }
             }
             else if (skillIndex == 3)
@@ -462,12 +462,13 @@ namespace Features.Battles
         {
             acting = true;
             playerController.LockWheel();
-            var burns = enemyController.Cards.Max(x => x.Effects.Count(x => x.Type == AbilityEnum.Burn));
+            var burns = enemyController.Cards.Max(x => x.Effects.Count(x => x.Type == EffectEnum.Fire));
             while (burns > 0 && !enemyController.AllUnitsDead())
             {
                 if (enemyController.AllUnitsDead()) yield break;
                 yield return enemyController.Rotate(ActDirection.Right, burns);
-                burns = enemyController.Cards.Max(x => x.Effects.Count(ability => ability.Type == AbilityEnum.Burn));
+                burns = enemyController.Cards.Max(x =>
+                    x.Effects.Count(ability => ability.Type == EffectEnum.Fire));
             }
 
             playerController.UnlockWheel();
@@ -496,10 +497,10 @@ namespace Features.Battles
             foreach (var card in controller.Cards)
             {
                 var cardActiveEffects = card.Effects;
-                var burns = cardActiveEffects.FirstOrDefault(a => a.Type == AbilityEnum.Burn);
+                var burns = cardActiveEffects.FirstOrDefault(a => a.Type == EffectEnum.Fire);
                 if (burns != null)
                 {
-                    card.UpdateEffect(AbilityEnum.Burn, -1);
+                    card.UpdateEffect(EffectEnum.Fire, -1);
                     yield return ApplyDamage(burns.Amount, card, null, controller, AbilityEnum.Burn);
                 }
             }

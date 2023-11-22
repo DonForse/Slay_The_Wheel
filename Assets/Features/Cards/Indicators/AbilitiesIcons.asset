@@ -1,0 +1,43 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 548c733eaa0d4172a80efaf639b12b0a, type: 3}
+  m_Name: AbilitiesIcons
+  m_EditorClassIdentifier: 
+  abilitiesIcons:
+  - ability: 0
+    image: {fileID: 21300000, guid: 1109169a53f9acd4ca42fd4de2dc8fd0, type: 3}
+  - ability: 1
+    image: {fileID: 21300000, guid: fca35a1ea8e843c49bf2aaccc88868b5, type: 3}
+  - ability: 2
+    image: {fileID: 21300000, guid: f1fac3ffa4eef464aa4235551ed9d11a, type: 3}
+  - ability: 3
+    image: {fileID: 21300000, guid: 018d6e34341e85b4a9d46a093d26cbab, type: 3}
+  - ability: 4
+    image: {fileID: 21300000, guid: 834cdda06f0fe3443bb6b7e1e7b72197, type: 3}
+  - ability: 6
+    image: {fileID: 21300000, guid: 4c8860a0a58c48d4a804bbfb4df27ef6, type: 3}
+  - ability: 5
+    image: {fileID: 21300000, guid: 10b2d0f9a70b03d469075622598df3a1, type: 3}
+  - ability: 7
+    image: {fileID: 21300000, guid: 8b6e8ae00f66711439ad1046495bd76a, type: 3}
+  - ability: 8
+    image: {fileID: 21300000, guid: d5350524eccaeaf48bd12ee7248bd3c3, type: 3}
+  - ability: 9
+    image: {fileID: 21300000, guid: d5350524eccaeaf48bd12ee7248bd3c3, type: 3}
+  - ability: 10
+    image: {fileID: 21300000, guid: 931bca92feff5794dbfbad8ac1347841, type: 3}
+  - ability: 11
+    image: {fileID: 21300000, guid: 821aeb3732e2cd24aac3c1f3fa5840e2, type: 3}
+  - ability: 12
+    image: {fileID: 21300000, guid: 564f95027841b5a4b8784b7024238b35, type: 3}
+  - ability: 13
+    image: {fileID: 21300000, guid: 3913d09bcc34ee44f867197712adb53f, type: 3}

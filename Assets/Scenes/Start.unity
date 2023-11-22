@@ -304,5 +304,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e83cf7a188a6e964eb1694c6af3e55f8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  deck: {fileID: 11400000, guid: c19647cd2bd31dc49bb940f65de28a7c, type: 2}
+  deck: {fileID: 11400000, guid: 87c99025e9baa994aaf3e7fba4574645, type: 2}
   enemiesDb: {fileID: 11400000, guid: 0b71d7b583473e94b87c0a4a4abbce8d, type: 2}

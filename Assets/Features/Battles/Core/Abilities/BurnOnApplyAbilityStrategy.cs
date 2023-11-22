@@ -2,7 +2,7 @@ using System.Collections;
 using Features.Battles.Wheel;
 using Features.Cards;
 
-namespace Features.Battles.Core.OnHitEffects
+namespace Features.Battles.Core.Abilities
 {
     public class BurnOnApplyAbilityStrategy : IOnApplyAbilityStrategy
     {
@@ -12,7 +12,7 @@ namespace Features.Battles.Core.OnHitEffects
             PlayerController attacker)
         {
             var affectedCard = defender.GetFrontCard();
-            affectedCard.UpdateEffect(AbilityEnum.Burn, amount);
+            affectedCard.UpdateEffect(EffectEnum.Fire, amount);
             yield break;
         }
     }

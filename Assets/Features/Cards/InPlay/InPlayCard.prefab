@@ -198,17 +198,14 @@ MonoBehaviour:
   atkCardFeedback: {fileID: 1998337621731687830}
   abilitiesContainer: {fileID: 1920387090359156846}
   effectsContainer: {fileID: 7748168679159865282}
-  fireIndicatorPrefab: {fileID: 6206021556773077456, guid: 041beb099c005b84395df6fb405c5dc2, type: 3}
-  turnIndicatorPrefab: {fileID: 2971843293548022519, guid: a18beabd2c189964aac6b86a4d3ff87a, type: 3}
-  burnAllIndicatorPrefab: {fileID: 6206021556773077456, guid: f8f14d6d20a16144385d14084321f177, type: 3}
-  atkLeftIndicatorPrefab: {fileID: 2971843293548022519, guid: 4876d76b378b0ca449ce14937980b58f, type: 3}
-  atkRightIndicatorPrefab: {fileID: 2971843293548022519, guid: db466114c9f020b4fb16614e7cdaf287, type: 3}
-  addShieldLeftIndicatorPrefab: {fileID: 2971843293548022519, guid: d1684d1ed11ab7a4c84079a3e73bc0e9, type: 3}
-  addShieldRightIndicatorPrefab: {fileID: 2971843293548022519, guid: c9863b6208173d246af40e025dbf3f6d, type: 3}
+  indicatorPrefab: {fileID: 7817342911328056359, guid: 041beb099c005b84395df6fb405c5dc2, type: 3}
+  effectsIconsScriptableObject: {fileID: 11400000, guid: b3fffa19363b5a347988196d44aa6fdb, type: 2}
+  abilitiesIconsScriptableObject: {fileID: 11400000, guid: 21f1e1d1aedacaf46a86ccacf3598fb7, type: 2}
   animator: {fileID: 8524329497729110065}
-  Shield: 0
+  Armor: 0
   Attack: 0
-  Effects: 
+  Effects: []
+  OwnerPlayer: {fileID: 0}
 --- !u!95 &8524329497729110065
 Animator:
   serializedVersion: 5
@@ -5537,14 +5534,14 @@ GameObject:
   m_Component:
   - component: {fileID: 7748168679159865282}
   - component: {fileID: 768634931497460805}
-  - component: {fileID: 6936175462037979220}
+  - component: {fileID: 1011753121444456229}
   m_Layer: 5
   m_Name: PanelEffects
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &7748168679159865282
 RectTransform:
   m_ObjectHideFlags: 0
@@ -5562,7 +5559,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 62.4}
+  m_AnchoredPosition: {x: 0, y: 87.5}
   m_SizeDelta: {x: 100, y: 25}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &768634931497460805
@@ -5573,7 +5570,7 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4283090935398646036}
   m_CullTransparentMesh: 1
---- !u!114 &6936175462037979220
+--- !u!114 &1011753121444456229
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -5582,7 +5579,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 4283090935398646036}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 30649d3a9faa99c48a7b1166b86bf2a0, type: 3}
+  m_Script: {fileID: 11500000, guid: 8a8695521f0d02e499659fee002a26c2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   m_Padding:
@@ -5591,14 +5588,12 @@ MonoBehaviour:
     m_Top: 0
     m_Bottom: 0
   m_ChildAlignment: 0
-  m_Spacing: 0
-  m_ChildForceExpandWidth: 1
-  m_ChildForceExpandHeight: 1
-  m_ChildControlWidth: 1
-  m_ChildControlHeight: 1
-  m_ChildScaleWidth: 0
-  m_ChildScaleHeight: 0
-  m_ReverseArrangement: 0
+  m_StartCorner: 0
+  m_StartAxis: 0
+  m_CellSize: {x: 25, y: 25}
+  m_Spacing: {x: 0, y: 0}
+  m_Constraint: 0
+  m_ConstraintCount: 2
 --- !u!1 &4565189841522286231
 GameObject:
   m_ObjectHideFlags: 0
@@ -6127,7 +6122,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 25, y: -62.5}
+  m_AnchoredPosition: {x: 25, y: -37.5}
   m_SizeDelta: {x: 50, y: 25}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &6525470979041955394
@@ -6241,7 +6236,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: 21300000, guid: 48ba6c50dbd9b66409f4670dc7564a4c, type: 3}
+  m_Sprite: {fileID: 21300000, guid: e084c7f07dffb7c4989a59233a9b3b00, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -6289,7 +6284,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -25, y: -62.5}
+  m_AnchoredPosition: {x: -25, y: -37.5}
   m_SizeDelta: {x: 50, y: 25}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &5967090859833464662
@@ -6341,14 +6336,14 @@ GameObject:
   - component: {fileID: 1920387090359156846}
   - component: {fileID: 118954311252630571}
   - component: {fileID: 8363548562080705542}
-  - component: {fileID: 9114892471241824173}
+  - component: {fileID: 7519835845235788640}
   m_Layer: 5
   m_Name: PanelAbilties
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &1920387090359156846
 RectTransform:
   m_ObjectHideFlags: 0
@@ -6366,7 +6361,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: -87.5}
+  m_AnchoredPosition: {x: 0, y: -62.5}
   m_SizeDelta: {x: 100, y: 25}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &118954311252630571
@@ -6407,7 +6402,7 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 8
---- !u!114 &9114892471241824173
+--- !u!114 &7519835845235788640
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -6416,7 +6411,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 5743158003080997828}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 30649d3a9faa99c48a7b1166b86bf2a0, type: 3}
+  m_Script: {fileID: 11500000, guid: 8a8695521f0d02e499659fee002a26c2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   m_Padding:
@@ -6425,14 +6420,12 @@ MonoBehaviour:
     m_Top: 0
     m_Bottom: 0
   m_ChildAlignment: 0
-  m_Spacing: 0
-  m_ChildForceExpandWidth: 1
-  m_ChildForceExpandHeight: 1
-  m_ChildControlWidth: 1
-  m_ChildControlHeight: 1
-  m_ChildScaleWidth: 0
-  m_ChildScaleHeight: 0
-  m_ReverseArrangement: 0
+  m_StartCorner: 0
+  m_StartAxis: 0
+  m_CellSize: {x: 25, y: 25}
+  m_Spacing: {x: 5, y: 5}
+  m_Constraint: 0
+  m_ConstraintCount: 2
 --- !u!1 &6821728066864064156
 GameObject:
   m_ObjectHideFlags: 0
@@ -12613,8 +12606,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 1000, y: 1000}
+  m_AnchoredPosition: {x: 0, y: -0.25}
+  m_SizeDelta: {x: 100, y: 150}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!223 &566433438574013145
 Canvas:

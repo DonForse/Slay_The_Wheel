@@ -15,10 +15,10 @@ MonoBehaviour:
   cardName: Kael Fireforge
   hp: 25
   attack: 1
-  onAttackAbilities: []
-  onDealDamageAbilities:
+  onAttackAbilities:
   - Type: 1
     Amount: 3
+  onDealDamageAbilities: []
   onSpinAbilities: []
   onTurnStartAbilities: []
   onTurnEndAbilities: []

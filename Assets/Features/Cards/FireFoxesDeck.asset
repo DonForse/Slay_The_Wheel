@@ -1,0 +1,26 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fa0995a890c24221a72c3943fc5ce218, type: 3}
+  m_Name: FireFoxesDeck
+  m_EditorClassIdentifier: 
+  hero: {fileID: 11400000, guid: ae97771e8a2cf0e48b25d4824c2a2327, type: 2}
+  cards:
+  - Amount: 5
+    card: {fileID: 11400000, guid: 9eb2a78e21dc0394fac0f72cd45511ef, type: 2}
+  - Amount: 2
+    card: {fileID: 11400000, guid: e3cb648db30bf584b9082846b7e25264, type: 2}
+  - Amount: 1
+    card: {fileID: 11400000, guid: c3f4fcdeb2705c948bb83b6d43cd442f, type: 2}
+  - Amount: 1
+    card: {fileID: 11400000, guid: c2faeacbfd0301d49999dc9033e424b9, type: 2}
+  - Amount: 1
+    card: {fileID: 11400000, guid: a509f3c4b1b3e2c4293bb0ec8ae1f6bd, type: 2}
