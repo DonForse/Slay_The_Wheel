@@ -10,7 +10,7 @@ namespace Features.Battles.Core.Abilities
 
         public IEnumerator Execute(InPlayCard executor, int value, PlayerController defender, PlayerController attacker)
         {
-            var neighbors = executor.OwnerPlayer.GetFrontNeighborsCards(1, 2);
+            var neighbors = executor.OwnerPlayer.GetNeighborsCards(executor,1, 2);
             var leftNeighbor = neighbors[1];
             if (leftNeighbor.IsDead)
                 yield break;
