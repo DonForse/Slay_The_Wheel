@@ -15,7 +15,7 @@ namespace Features.Battles.Core.Attacks
 
         public IEnumerator Execute(InPlayCard attackerCard, PlayerController defenderPlayerController)
         {
-            attackerCard.PlayAct();
+            yield return attackerCard.PlayAttack();
             foreach (var defender in defenderPlayerController.Cards)
                 yield return _battle.ApplyDamage(attackerCard.Attack, defender,attackerCard, defenderPlayerController, null);
             yield break;

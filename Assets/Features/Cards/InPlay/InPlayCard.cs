@@ -5,6 +5,7 @@ using System.Linq;
 using Features.Battles;
 using Features.Battles.Wheel;
 using Features.Cards.Indicators;
+using Features.Cards.InPlay.Feedback;
 using MoreMountains.Feedbacks;
 using TMPro;
 using UnityEngine;
@@ -20,17 +21,11 @@ namespace Features.Cards
         [SerializeField] private Transform viewContainer;
         [SerializeField] private TMP_Text hpText;
         [SerializeField] private TMP_Text atkText;
-        [SerializeField] private MMF_Player damageFeedback;
-        [SerializeField] private MMF_Player deadFeedback;
-        [SerializeField] private MMF_Player showCardFeedback;
-        [SerializeField] private MMF_Player atkCardFeedback;
         [SerializeField] private Transform abilitiesContainer;
         [SerializeField] private Transform effectsContainer;
         [SerializeField] private IndicatorIconView indicatorPrefab;
         [SerializeField] private EffectsIconsScriptableObject effectsIconsScriptableObject;
         [SerializeField] private AbilitiesIconsScriptableObject abilitiesIconsScriptableObject;
-        [SerializeField] private Animator animator;
-        private MMF_FloatingText _feedbackFloatingText;
 
         private bool _isDead = false;
 
@@ -43,11 +38,7 @@ namespace Features.Cards
 
         public string CardName => _card.CardName;
         public PlayerController OwnerPlayer;
-
-        private void OnEnable()
-        {
-            _feedbackFloatingText = damageFeedback.GetFeedbackOfType<MMF_FloatingText>();
-        }
+        [SerializeField] private InPlayCardFeedbacks inPlayCardFeedbacks;
 
         public void SetPlayer(bool player)
         {
@@ -77,7 +68,7 @@ namespace Features.Cards
 
             _card.ValueChanged += UpdateCardValues;
             UpdateCardValues(null, _card);
-            yield return showCardFeedback.PlayFeedbacksCoroutine(this.transform.position);
+            yield return inPlayCardFeedbacks.PlayOnAppearFeedback();
         }
 
         private void OnDestroy()
@@ -139,82 +130,20 @@ namespace Features.Cards
             return _card;
         }
 
-        public void SetDead()
+        public IEnumerator SetDead()
         {
             _isDead = true;
             hpText.text = "0";
             atkText.text = "0";
             Effects = new List<Effect>();
             spriteRenderer.sprite = cardBack;
-            deadFeedback.PlayFeedbacks(this.transform.position);
+            yield return inPlayCardFeedbacks.PlayOnDeadFeedback();
+            
         }
 
-        public void PlayGetHitAnimation(int damage, AbilityEnum? source = null)
+        public IEnumerator PlayGetHitAnimation(int damage, AbilityEnum? source = null)
         {
-            _feedbackFloatingText.Value = damage.ToString();
-            animator.SetTrigger($"ReceiveDamage{source?.ToString() ?? string.Empty}");
-            SetAnimationTextColor(source);
-
-            // _player.PlayFeedbacks(this.transform.position, damage);
-            damageFeedback.PlayFeedbacks(this.transform.position, damage);
-        }
-
-        private void SetAnimationTextColor(AbilityEnum? source)
-        {
-            switch (source)
-            {
-                case null:
-                    SetNormalColor();
-                    break;
-                case AbilityEnum.Burn:
-                    SetFireColor();
-                    break;
-                default:
-                    SetCommonColor();
-                    break;
-            }
-        }
-
-        private void SetCommonColor()
-        {
-            _feedbackFloatingText.ForceColor = true;
-            _feedbackFloatingText.AnimateColorGradient = new Gradient()
-            {
-                mode = GradientMode.Fixed,
-                colorKeys = new[]
-                {
-                    new GradientColorKey(Color.white, 0f),
-                    new GradientColorKey(Color.white, 1f)
-                }
-            };
-        }
-
-        private void SetFireColor()
-        {
-            _feedbackFloatingText.ForceColor = true;
-            _feedbackFloatingText.AnimateColorGradient = new Gradient()
-            {
-                mode = GradientMode.Fixed,
-                colorKeys = new[]
-                {
-                    new GradientColorKey(Color.red, 0f),
-                    new GradientColorKey(Color.red, 1f)
-                }
-            };
-        }
-
-        private void SetNormalColor()
-        {
-            _feedbackFloatingText.ForceColor = true;
-            _feedbackFloatingText.AnimateColorGradient = new Gradient()
-            {
-                mode = GradientMode.Fixed,
-                colorKeys = new[]
-                {
-                    new GradientColorKey(Color.yellow, 0f),
-                    new GradientColorKey(Color.yellow, 1f)
-                }
-            };
+            yield return inPlayCardFeedbacks.PlayOnGetHitFeedback(damage, source);
         }
 
         public void UpdateEffect(EffectEnum effectType, int amount)
@@ -234,10 +163,10 @@ namespace Features.Cards
             UpdateCardValues(this, GetCard());
         }
 
-        public void PlayAct()
+        public IEnumerator PlayAttack()
         {
-            if (IsDead) return;
-            atkCardFeedback.PlayFeedbacks();
+            if (IsDead) yield break;
+            yield return inPlayCardFeedbacks.PlayOnAttackFeedback();
         }
     }
 }

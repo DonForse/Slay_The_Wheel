@@ -236,7 +236,7 @@ namespace Features.Battles
             AbilityEnum? source)
         {
             var defenderCard = damageReceiver.GetCard();
-            damageReceiver.PlayGetHitAnimation(damage, source);
+            StartCoroutine(damageReceiver.PlayGetHitAnimation(damage, source));
             var difDamage = Mathf.Max(damage - damageReceiver.Armor, 0);
 
             damageReceiver.Armor = Mathf.Max(0, damageReceiver.Armor - damage);
@@ -251,7 +251,7 @@ namespace Features.Battles
             if (defenderCard.Hp > 0)
                 yield break;
 
-            damageReceiver.SetDead();
+            yield return damageReceiver.SetDead();
 
             if (defenderPlayerController == enemyController)
             {

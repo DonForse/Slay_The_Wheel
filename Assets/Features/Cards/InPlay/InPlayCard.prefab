@@ -145,6 +145,7 @@ GameObject:
   m_Component:
   - component: {fileID: 5495224867373939468}
   - component: {fileID: 9020182488548676372}
+  - component: {fileID: 2867186676218229456}
   - component: {fileID: 8524329497729110065}
   m_Layer: 0
   m_Name: InPlayCard
@@ -192,20 +193,33 @@ MonoBehaviour:
   viewContainer: {fileID: 710592379794037747}
   hpText: {fileID: 6363361793529549309}
   atkText: {fileID: 5686538585994836151}
-  damageFeedback: {fileID: 8020572161793104433}
-  deadFeedback: {fileID: 6663796213429632327}
-  showCardFeedback: {fileID: 3532881214213100316}
-  atkCardFeedback: {fileID: 1998337621731687830}
   abilitiesContainer: {fileID: 1920387090359156846}
   effectsContainer: {fileID: 7748168679159865282}
   indicatorPrefab: {fileID: 7817342911328056359, guid: 041beb099c005b84395df6fb405c5dc2, type: 3}
   effectsIconsScriptableObject: {fileID: 11400000, guid: b3fffa19363b5a347988196d44aa6fdb, type: 2}
   abilitiesIconsScriptableObject: {fileID: 11400000, guid: 21f1e1d1aedacaf46a86ccacf3598fb7, type: 2}
-  animator: {fileID: 8524329497729110065}
   Armor: 0
   Attack: 0
   Effects: []
   OwnerPlayer: {fileID: 0}
+  inPlayCardFeedbacks: {fileID: 2867186676218229456}
+--- !u!114 &2867186676218229456
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1372488790367608526}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1e825b86827b9f84cbdbf6b82d3bf391, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  animator: {fileID: 8524329497729110065}
+  damageFeedback: {fileID: 8020572161793104433}
+  deadFeedback: {fileID: 6663796213429632327}
+  showCardFeedback: {fileID: 3532881214213100316}
+  atkCardFeedback: {fileID: 1998337621731687830}
 --- !u!95 &8524329497729110065
 Animator:
   serializedVersion: 5
