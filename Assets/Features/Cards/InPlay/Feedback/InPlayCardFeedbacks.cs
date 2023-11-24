@@ -13,7 +13,7 @@ namespace Features.Cards.InPlay.Feedback
         [SerializeField] private MMF_Player deadFeedback;
         [SerializeField] private MMF_Player showCardFeedback;
         [SerializeField] private MMF_Player atkCardFeedback;
-        private static readonly int Property = Animator.StringToHash("gain-armor");
+        [SerializeField] private MMF_Player gainArmorFeedback;
         private MMF_FloatingText _feedbackFloatingText;
 
         private void OnEnable()
@@ -21,9 +21,10 @@ namespace Features.Cards.InPlay.Feedback
             _feedbackFloatingText = damageFeedback.GetFeedbackOfType<MMF_FloatingText>();
         }
 
-        public void ArmorGain()
+        public IEnumerator PlayOnArmorGain()
         {
-            animator.SetTrigger(Property);
+            yield return gainArmorFeedback.PlayFeedbacksCoroutine(this.transform.position);
+            
         }
 
         public IEnumerator PlayOnAppearFeedback()

@@ -12,7 +12,7 @@ namespace Features.Battles.Core.Abilities
             PlayerController attacker)
         {
             executor.Armor += amount;
-            yield break;
+            yield return executor.PlayGainArmor();
         }
     }
 }

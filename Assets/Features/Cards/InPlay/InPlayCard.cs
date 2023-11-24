@@ -1,4 +1,3 @@
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -6,10 +5,8 @@ using Features.Battles;
 using Features.Battles.Wheel;
 using Features.Cards.Indicators;
 using Features.Cards.InPlay.Feedback;
-using MoreMountains.Feedbacks;
 using TMPro;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 namespace Features.Cards
 {
@@ -144,6 +141,11 @@ namespace Features.Cards
         public IEnumerator PlayGetHitAnimation(int damage, AbilityEnum? source = null)
         {
             yield return inPlayCardFeedbacks.PlayOnGetHitFeedback(damage, source);
+        }
+
+        public IEnumerator PlayGainArmor()
+        {
+            yield return inPlayCardFeedbacks.PlayOnArmorGain();
         }
 
         public void UpdateEffect(EffectEnum effectType, int amount)

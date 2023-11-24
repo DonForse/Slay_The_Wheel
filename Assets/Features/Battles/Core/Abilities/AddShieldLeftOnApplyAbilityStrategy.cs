@@ -2,7 +2,7 @@ using System.Collections;
 using Features.Battles.Wheel;
 using Features.Cards;
 
-namespace Features.Battles.Core.OnActEffects
+namespace Features.Battles.Core.Abilities
 {
     public class AddShieldLeftOnApplyAbilityStrategy : IOnApplyAbilityStrategy
     {
@@ -12,9 +12,10 @@ namespace Features.Battles.Core.OnActEffects
         {
             var neighbors = executor.OwnerPlayer.GetFrontNeighborsCards(1, 2);
             var leftNeighbor = neighbors[0];
-            if (!leftNeighbor.IsDead)
-                leftNeighbor.Armor += value;
-            yield break;
+            if (leftNeighbor.IsDead) yield break;
+                
+            leftNeighbor.Armor += value;
+            yield return leftNeighbor.PlayGainArmor();
         }
     }
 }
