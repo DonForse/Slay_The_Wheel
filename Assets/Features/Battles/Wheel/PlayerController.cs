@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Features.Cards;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace Features.Battles.Wheel
 {
@@ -11,17 +12,18 @@ namespace Features.Battles.Wheel
     {
         public WheelData WheelData = new();
         public InPlayCard inPlayCardPrefab;
-        public Animator rotatingVFX;
         [HideInInspector] public List<InPlayCard> Cards = new();
         [HideInInspector] public List<Vector2> Positions;
         private IControlWheel input;
         private ControlWheel[] wheelControllers;
         private AutomaticControlWheel wheelMovement;
+        [SerializeField] Animator animator;
 
         // private List<RunCard> _cardsToAdd;
         private int frontCardIndex;
         private Func<IEnumerator> _wheelMovedCallback;
         private ActDirection _lastActionDirection;
+        private static readonly int OnMoved = Animator.StringToHash("on_moved");
         public event EventHandler<InPlayCard> Acted;
         public event EventHandler<InPlayCard> WheelTurn;
 
@@ -68,7 +70,6 @@ namespace Features.Battles.Wheel
                     yield break;
                 }
                 yield return wheelMovement.TurnTowardsDirection(toTheRight, true);
-                //to solve the issue where put alive unit does not trigger damage immediately, you have to make this a part of the busqueue
                 yield return new WaitForSeconds(0.1f);
             }
         }
@@ -93,6 +94,8 @@ namespace Features.Battles.Wheel
                 yield break;
             _lastActionDirection = ActDirection.Left;
             IncrementFrontCardIndex();
+            animator.SetTrigger(OnMoved);
+            yield return new WaitForSeconds(0.3f);
             Acted?.Invoke(this, Cards[frontCardIndex]);
         }
 
@@ -104,6 +107,8 @@ namespace Features.Battles.Wheel
             _lastActionDirection = ActDirection.Right; 
             
             DecrementFrontCardIndex();
+            animator.SetTrigger(OnMoved);
+            yield return new WaitForSeconds(0.3f);
             Acted?.Invoke(this, Cards[frontCardIndex]);
         }
 
@@ -126,7 +131,7 @@ namespace Features.Battles.Wheel
         
         private void OnBeforeRotation(TurningOrientation turningOrientation)
         {
-            rotatingVFX.SetTrigger($"Rotate_{turningOrientation}");
+            animator.SetTrigger($"Rotate_{turningOrientation}");
         }
 
         private IEnumerator SetRunCards(bool player, List<RunCard>cards)
@@ -211,7 +216,7 @@ namespace Features.Battles.Wheel
         public List<InPlayCard> GetNeighborsCards(InPlayCard executor, int startLevel, int finishLevel)
         {
             var cards = new List<InPlayCard>();
-            var cardIndex = cards.IndexOf(executor);
+            var cardIndex = Cards.IndexOf(executor);
             for (int i = startLevel; i < finishLevel; i++)
             {
                 var currentNegativeIndex = cardIndex - i;

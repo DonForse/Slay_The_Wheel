@@ -8,7 +8,7 @@ namespace Features.Battles.Wheel
     public abstract class ControlWheel :MonoBehaviour, IControlWheel
     {
         [SerializeField] protected float rotationSpeed = 5;
-        [FormerlySerializedAs("wheelController")] [SerializeField] protected PlayerController playerController;
+        [SerializeField] protected PlayerController playerController;
         
         protected float startAngle;
         protected Func<IEnumerator> _rightCallback;
@@ -52,7 +52,6 @@ namespace Features.Battles.Wheel
                 var newTheta = initialTheta + playerController.WheelData.RotationAngle;
                 var x = playerController.WheelData.Radius * Mathf.Cos(newTheta);
                 var y = playerController.WheelData.Radius * Mathf.Sin(newTheta);
-
                 var newPosition = new Vector2(x, y);
                 playerController.Cards[i].transform.localPosition = newPosition;
             }
