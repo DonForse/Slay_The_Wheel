@@ -17,7 +17,7 @@ namespace Features.Battles.Wheel
         {
             foreach (var card in playerController.Cards)
             {
-                card.SetAsActive(card == e);
+                // card.SetAsActive(card == e);
             }
         }
 

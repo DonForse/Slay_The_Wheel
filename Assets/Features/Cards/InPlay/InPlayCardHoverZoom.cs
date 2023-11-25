@@ -7,7 +7,7 @@ namespace Features.Cards.InPlay
         [SerializeField]private float activeScale;
         [SerializeField]private float inactiveScale;
         
-        public bool IsActive;
+        // public bool IsActive;
 
         private bool _dragging;
         private Vector3 _previousScale;
@@ -29,19 +29,7 @@ namespace Features.Cards.InPlay
             _inactiveScale = Vector3.one * inactiveScale;
         }
 
-        private void OnMouseDown()
-        {
-            _previousScale = this.transform.localScale;
-            _dragging = true;
-        }
-        
-        private void OnMouseUp()
-        {
-            _dragging = false;
-            this.transform.localScale = _previousScale;
-        }
-
-        private void OnMouseOver()
+        private void OnMouseEnter()
         {
             _previousScale = this.transform.localScale; 
             this.transform.localScale =_activeScale;
@@ -50,14 +38,15 @@ namespace Features.Cards.InPlay
         private void OnMouseExit()
         {
             if (_dragging) return;
-            
-            this.transform.localScale = IsActive ? _activeScale : _inactiveScale;
+            this.transform.localScale =_previousScale;
+
+            // this.transform.localScale = IsActive ? _activeScale : _inactiveScale;
         }
 
         public void SetActive(bool value)
         {
-            IsActive = value;
-            this.transform.localScale = IsActive ? _activeScale : _inactiveScale;
+            // IsActive = value;
+            // this.transform.localScale = IsActive ? _activeScale : _inactiveScale;
         }
     }
 }

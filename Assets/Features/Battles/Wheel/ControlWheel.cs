@@ -56,7 +56,7 @@ namespace Features.Battles.Wheel
                 var newPosition = new Vector2(x, y);
                 playerController.Cards[i].transform.localPosition = newPosition;
                 
-                zoomWheel.SetValue(playerController.Cards[i], 1f-Mathf.Clamp01((newPosition - playerController.Positions[0]).magnitude));
+                zoomWheel.SetValue(playerController.Cards[i], 1f-Mathf.Clamp01((newPosition - playerController.Positions[0]).magnitude/3f));
             }
         }
     }
