@@ -183,5 +183,10 @@ namespace Features.Cards
         {
             zoomControl.SetScale(scale);
         }
+
+        public IEnumerator PlayRangedAttack(InPlayCard defender)
+        {
+            yield return inPlayCardFeedbacks.PlayOnRangedAttackedFeedback(defender.transform);
+        }
     }
 }

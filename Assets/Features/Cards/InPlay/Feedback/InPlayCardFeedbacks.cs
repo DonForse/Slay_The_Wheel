@@ -14,11 +14,15 @@ namespace Features.Cards.InPlay.Feedback
         [SerializeField] private MMF_Player showCardFeedback;
         [SerializeField] private MMF_Player atkCardFeedback;
         [SerializeField] private MMF_Player gainArmorFeedback;
+        [SerializeField]private MMF_Player rangedAtkCardFeedback;
+        
         private MMF_FloatingText _feedbackFloatingText;
+        private MMF_DestinationTransform _destinationTransform;
 
         private void OnEnable()
         {
             _feedbackFloatingText = damageFeedback.GetFeedbackOfType<MMF_FloatingText>();
+            _destinationTransform = rangedAtkCardFeedback.GetFeedbackOfType<MMF_DestinationTransform>();
         }
 
         public IEnumerator PlayOnArmorGain()
@@ -108,6 +112,12 @@ namespace Features.Cards.InPlay.Feedback
         public IEnumerator PlayOnAttackFeedback()
         {
             yield return atkCardFeedback.PlayFeedbacksCoroutine(this.transform.position);
+        }
+
+        public IEnumerator PlayOnRangedAttackedFeedback(Transform defenderTransform)
+        {
+            _destinationTransform.Destination = defenderTransform;
+            yield return rangedAtkCardFeedback.PlayFeedbacksCoroutine(this.transform.position);
         }
     }
 }
