@@ -9,6 +9,7 @@ namespace Features.Battles.Wheel
     {
         [SerializeField] protected float rotationSpeed = 5;
         [SerializeField] protected PlayerController playerController;
+        [SerializeField] protected ZoomWheel zoomWheel;
         
         protected float startAngle;
         protected Func<IEnumerator> _rightCallback;
@@ -54,6 +55,8 @@ namespace Features.Battles.Wheel
                 var y = playerController.WheelData.Radius * Mathf.Sin(newTheta);
                 var newPosition = new Vector2(x, y);
                 playerController.Cards[i].transform.localPosition = newPosition;
+                
+                zoomWheel.SetValue(playerController.Cards[i], 1f-Mathf.Clamp01((newPosition - playerController.Positions[0]).magnitude));
             }
         }
     }

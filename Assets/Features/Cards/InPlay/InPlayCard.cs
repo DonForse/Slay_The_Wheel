@@ -178,5 +178,10 @@ namespace Features.Cards
         {
             zoomControl.SetActive(value);
         }
+
+        public void SetScale(float scale)
+        {
+            zoomControl.SetScale(scale);
+        }
     }
 }

@@ -2313,6 +2313,7 @@ MonoBehaviour:
   Cards: []
   Positions: []
   animator: {fileID: 102490607}
+  frontCardIndex: 0
 --- !u!4 &652674505
 Transform:
   m_ObjectHideFlags: 0
@@ -2343,6 +2344,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   rotationSpeed: 3
   playerController: {fileID: 652674504}
+  zoomWheel: {fileID: 652674508}
 --- !u!114 &652674507
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2357,6 +2359,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   rotationSpeed: 3
   playerController: {fileID: 652674504}
+  zoomWheel: {fileID: 652674508}
 --- !u!114 &652674508
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4052,6 +4055,7 @@ MonoBehaviour:
   Cards: []
   Positions: []
   animator: {fileID: 2048894829}
+  frontCardIndex: 0
 --- !u!4 &1555398150
 Transform:
   m_ObjectHideFlags: 0
@@ -4082,6 +4086,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   rotationSpeed: 5
   playerController: {fileID: 1555398149}
+  zoomWheel: {fileID: 1555398153}
 --- !u!114 &1555398152
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4096,6 +4101,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   rotationSpeed: 3
   playerController: {fileID: 1555398149}
+  zoomWheel: {fileID: 1555398153}
 --- !u!114 &1555398153
 MonoBehaviour:
   m_ObjectHideFlags: 0

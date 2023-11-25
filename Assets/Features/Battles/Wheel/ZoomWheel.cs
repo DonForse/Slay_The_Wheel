@@ -21,10 +21,9 @@ namespace Features.Battles.Wheel
             }
         }
 
-        private void Update()
+        public void SetValue(InPlayCard card,float scale)
         {
-            Debug.Log(playerController.WheelData.RotationAngle);
-            
+            card.SetScale(scale);
         }
     }
 }

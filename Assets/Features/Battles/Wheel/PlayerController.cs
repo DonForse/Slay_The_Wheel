@@ -20,7 +20,7 @@ namespace Features.Battles.Wheel
         [SerializeField] Animator animator;
 
         // private List<RunCard> _cardsToAdd;
-        private int frontCardIndex;
+        public int frontCardIndex;
         private Func<IEnumerator> _wheelMovedCallback;
         private ActDirection _lastActionDirection;
         private static readonly int OnMoved = Animator.StringToHash("on_moved");

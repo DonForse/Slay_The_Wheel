@@ -14,6 +14,13 @@ namespace Features.Cards.InPlay
         private Vector3 _activeScale;
         private Vector3 _inactiveScale;
 
+        public void SetScale(float range)
+        {
+            var clampedRange = Mathf.Clamp01(range);
+            var value = Mathf.Lerp(inactiveScale, activeScale, clampedRange);
+            this.transform.localScale = Vector3.one * value;
+        }
+
         private void OnEnable()
         {
             this.transform.localScale = new Vector3(0.5f, 0.5f, 0.5f);
