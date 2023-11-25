@@ -2285,6 +2285,7 @@ GameObject:
   - component: {fileID: 652674504}
   - component: {fileID: 652674506}
   - component: {fileID: 652674507}
+  - component: {fileID: 652674508}
   m_Layer: 0
   m_Name: EnemyController
   m_TagString: Untagged
@@ -2355,6 +2356,19 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   rotationSpeed: 3
+  playerController: {fileID: 652674504}
+--- !u!114 &652674508
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 652674503}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4ee9bccdbe6c408d942e8800eb450bb4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
   playerController: {fileID: 652674504}
 --- !u!1 &655113290
 GameObject:
@@ -4010,6 +4024,7 @@ GameObject:
   - component: {fileID: 1555398149}
   - component: {fileID: 1555398151}
   - component: {fileID: 1555398152}
+  - component: {fileID: 1555398153}
   m_Layer: 0
   m_Name: PlayerController
   m_TagString: Untagged
@@ -4080,6 +4095,19 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   rotationSpeed: 3
+  playerController: {fileID: 1555398149}
+--- !u!114 &1555398153
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1555398148}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4ee9bccdbe6c408d942e8800eb450bb4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
   playerController: {fileID: 1555398149}
 --- !u!1 &1627362538
 GameObject:

@@ -46,5 +46,11 @@ namespace Features.Cards.InPlay
             
             this.transform.localScale = IsActive ? _activeScale : _inactiveScale;
         }
+
+        public void SetActive(bool value)
+        {
+            IsActive = value;
+            this.transform.localScale = IsActive ? _activeScale : _inactiveScale;
+        }
     }
 }

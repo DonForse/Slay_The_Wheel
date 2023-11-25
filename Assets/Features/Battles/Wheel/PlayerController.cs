@@ -26,6 +26,7 @@ namespace Features.Battles.Wheel
         private static readonly int OnMoved = Animator.StringToHash("on_moved");
         public event EventHandler<InPlayCard> Acted;
         public event EventHandler<InPlayCard> WheelTurn;
+        public event EventHandler<InPlayCard> ActiveCardChanged;
 
         private void Awake()
         {
@@ -79,6 +80,7 @@ namespace Features.Battles.Wheel
             frontCardIndex--;
             if (frontCardIndex < 0)
                 frontCardIndex = Cards.Count - 1;
+            ActiveCardChanged?.Invoke(this,Cards[frontCardIndex]);
         }
 
         private void IncrementFrontCardIndex()
@@ -86,6 +88,7 @@ namespace Features.Battles.Wheel
             frontCardIndex++;
             if (frontCardIndex > Cards.Count - 1)
                 frontCardIndex = 0;
+            ActiveCardChanged?.Invoke(this,Cards[frontCardIndex]);
         }
 
         private IEnumerator OnTurnLeftAction()

@@ -201,11 +201,12 @@ MonoBehaviour:
   indicatorPrefab: {fileID: 7817342911328056359, guid: 041beb099c005b84395df6fb405c5dc2, type: 3}
   effectsIconsScriptableObject: {fileID: 11400000, guid: b3fffa19363b5a347988196d44aa6fdb, type: 2}
   abilitiesIconsScriptableObject: {fileID: 11400000, guid: 21f1e1d1aedacaf46a86ccacf3598fb7, type: 2}
+  inPlayCardFeedbacks: {fileID: 2867186676218229456}
+  zoomControl: {fileID: 6280832312827481847}
   Armor: 0
   Attack: 0
   Effects: []
   OwnerPlayer: {fileID: 0}
-  inPlayCardFeedbacks: {fileID: 2867186676218229456}
 --- !u!114 &2867186676218229456
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -236,6 +237,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fa12b232819b4cf7b63f41161525c684, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  activeScale: 1.5
+  inactiveScale: 0.5
+  IsActive: 0
 --- !u!95 &8524329497729110065
 Animator:
   serializedVersion: 5

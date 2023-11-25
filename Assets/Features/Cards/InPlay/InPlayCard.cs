@@ -4,6 +4,7 @@ using System.Linq;
 using Features.Battles;
 using Features.Battles.Wheel;
 using Features.Cards.Indicators;
+using Features.Cards.InPlay;
 using Features.Cards.InPlay.Feedback;
 using TMPro;
 using UnityEngine;
@@ -23,7 +24,9 @@ namespace Features.Cards
         [SerializeField] private IndicatorIconView indicatorPrefab;
         [SerializeField] private EffectsIconsScriptableObject effectsIconsScriptableObject;
         [SerializeField] private AbilitiesIconsScriptableObject abilitiesIconsScriptableObject;
-
+        [SerializeField] private InPlayCardFeedbacks inPlayCardFeedbacks;
+        [SerializeField] private InPlayCardHoverZoom zoomControl;
+        
         private bool _isDead = false;
 
         public bool IsDead => _isDead;
@@ -35,7 +38,7 @@ namespace Features.Cards
 
         public string CardName => _card.CardName;
         public PlayerController OwnerPlayer;
-        [SerializeField] private InPlayCardFeedbacks inPlayCardFeedbacks;
+
 
         public void SetPlayer(bool player)
         {
@@ -169,6 +172,11 @@ namespace Features.Cards
         {
             if (IsDead) yield break;
             yield return inPlayCardFeedbacks.PlayOnAttackFeedback();
+        }
+
+        public void SetAsActive(bool value)
+        {
+            zoomControl.SetActive(value);
         }
     }
 }
