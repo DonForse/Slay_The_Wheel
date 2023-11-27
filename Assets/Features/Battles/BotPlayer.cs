@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using Features.Battles.Core;
 using Features.Battles.Wheel;
 using UnityEngine;
 using UnityEngine.Serialization;
@@ -11,7 +12,7 @@ namespace Features.Battles
     {
         [FormerlySerializedAs("wheelController")] [SerializeField] private PlayerController playerController;
         [SerializeField] private BotControlWheel botControlWheel;
-        [SerializeField] private BusQueue busQueue;
+        [SerializeField] private BusQueue.BusQueue busQueue;
         [SerializeField] private Battle battle;
         private bool turnEnabled;
         private float delay = 3f;

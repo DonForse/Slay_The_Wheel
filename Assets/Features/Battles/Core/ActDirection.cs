@@ -1,4 +1,4 @@
-namespace Features.Battles
+namespace Features.Battles.Core
 {
     public enum ActDirection
     {

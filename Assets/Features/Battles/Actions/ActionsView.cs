@@ -1,22 +1,23 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
-public class ActionsView : MonoBehaviour
+namespace Features.Battles.Actions
 {
-    [SerializeField] private GameObject iconActionPrefab;
-    [SerializeField] private Transform container;
-
-    public void ShowRemaining(int amount)
+    public class ActionsView : MonoBehaviour
     {
-        foreach (Transform child in container)
-        {
-            Destroy(child.gameObject);
-        }
+        [SerializeField] private GameObject iconActionPrefab;
+        [SerializeField] private Transform container;
 
-        for (int i = 0; i < amount; i++)
+        public void ShowRemaining(int amount)
         {
-            Instantiate(iconActionPrefab, container);
+            foreach (Transform child in container)
+            {
+                Destroy(child.gameObject);
+            }
+
+            for (int i = 0; i < amount; i++)
+            {
+                Instantiate(iconActionPrefab, container);
+            }
         }
     }
 }

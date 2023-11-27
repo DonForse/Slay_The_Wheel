@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using Features.Cards;
 using UnityEngine;
 
-namespace Features.Maps
+namespace Features.Maps.Shop.Packs
 {
     [CreateAssetMenu(fileName = "Pack", menuName = "Shop/Pack")]
     public class CardPackScriptableObject : ScriptableObject

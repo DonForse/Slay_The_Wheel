@@ -1,5 +1,8 @@
-public enum TurningOrientation
+namespace Features.Battles.Wheel
 {
-    TurnRight = 0,
-    TurnLeft = 1,
+    public enum TurningOrientation
+    {
+        TurnRight = 0,
+        TurnLeft = 1,
+    }
 }

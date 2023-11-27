@@ -1,38 +1,40 @@
-using System;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class SpellView : MonoBehaviour
+namespace Features.Battles.Spells
 {
-    [SerializeField] private Button button;
-    [SerializeField] private TMP_Text cooldownCount;
-    [SerializeField] public int actionCost;
-    [SerializeField] public int totalCooldown;
-
-    public int currentCooldown = 0;
-
-    private void OnEnable()
+    public class SpellView : MonoBehaviour
     {
-        currentCooldown = 0;
-        cooldownCount.text = $"{(currentCooldown<= 0 ? "": currentCooldown)}";
-    }
+        [SerializeField] private Button button;
+        [SerializeField] private TMP_Text cooldownCount;
+        [SerializeField] public int actionCost;
+        [SerializeField] public int totalCooldown;
 
-    public void Activate()
-    {
-        currentCooldown = totalCooldown;
-        button.interactable = false;
-        cooldownCount.text = $"{(currentCooldown<= 0 ? "": currentCooldown)}";
-    }
+        public int currentCooldown = 0;
 
-    public void ReduceCooldown()
-    {
-        currentCooldown--;
-        cooldownCount.text = $"{(currentCooldown<= 0 ? "": currentCooldown)}";
-    }
+        private void OnEnable()
+        {
+            currentCooldown = 0;
+            cooldownCount.text = $"{(currentCooldown<= 0 ? "": currentCooldown)}";
+        }
 
-    public void SetActivateable(bool value)
-    {
-        button.interactable = value && currentCooldown <= 0;
+        public void Activate()
+        {
+            currentCooldown = totalCooldown;
+            button.interactable = false;
+            cooldownCount.text = $"{(currentCooldown<= 0 ? "": currentCooldown)}";
+        }
+
+        public void ReduceCooldown()
+        {
+            currentCooldown--;
+            cooldownCount.text = $"{(currentCooldown<= 0 ? "": currentCooldown)}";
+        }
+
+        public void SetActivateable(bool value)
+        {
+            button.interactable = value && currentCooldown <= 0;
+        }
     }
 }

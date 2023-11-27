@@ -2,10 +2,11 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using Features.Battles.Actions;
+using Features.Battles.Core;
 using Features.Battles.Core.Abilities;
 using Features.Battles.Core.Attacks;
-using Features.Battles.Core.OnActEffects;
-using Features.Battles.Core.OnHitEffects;
+using Features.Battles.Spells;
 using Features.Battles.Wheel;
 using Features.Cards;
 using Features.Cards.InPlay;
@@ -21,7 +22,7 @@ namespace Features.Battles
         [SerializeField] private PlayerController playerController;
         [SerializeField] private PlayerController enemyController;
         [SerializeField] private BotControlWheel botControlWheel;
-        [SerializeField] private BusQueue _busQueue;
+        [SerializeField] private BusQueue.BusQueue _busQueue;
         [SerializeField] private TurnMessage turnMessage;
         [SerializeField] private ActionsView actionsView;
 

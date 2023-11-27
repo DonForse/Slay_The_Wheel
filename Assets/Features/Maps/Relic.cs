@@ -1,11 +1,12 @@
-using Features.Maps;
-
-public class Relic
+namespace Features.Maps
 {
-    public RelicScriptableObject RelicBase;
-
-    public Relic(RelicScriptableObject r )
+    public class Relic
     {
-        RelicBase = r;
+        public RelicScriptableObject RelicBase;
+
+        public Relic(RelicScriptableObject r )
+        {
+            RelicBase = r;
+        }
     }
 }
