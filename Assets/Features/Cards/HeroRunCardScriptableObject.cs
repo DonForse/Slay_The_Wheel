@@ -5,11 +5,11 @@ using UnityEngine;
 
 namespace Features.Cards
 {
-    public class HeroRunCard : RunCard
+    public class HeroRunCardScriptableObject : RunCardScriptableObject
     {
         public int Exp;
         public int Level;
-        public HeroRunCard(BaseCardScriptableObject cardScriptableObject) : base(cardScriptableObject)
+        public HeroRunCardScriptableObject(BaseCardScriptableObject cardScriptableObject) : base(cardScriptableObject)
         {
             
         }

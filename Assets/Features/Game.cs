@@ -17,12 +17,12 @@ namespace Features
         [SerializeField] private DeckConfigurationScriptableObject deck;
         [SerializeField] private BaseCardsScriptableObject enemiesDb;
 
-        private List<RunCard> _deck;
+        private List<RunCardScriptableObject> _deck;
         private List<Relic> _relics = new();
         private Battle _battleGo;
         private Map _mapGo;
         private PostBattle _postBattle;
-        private HeroRunCard _heroCard;
+        private HeroRunCardScriptableObject _heroCardScriptableObject;
 
         private int minorBattlesAmount = 0;
         private int majorBattlesAmount = 0;
@@ -48,21 +48,21 @@ namespace Features
 
         private void AddInitialCards()
         {
-            _deck = new List<RunCard>();
+            _deck = new List<RunCardScriptableObject>();
             var heroCardDb = deck.hero;
-            _heroCard = new HeroRunCard(heroCardDb);
+            _heroCardScriptableObject = new HeroRunCardScriptableObject(heroCardDb);
             foreach (var cardConfiguration in deck.cards)
             {
                 for (int i = 0; i < cardConfiguration.Amount; i++)
-                    _deck.Add(new RunCard(cardConfiguration.card));
+                    _deck.Add(new RunCardScriptableObject(cardConfiguration.card));
             }
         }
 
         private void ShuffleDeck() => _deck = _deck.OrderBy(d => Random.Range(0, 100f)).ToList();
 
-        private void RemoveDeadCardsFromDeck() => _deck = _deck.Where(x => !x.IsDead).ToList();
+        private void RemoveDeadCardsFromDeck() => _deck = _deck.Where(x => x.hp > 0).ToList();
 
-        private (List<RunCard>cards, int size) GetBattleEnemies(int difficulty)
+        private (List<RunCardScriptableObject>cards, int size) GetBattleEnemies(int difficulty)
         {
             if (difficulty == 0)
             {
@@ -73,10 +73,10 @@ namespace Features
                 var spider = enemiesDb.cards.FirstOrDefault(x => x.cardName.Contains("Spider"));
                 return minorBattlesAmount switch
                 {
-                    1 => (new List<RunCard>() { new RunCard(slime), new RunCard(slime), new RunCard(slime) }, 3),
-                    2 => (new List<RunCard>() { new RunCard(slime), new RunCard(slime), new RunCard(slime), new RunCard(zombie)}, 4),
-                    3 => (new List<RunCard>() { new RunCard(zombie), new RunCard(kobold), new RunCard(zombie) }, 3),
-                    _ => (new List<RunCard>() { new RunCard(spider), new RunCard(kobold), new RunCard(spider) }, 3)
+                    1 => (new List<RunCardScriptableObject>() { new RunCardScriptableObject(slime), new RunCardScriptableObject(slime), new RunCardScriptableObject(slime) }, 3),
+                    2 => (new List<RunCardScriptableObject>() { new RunCardScriptableObject(slime), new RunCardScriptableObject(slime), new RunCardScriptableObject(slime), new RunCardScriptableObject(zombie)}, 4),
+                    3 => (new List<RunCardScriptableObject>() { new RunCardScriptableObject(zombie), new RunCardScriptableObject(kobold), new RunCardScriptableObject(zombie) }, 3),
+                    _ => (new List<RunCardScriptableObject>() { new RunCardScriptableObject(spider), new RunCardScriptableObject(kobold), new RunCardScriptableObject(spider) }, 3)
                 };
             }
 
@@ -89,16 +89,16 @@ namespace Features
                 var bigSpider = enemiesDb.cards.FirstOrDefault(x => x.cardName.Equals("Big Spider"));
                 return majorBattlesAmount switch
                 {
-                    1 => (new List<RunCard>() { new RunCard(spider), new RunCard(spider), new RunCard(spider), new RunCard(spider), new RunCard(spider), new RunCard(spider), new RunCard(bigSpider)}, 5) ,
-                    _ => (new List<RunCard>() { new RunCard(zombie), new RunCard(zombie), new RunCard(zombie), new RunCard(zombie),
-                        new RunCard(zombie), new RunCard(zombie), new RunCard(zombie), new RunCard(zombie), new RunCard(zombie), new RunCard(zombie) }, 5)
+                    1 => (new List<RunCardScriptableObject>() { new RunCardScriptableObject(spider), new RunCardScriptableObject(spider), new RunCardScriptableObject(spider), new RunCardScriptableObject(spider), new RunCardScriptableObject(spider), new RunCardScriptableObject(spider), new RunCardScriptableObject(bigSpider)}, 5) ,
+                    _ => (new List<RunCardScriptableObject>() { new RunCardScriptableObject(zombie), new RunCardScriptableObject(zombie), new RunCardScriptableObject(zombie), new RunCardScriptableObject(zombie),
+                        new RunCardScriptableObject(zombie), new RunCardScriptableObject(zombie), new RunCardScriptableObject(zombie), new RunCardScriptableObject(zombie), new RunCardScriptableObject(zombie), new RunCardScriptableObject(zombie) }, 5)
                 };
             }
 
             var dinosaur = enemiesDb.cards.FirstOrDefault(x => x.cardName.Contains("Cookie Dinosaur"));
             return bossBattlesAmount switch
             {
-                _=> (new List<RunCard>() { new RunCard(dinosaur)},1)  
+                _=> (new List<RunCardScriptableObject>() { new RunCardScriptableObject(dinosaur)},1)  
             };
         }
 
@@ -115,7 +115,7 @@ namespace Features
             StartCoroutine(LoadMapSceneCoroutine());
         }
 
-        private IEnumerator LoadBattleSceneCoroutine(List<RunCard> battleEnemies, int enemyWheelSize)
+        private IEnumerator LoadBattleSceneCoroutine(List<RunCardScriptableObject> battleEnemies, int enemyWheelSize)
         {
             if (_mapGo != null)
             {
@@ -131,7 +131,7 @@ namespace Features
             SceneManager.LoadScene("Battle");
             yield return new WaitForSeconds(.5f);
             _battleGo = GameObject.Find("Battle").GetComponent<Battle>();
-            yield return _battleGo.Initialize(_deck,battleEnemies, 5, enemyWheelSize, _heroCard);
+            yield return _battleGo.Initialize(_deck,battleEnemies, 5, enemyWheelSize, _heroCardScriptableObject);
 
             if (_battleGo != null)
                 _battleGo.BattleFinished += BattleComplete;
@@ -150,7 +150,7 @@ namespace Features
 
             _postBattle.Completed += OnPostBattleCompleted;
             if (expFromBattle > 0)
-                _postBattle.Initialize(_heroCard,expFromBattle);
+                _postBattle.Initialize(_heroCardScriptableObject,expFromBattle);
             expFromBattle = 0;
         }
 
@@ -175,7 +175,7 @@ namespace Features
         {
             foreach (var card in cards)
             {
-                var runCard = new RunCard(card);
+                var runCard = new RunCardScriptableObject(card);
                 _deck.Add(runCard);
             }
         }
@@ -184,7 +184,7 @@ namespace Features
         {
             foreach (var card in _deck)
             {
-                card.Hp = Math.Min(card.Hp + Mathf.FloorToInt(card.Hp * 0.2f), card.baseCard.hp);
+                card.hp = Math.Min(card.hp + Mathf.FloorToInt(card.hp * 0.2f), card.baseCard.hp);
             }
         }
 
@@ -195,7 +195,7 @@ namespace Features
             {
                 foreach (var card in _deck)
                 {
-                    card.Hp += 5;
+                    card.hp += 5;
                 }
 
                 return;
@@ -205,14 +205,14 @@ namespace Features
             {
                 foreach (var card in _deck)
                 {
-                    var abs = card.OnDealDamageAbilities.ToList();
+                    var abs = card.onDealDamageAbilities.ToList();
                     var ability = abs.FirstOrDefault(x=>x.Type == AbilityEnum.Burn);
                     abs.Remove(ability);
                     if (ability == null)
                         ability = new Ability(){Type =  AbilityEnum.Burn, Amount = 0};
                     ability.Amount++;
                     abs.Add(ability);
-                    card.OnDealDamageAbilities = abs.ToArray();
+                    card.onDealDamageAbilities = abs.ToArray();
                 }
 
                 return;
@@ -222,7 +222,7 @@ namespace Features
             {
                 foreach (var card in _deck)
                 {
-                    card.Attack += 1;
+                    card.attack += 1;
                 }
                 return;
             }

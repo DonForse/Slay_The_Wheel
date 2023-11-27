@@ -15,12 +15,12 @@ namespace Features.PostBattles
         [SerializeField]private GameObject canvas;
         [SerializeField]private Transform container;
         [SerializeField]private LevelUpUpgradeView levelUpPrefab;
-        private HeroRunCard _heroCard;
+        private HeroRunCardScriptableObject _heroCardScriptableObject;
         public event EventHandler<LevelUpUpgrade> Selected;
-        public void Show(List<LevelUpUpgrade> infoLevelUpUpgrades, HeroRunCard heroRunCard)
+        public void Show(List<LevelUpUpgrade> infoLevelUpUpgrades, HeroRunCardScriptableObject heroRunCardScriptableObject)
         {
             canvas.SetActive(true);
-            _heroCard = heroRunCard;
+            _heroCardScriptableObject = heroRunCardScriptableObject;
             foreach (Transform child in container)
             {
                 Destroy(child.gameObject);
@@ -38,26 +38,26 @@ namespace Features.PostBattles
         {
             if (e == LevelUpUpgrade.Burn)
             {
-                var asd = _heroCard.OnDealDamageAbilities.ToList();
+                var asd = _heroCardScriptableObject.onDealDamageAbilities.ToList();
                 var burnAll=asd.FirstOrDefault(x => x.Type == AbilityEnum.BurnAll);
                 asd.Remove(burnAll);
                 if (burnAll == null)
                     burnAll = new Ability() { Type = AbilityEnum.BurnAll, Amount = 0 };
                 burnAll.Amount++;
                 asd.Add(burnAll);
-                _heroCard.OnDealDamageAbilities = asd.ToArray();
+                _heroCardScriptableObject.onDealDamageAbilities = asd.ToArray();
             }
             if (e == LevelUpUpgrade.Atk)
             {
-                _heroCard.Attack += 2;
+                _heroCardScriptableObject.attack += 2;
             }
             if (e == LevelUpUpgrade.Hp)
             {
-                _heroCard.Hp += 20;
+                _heroCardScriptableObject.hp += 20;
             }
 
-            _heroCard.Hp += Random.Range(0, 2) == 0 ? 5 : 10;
-            _heroCard.Attack += Random.Range(0,2);
+            _heroCardScriptableObject.hp += Random.Range(0, 2) == 0 ? 5 : 10;
+            _heroCardScriptableObject.attack += Random.Range(0,2);
 
             
             

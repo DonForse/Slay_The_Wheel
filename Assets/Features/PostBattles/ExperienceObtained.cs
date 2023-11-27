@@ -18,39 +18,39 @@ namespace Features.PostBattles
         [SerializeField] private SelectLevelUpUpgrade selectUpgrade;
         public event EventHandler Completed;
 
-        public void Show(HeroRunCard heroCard, int experienceObtained)
+        public void Show(HeroRunCardScriptableObject heroCardScriptableObject, int experienceObtained)
         {
             continueButton.gameObject.SetActive(false);
             container.SetActive(true);
-            var info = levelUpsScriptableObject.LevelUpInformations[heroCard.Level];
-            progressBar.InitialFillValue = heroCard.Exp / (float)info.ExpToLevel;
-            if (heroCard.Exp + experienceObtained >= info.ExpToLevel)
+            var info = levelUpsScriptableObject.LevelUpInformations[heroCardScriptableObject.Level];
+            progressBar.InitialFillValue = heroCardScriptableObject.Exp / (float)info.ExpToLevel;
+            if (heroCardScriptableObject.Exp + experienceObtained >= info.ExpToLevel)
             {
                 progressBar.UpdateBar01(1);
-                StartCoroutine(ShowLevelUp(info, heroCard, experienceObtained));
+                StartCoroutine(ShowLevelUp(info, heroCardScriptableObject, experienceObtained));
             }
             else
             {
-                progressBar.UpdateBar01(Mathf.FloorToInt(heroCard.Exp + experienceObtained) / (float)info.ExpToLevel);
-                heroCard.Exp += experienceObtained;
+                progressBar.UpdateBar01(Mathf.FloorToInt(heroCardScriptableObject.Exp + experienceObtained) / (float)info.ExpToLevel);
+                heroCardScriptableObject.Exp += experienceObtained;
                 continueButton.gameObject.SetActive(true);
             }
             // levelUpsScriptableObject.LevelUpInformations.Firs
             // if (heroCard.Exp + experienceObtained)
         }
 
-        private IEnumerator ShowLevelUp(LevelUpInformation info, HeroRunCard heroCard, int experienceObtained)
+        private IEnumerator ShowLevelUp(LevelUpInformation info, HeroRunCardScriptableObject heroCardScriptableObject, int experienceObtained)
         {
-            var expRemaining = info.ExpToLevel - (heroCard.Exp + experienceObtained);
-            heroCard.Level++;
-            if (heroCard.Level > levelUpsScriptableObject.LevelUpInformations.Count)
-                heroCard.Level = levelUpsScriptableObject.LevelUpInformations.Count;
-            heroCard.Exp = 0;
-            heroCard.Exp += expRemaining;
-            info = levelUpsScriptableObject.LevelUpInformations[heroCard.Level];
+            var expRemaining = info.ExpToLevel - (heroCardScriptableObject.Exp + experienceObtained);
+            heroCardScriptableObject.Level++;
+            if (heroCardScriptableObject.Level > levelUpsScriptableObject.LevelUpInformations.Count)
+                heroCardScriptableObject.Level = levelUpsScriptableObject.LevelUpInformations.Count;
+            heroCardScriptableObject.Exp = 0;
+            heroCardScriptableObject.Exp += expRemaining;
+            info = levelUpsScriptableObject.LevelUpInformations[heroCardScriptableObject.Level];
             progressBar.UpdateBar01(Mathf.FloorToInt(expRemaining / (float)info.ExpToLevel));
             container.SetActive(false);
-            selectUpgrade.Show(info.LevelUpUpgrades, heroCard);
+            selectUpgrade.Show(info.LevelUpUpgrades, heroCardScriptableObject);
             selectUpgrade.Selected += OnUpgradeSelected;
             
             yield break;

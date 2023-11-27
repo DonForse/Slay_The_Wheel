@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Features.Cards;
+using Features.Cards.InPlay;
 using UnityEngine;
 using UnityEngine.Serialization;
 
@@ -35,7 +36,7 @@ namespace Features.Battles.Wheel
             wheelMovement = GetComponent<AutomaticControlWheel>();
         }
 
-        public IEnumerator InitializeWheel(bool player, int wheelSize, List<RunCard> cards)
+        public IEnumerator InitializeWheel(bool player, int wheelSize, List<InPlayCardScriptableObject> cards)
         {
             Positions = new();
             WheelData.Size = wheelSize;
@@ -137,7 +138,7 @@ namespace Features.Battles.Wheel
             animator.SetTrigger($"Rotate_{turningOrientation}");
         }
 
-        private IEnumerator SetRunCards(bool player, List<RunCard>cards)
+        private IEnumerator SetRunCards(bool player, List<InPlayCardScriptableObject>cards)
         {
             var amountToSet = Mathf.Min(WheelData.Size, cards.Count);
             for (int i = 0; i < amountToSet; i++)

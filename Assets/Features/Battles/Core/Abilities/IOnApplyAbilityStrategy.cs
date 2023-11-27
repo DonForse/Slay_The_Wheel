@@ -1,6 +1,7 @@
 using System.Collections;
 using Features.Battles.Wheel;
 using Features.Cards;
+using Features.Cards.InPlay;
 
 namespace Features.Battles
 {

@@ -4,23 +4,24 @@ using System.Linq;
 using Features.Battles;
 using Features.Battles.Wheel;
 using Features.Cards.Indicators;
-using Features.Cards.InPlay;
 using Features.Cards.InPlay.Feedback;
 using TMPro;
 using UnityEngine;
 
-namespace Features.Cards
+namespace Features.Cards.InPlay
 {
     public class InPlayCard : MonoBehaviour
     {
-        private RunCard _card;
+        private InPlayCardScriptableObject _cardScriptableObject;
         [SerializeField] private SpriteRenderer spriteRenderer;
         [SerializeField] private Sprite cardBack;
         [SerializeField] private Transform viewContainer;
         [SerializeField] private TMP_Text hpText;
         [SerializeField] private TMP_Text atkText;
+        [SerializeField] private TMP_Text armorText;
         [SerializeField] private Transform abilitiesContainer;
         [SerializeField] private Transform effectsContainer;
+        [SerializeField] private Transform armorContainer;
         [SerializeField] private IndicatorIconView indicatorPrefab;
         [SerializeField] private EffectsIconsScriptableObject effectsIconsScriptableObject;
         [SerializeField] private AbilitiesIconsScriptableObject abilitiesIconsScriptableObject;
@@ -36,7 +37,7 @@ namespace Features.Cards
 
         public List<Effect> Effects = new();
 
-        public string CardName => _card.CardName;
+        public string CardName => _cardScriptableObject.CardName;
         public PlayerController OwnerPlayer;
 
 
@@ -46,34 +47,38 @@ namespace Features.Cards
                 viewContainer.transform.localRotation = new Quaternion(0, 0, 180, 0);
         }
 
-        public IEnumerator SetCard(RunCard runCard, PlayerController owner)
+        public IEnumerator SetCard(InPlayCardScriptableObject runCardScriptableObject, PlayerController owner)
         {
             OwnerPlayer = owner;
-            _card = runCard;
+            _cardScriptableObject = runCardScriptableObject;
             _isDead = false;
 
-            Attack = runCard.Attack;
+            Attack = runCardScriptableObject.Attack;
             Armor = 0;
 
-            spriteRenderer.sprite = runCard.baseCard.cardSprite;
+            spriteRenderer.sprite = runCardScriptableObject.CardSprite;
 
             SetAbilityIcons(
-                runCard.OnDealDamageAbilities
-                    .Concat(runCard.OnAttackAbilities)
-                    .Concat(runCard.OnActAbilities)
-                    .Concat(runCard.OnSpinAbilities)
-                    .Concat(runCard.OnTurnStartAbilities)
-                    .Concat(runCard.OnTurnEndAbilities).ToArray());
+                runCardScriptableObject.OnDealDamageAbilities
+                    .Concat(runCardScriptableObject.OnAttackAbilities)
+                    .Concat(runCardScriptableObject.OnActAbilities)
+                    .Concat(runCardScriptableObject.OnSpinAbilities)
+                    .Concat(runCardScriptableObject.OnTurnStartAbilities)
+                    .Concat(runCardScriptableObject.OnTurnEndAbilities).ToArray());
             SetEffectIcons(Effects.ToArray());
 
-            _card.ValueChanged += UpdateCardValues;
-            UpdateCardValues(null, _card);
+            _cardScriptableObject.ValueChanged += UpdateCardScriptableObjectValues;
+            _cardScriptableObject.HealthValueChanged += UpdateHealth;
+            _cardScriptableObject.AttackValueChanged += UpdateAttack;
+            UpdateCardScriptableObjectValues(null, _cardScriptableObject);
             yield return inPlayCardFeedbacks.PlayOnAppearFeedback();
         }
 
-        private void OnDestroy()
+        private void OnDisable()
         {
-            _card.ValueChanged -= UpdateCardValues;
+            _cardScriptableObject.HealthValueChanged -= UpdateHealth;
+            _cardScriptableObject.AttackValueChanged -= UpdateAttack;
+            _cardScriptableObject.ValueChanged -= UpdateCardScriptableObjectValues;
         }
 
         private void SetAbilityIcons(Ability[] abilities)
@@ -110,7 +115,7 @@ namespace Features.Cards
             effectsContainer.gameObject.SetActive(effectsContainer.childCount > 0);
         }
 
-        private void UpdateCardValues(object sender, RunCard e)
+        private void UpdateCardScriptableObjectValues(object sender, InPlayCardScriptableObject e)
         {
             if (_isDead)
             {
@@ -120,14 +125,16 @@ namespace Features.Cards
             }
 
             SetEffectIcons(Effects?.ToArray());
-
-            hpText.text = e.Hp.ToString();
-            atkText.text = Attack.ToString();
+            
+            armorText.text = Armor.ToString();
+            armorContainer.gameObject.SetActive(Armor > 0);
         }
+        private void UpdateHealth(object sender, (int previous, int current) e) => hpText.text = e.current.ToString();
+        private void UpdateAttack(object sender, (int previous, int current) e) => atkText.text = e.current.ToString();
 
-        public RunCard GetCard()
+        public InPlayCardScriptableObject GetCard()
         {
-            return _card;
+            return _cardScriptableObject;
         }
 
         public IEnumerator SetDead()
@@ -165,7 +172,7 @@ namespace Features.Cards
             if (effectInCard.Amount > 0)
                 Effects.Add(effectInCard);
 
-            UpdateCardValues(this, GetCard());
+            UpdateCardScriptableObjectValues(this, GetCard());
         }
 
         public IEnumerator PlayAttack()

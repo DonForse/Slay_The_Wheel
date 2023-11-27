@@ -1,28 +1,26 @@
 using System;
-using System.Collections.Generic;
 using Features.Battles;
+using UnityEngine;
 
-namespace Features.Cards
+namespace Features.Cards.InPlay
 {
-    public class RunCard
+    public class InPlayCardScriptableObject : ScriptableObject
     {
-        public string CardName
-        {
-            get => _cardName;
-            set
-            {
-                _cardName = value;
-                ValueChanged?.Invoke(this, this);
-            }
-        }
+        public event EventHandler<(int previous, int current)> HealthValueChanged;
+        public event EventHandler<(int previous, int current)> AttackValueChanged;
+        public event EventHandler<InPlayCardScriptableObject> ValueChanged;
 
-        public int Hp
+        public string CardName => _cardName;
+        public Sprite CardSprite => _runCard.baseCard.cardSprite;
+
+        public int Health
         {
-            get => _hp;
+            get => _runCard.hp;
             set
             {
-                _hp = value;
-                ValueChanged?.Invoke(this, this);
+                var previous = _runCard.hp;
+                _runCard.hp = value;
+                HealthValueChanged?.Invoke(this, (previous,_runCard.hp));
             }
         }
 
@@ -31,11 +29,12 @@ namespace Features.Cards
             get => _attack;
             set
             {
+                var previous = _attack;
+
                 _attack = value;
-                ValueChanged?.Invoke(this, this);
+                AttackValueChanged?.Invoke(this, (previous, _attack));
             }
         }
-    //TODO: Run card shouldnt use this autoproperties, runcard should be pretty similar to base card, but with status changes, and inplaycard should have this autoproperties.
         public Ability[] OnDealDamageAbilities
         {
             get => _onDealDamageAbilities;
@@ -90,40 +89,56 @@ namespace Features.Cards
                 ValueChanged?.Invoke(this, this);
             }
         }
-        
-        public AttackType AttackType { get; set; }
-        public bool IsDead => Hp <= 0;
-        public int ActCost => baseCard.actCost;
+
+        public bool IsDead => _runCard.hp <= 0;
+
+        public AttackType AttackType
+        {
+            get => _attackType;
+
+            set
+            {
+                _attackType = value;
+                ValueChanged?.Invoke(this, this);
+            }
+        }
+
+        public int ActCost { get => _actCost;
+
+            set
+            {
+                _actCost = value;
+                ValueChanged?.Invoke(this, this);
+            } }
 
 
-        public readonly BaseCardScriptableObject baseCard;
-    
-        private int _attack;
-        private Ability[] _onDealDamageAbilities;
-        private Ability[] _onAttackAbilities;
-        private Ability[] _onActAbilities;
-        private int _hp;
         private string _cardName;
+        private int _attack;
+        private Ability[] _onAttackAbilities;
+        private Ability[] _onDealDamageAbilities;
         private Ability[] _onSpinAbilities;
         private Ability[] _onTurnStartAbilities;
         private Ability[] _onTurnEndAbilities;
+        private Ability[] _onActAbilities;
+        private AttackType _attackType;
+        private Sprite _cardSprite;
+        private int _actCost;
+        private readonly RunCardScriptableObject _runCard;
 
-        public RunCard(BaseCardScriptableObject cardScriptableObject)
+        public InPlayCardScriptableObject(RunCardScriptableObject cardScriptableObject)
         {
             _cardName = cardScriptableObject.cardName;
-            _hp = cardScriptableObject.hp;
             _attack = cardScriptableObject.attack;
             _onDealDamageAbilities = cardScriptableObject.onDealDamageAbilities;
-            _onAttackAbilities = cardScriptableObject.onAttackAbilities; 
+            _onAttackAbilities = cardScriptableObject.onAttackAbilities;
             _onActAbilities = cardScriptableObject.onActAbilities;
             _onSpinAbilities = cardScriptableObject.onSpinAbilities;
             _onTurnStartAbilities = cardScriptableObject.onTurnStartAbilities;
             _onTurnEndAbilities = cardScriptableObject.onTurnEndAbilities;
+            _attackType = cardScriptableObject.attackType;
+            _actCost = cardScriptableObject.actCost;
+            _runCard = cardScriptableObject;
 
-            baseCard = cardScriptableObject;
-            AttackType = cardScriptableObject.attackType;
         }
-
-        public event EventHandler<RunCard> ValueChanged;
     }
 }

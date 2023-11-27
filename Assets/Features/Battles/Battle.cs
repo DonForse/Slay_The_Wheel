@@ -8,6 +8,7 @@ using Features.Battles.Core.OnActEffects;
 using Features.Battles.Core.OnHitEffects;
 using Features.Battles.Wheel;
 using Features.Cards;
+using Features.Cards.InPlay;
 using JetBrains.Annotations;
 using UnityEngine;
 using UnityEngine.Serialization;
@@ -30,10 +31,10 @@ namespace Features.Battles
         // public DamageSystem damageSystem;
         private int _actions;
         private int turn = 0;
-        private List<RunCard> _playerBattleDeck;
-        private List<RunCard> _playerDiscardPile;
-        private List<RunCard> _enemiesDeck;
-        private RunCard _heroCard;
+        private List<InPlayCardScriptableObject> _playerBattleDeck;
+        private List<InPlayCardScriptableObject> _playerDiscardPile;
+        private List<InPlayCardScriptableObject> _enemiesDeck;
+        private InPlayCardScriptableObject _heroCardScriptableObject;
         private bool acting;
         public event EventHandler<bool> BattleFinished;
         public Turn Turn => IsPlayerTurn() ? Turn.Player : Turn.Enemy;
@@ -42,8 +43,8 @@ namespace Features.Battles
         private List<IOnApplyAbilityStrategy> _applyAbilityStrategies = new();
         private List<IAttackStrategy> _attackStrategies = new();
 
-        public IEnumerator Initialize(List<RunCard> deck, List<RunCard> enemies, int playerWheelSize,
-            int enemyWheelSize, RunCard heroCard)
+        public IEnumerator Initialize(List<RunCardScriptableObject> deck, List<RunCardScriptableObject> enemies, int playerWheelSize,
+            int enemyWheelSize, RunCardScriptableObject heroCardScriptableObject)
         {
             _applyAbilityStrategies = new()
             {
@@ -67,13 +68,16 @@ namespace Features.Battles
                 new AllAttackStrategy(this)
             };
 
-            _playerBattleDeck = deck.ToList();
+            _playerBattleDeck = deck.Select(card=> new InPlayCardScriptableObject(card)).ToList();
             _playerDiscardPile = new();
-            _enemiesDeck = enemies.Skip(enemyWheelSize).ToList();
-            _heroCard = heroCard;
+            _enemiesDeck = enemies.Skip(enemyWheelSize).Select(card =>new InPlayCardScriptableObject(card)).ToList();
+            _heroCardScriptableObject = new InPlayCardScriptableObject(heroCardScriptableObject);
+            var enemiesTemp = enemies.Select(card => new InPlayCardScriptableObject(card)).ToList();
+            
             var cards = DrawCards(playerWheelSize - 1, ref _playerBattleDeck, ref _playerDiscardPile);
-            cards = new List<RunCard>() { heroCard }.Concat(cards).ToList();
-            StartCoroutine(enemyController.InitializeWheel(false, enemyWheelSize, enemies));
+            cards = new List<InPlayCardScriptableObject>() { _heroCardScriptableObject }.Concat(cards).ToList();
+            
+            StartCoroutine(enemyController.InitializeWheel(false, enemyWheelSize, enemiesTemp));
             yield return playerController.InitializeWheel(true, playerWheelSize, cards);
 
             enemyController.LockWheel();
@@ -163,7 +167,7 @@ namespace Features.Battles
             yield return null;
         }
 
-        private List<RunCard> DrawCards(int amountToDraw, ref List<RunCard> deck, ref List<RunCard> discardPile)
+        private List<InPlayCardScriptableObject> DrawCards(int amountToDraw, ref List<InPlayCardScriptableObject> deck, ref List<InPlayCardScriptableObject> discardPile)
         {
             discardPile = discardPile.Where(x => !x.IsDead).ToList();
             if (deck.Count < amountToDraw)
@@ -244,11 +248,11 @@ namespace Features.Battles
             {
                 if (damageDealer != null)
                     yield return ApplyOnDealDamageAbilities(damageDealer, damageReceiver);
-                defenderCard.Hp -= damage;
+                defenderCard.Health -= damage;
                 //apply receive damage.
             }
 
-            if (defenderCard.Hp > 0)
+            if (defenderCard.Health > 0)
                 yield break;
 
             yield return damageReceiver.SetDead();
@@ -257,7 +261,7 @@ namespace Features.Battles
             {
                 if (_enemiesDeck.Count > 0)
                 {
-                    var runCards = new List<RunCard>();
+                    var runCards = new List<InPlayCardScriptableObject>();
                     var cards = DrawCards(1, ref _enemiesDeck, ref runCards);
                     if (cards == null || cards.Count == 0)
                         _busQueue.EnqueueInterruptAction(EndBattle(defenderPlayerController));
@@ -273,7 +277,7 @@ namespace Features.Battles
             }
             else
             {
-                if (_heroCard.IsDead)
+                if (_heroCardScriptableObject.IsDead)
                 {
                     _busQueue.EnqueueInterruptAction(EndBattle(defenderPlayerController));
                     yield break;
@@ -481,8 +485,8 @@ namespace Features.Battles
             var slots = playerController.Cards.Count;
             var cards = DrawCards(slots - 1, ref _playerBattleDeck, ref _playerDiscardPile);
             var cardsInWheel = playerController.Cards.Select(x => x.GetCard()).ToList();
-            cardsInWheel.Remove(_heroCard);
-            cards = new List<RunCard>() { _heroCard }.Concat(cards).ToList();
+            cardsInWheel.Remove(_heroCardScriptableObject);
+            cards = new List<InPlayCardScriptableObject>() { _heroCardScriptableObject }.Concat(cards).ToList();
             _playerDiscardPile = _playerDiscardPile.Concat(cardsInWheel).ToList();
             for (int i = 0; i < slots; i++)
             {

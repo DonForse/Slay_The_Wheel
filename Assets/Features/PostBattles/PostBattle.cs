@@ -8,9 +8,9 @@ namespace Features.PostBattles
     {
         [SerializeField] private ExperienceObtained _experienceObtained;
         public event EventHandler Completed;
-        public void Initialize(HeroRunCard heroRunCard, int expObtained)
+        public void Initialize(HeroRunCardScriptableObject heroRunCardScriptableObject, int expObtained)
         {
-            _experienceObtained.Show(heroRunCard, expObtained);
+            _experienceObtained.Show(heroRunCardScriptableObject, expObtained);
             _experienceObtained.Completed += OnExpCompleted;
         }
 
