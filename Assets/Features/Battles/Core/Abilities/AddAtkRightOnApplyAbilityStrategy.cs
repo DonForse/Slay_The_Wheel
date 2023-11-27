@@ -14,7 +14,7 @@ namespace Features.Battles.Core.Abilities
             var neighbors = executor.OwnerPlayer.GetNeighborsCards(executor,1, 2);
             var leftNeighbor = neighbors[1];
             if (!leftNeighbor.IsDead)
-                leftNeighbor.Attack += 1;
+                leftNeighbor.GetCard().Attack += 1;
             yield break;
         }
     }

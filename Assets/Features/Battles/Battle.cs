@@ -242,9 +242,9 @@ namespace Features.Battles
         {
             var defenderCard = damageReceiver.GetCard();
             StartCoroutine(damageReceiver.PlayGetHitAnimation(damage, source));
-            var difDamage = Mathf.Max(damage - damageReceiver.Armor, 0);
+            var difDamage = Mathf.Max(damage - damageReceiver.GetCard().Armor, 0);
 
-            damageReceiver.Armor = Mathf.Max(0, damageReceiver.Armor - damage);
+            damageReceiver.GetCard().Armor = Mathf.Max(0, damageReceiver.GetCard().Armor - damage);
             if (difDamage > 0)
             {
                 if (damageDealer != null)

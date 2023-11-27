@@ -20,7 +20,7 @@ namespace Features.Battles.Core.Abilities
         {
             var defenderCard = defender.GetFrontCard();
             yield return executor.PlayRangedAttack(defenderCard);
-            yield return _battle.ApplyDamage(executor.Attack, defenderCard, executor, defender, null);
+            yield return _battle.ApplyDamage(executor.GetCard().Attack, defenderCard, executor, defender, null);
             yield break;
         }
     }

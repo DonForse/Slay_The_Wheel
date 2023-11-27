@@ -16,7 +16,7 @@ namespace Features.Battles.Core.Abilities
             if (leftNeighbor.IsDead)
                 yield break;
             
-            leftNeighbor.Armor += value;
+            leftNeighbor.GetCard().Armor += value;
             yield return leftNeighbor.PlayGainArmor();
         }
     }

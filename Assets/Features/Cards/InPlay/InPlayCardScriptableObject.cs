@@ -6,8 +6,10 @@ namespace Features.Cards.InPlay
 {
     public class InPlayCardScriptableObject : ScriptableObject
     {
+        public event EventHandler<InPlayCardScriptableObject> Dead;
         public event EventHandler<(int previous, int current)> HealthValueChanged;
         public event EventHandler<(int previous, int current)> AttackValueChanged;
+        public event EventHandler<(int previous, int current)> ArmorValueChanged;
         public event EventHandler<InPlayCardScriptableObject> ValueChanged;
 
         public string CardName => _cardName;
@@ -21,6 +23,8 @@ namespace Features.Cards.InPlay
                 var previous = _runCard.hp;
                 _runCard.hp = value;
                 HealthValueChanged?.Invoke(this, (previous,_runCard.hp));
+                if (IsDead)
+                    Dead?.Invoke(this, this);
             }
         }
 
@@ -35,6 +39,19 @@ namespace Features.Cards.InPlay
                 AttackValueChanged?.Invoke(this, (previous, _attack));
             }
         }
+
+        public int Armor
+        {
+            get => _armor;
+            set
+            {
+                var previous = _armor;
+
+                _armor = value;
+                ArmorValueChanged?.Invoke(this, (previous, _armor));
+            }
+        }
+
         public Ability[] OnDealDamageAbilities
         {
             get => _onDealDamageAbilities;
@@ -124,6 +141,7 @@ namespace Features.Cards.InPlay
         private Sprite _cardSprite;
         private int _actCost;
         private readonly RunCardScriptableObject _runCard;
+        private int _armor;
 
         public InPlayCardScriptableObject(RunCardScriptableObject cardScriptableObject)
         {

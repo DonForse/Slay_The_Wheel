@@ -206,8 +206,6 @@ MonoBehaviour:
   abilitiesIconsScriptableObject: {fileID: 11400000, guid: 21f1e1d1aedacaf46a86ccacf3598fb7, type: 2}
   inPlayCardFeedbacks: {fileID: 2867186676218229456}
   zoomControl: {fileID: 6280832312827481847}
-  Armor: 0
-  Attack: 0
   Effects: []
   OwnerPlayer: {fileID: 0}
 --- !u!114 &2867186676218229456
@@ -18900,7 +18898,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1811929402853918694
 RectTransform:
   m_ObjectHideFlags: 0

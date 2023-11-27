@@ -12,7 +12,7 @@ namespace Features.Battles.Core.Abilities
         public IEnumerator Execute(InPlayCard executor, int amount, PlayerController defender,
             PlayerController attacker)
         {
-            executor.Armor += amount;
+            executor.GetCard().Armor += amount;
             yield return executor.PlayGainArmor();
         }
     }

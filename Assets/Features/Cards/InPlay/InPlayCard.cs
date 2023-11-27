@@ -28,13 +28,8 @@ namespace Features.Cards.InPlay
         [SerializeField] private InPlayCardFeedbacks inPlayCardFeedbacks;
         [SerializeField] private InPlayCardHoverZoom zoomControl;
         
-        private bool _isDead = false;
-
-        public bool IsDead => _isDead;
-
-        public int Armor;
-        public int Attack;
-
+        public bool IsDead => _cardScriptableObject.IsDead;
+        
         public List<Effect> Effects = new();
 
         public string CardName => _cardScriptableObject.CardName;
@@ -51,11 +46,6 @@ namespace Features.Cards.InPlay
         {
             OwnerPlayer = owner;
             _cardScriptableObject = runCardScriptableObject;
-            _isDead = false;
-
-            Attack = runCardScriptableObject.Attack;
-            Armor = 0;
-
             spriteRenderer.sprite = runCardScriptableObject.CardSprite;
 
             SetAbilityIcons(
@@ -70,6 +60,7 @@ namespace Features.Cards.InPlay
             _cardScriptableObject.ValueChanged += UpdateCardScriptableObjectValues;
             _cardScriptableObject.HealthValueChanged += UpdateHealth;
             _cardScriptableObject.AttackValueChanged += UpdateAttack;
+            _cardScriptableObject.ArmorValueChanged += UpdateArmor;
             UpdateCardScriptableObjectValues(null, _cardScriptableObject);
             yield return inPlayCardFeedbacks.PlayOnAppearFeedback();
         }
@@ -117,7 +108,7 @@ namespace Features.Cards.InPlay
 
         private void UpdateCardScriptableObjectValues(object sender, InPlayCardScriptableObject e)
         {
-            if (_isDead)
+            if (e.IsDead)
             {
                 hpText.text = "0";
                 atkText.text = "0";
@@ -125,12 +116,15 @@ namespace Features.Cards.InPlay
             }
 
             SetEffectIcons(Effects?.ToArray());
-            
-            armorText.text = Armor.ToString();
-            armorContainer.gameObject.SetActive(Armor > 0);
         }
         private void UpdateHealth(object sender, (int previous, int current) e) => hpText.text = e.current.ToString();
         private void UpdateAttack(object sender, (int previous, int current) e) => atkText.text = e.current.ToString();
+        private void UpdateArmor(object sender, (int previous, int current) e)
+        {
+            armorText.text = e.current.ToString();
+            armorContainer.gameObject.SetActive(e.current > 0);
+        }
+
 
         public InPlayCardScriptableObject GetCard()
         {
@@ -139,13 +133,11 @@ namespace Features.Cards.InPlay
 
         public IEnumerator SetDead()
         {
-            _isDead = true;
             hpText.text = "0";
             atkText.text = "0";
             Effects = new List<Effect>();
             spriteRenderer.sprite = cardBack;
             yield return inPlayCardFeedbacks.PlayOnDeadFeedback();
-            
         }
 
         public IEnumerator PlayGetHitAnimation(int damage, AbilityEnum? source = null)
