@@ -1,7 +1,5 @@
-using System;
 using Features.Battles;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 namespace Features.Cards
 {

@@ -22,7 +22,7 @@ namespace Features.Cards.InPlay
             {
                 var previous = _runCard.hp;
                 _runCard.hp = value;
-                HealthValueChanged?.Invoke(this, (previous,_runCard.hp));
+                HealthValueChanged?.Invoke(this, (previous, _runCard.hp));
                 if (IsDead)
                     Dead?.Invoke(this, this);
             }
@@ -61,6 +61,7 @@ namespace Features.Cards.InPlay
                 ValueChanged?.Invoke(this, this);
             }
         }
+
         public Ability[] OnAttackAbilities
         {
             get => _onAttackAbilities;
@@ -70,6 +71,7 @@ namespace Features.Cards.InPlay
                 ValueChanged?.Invoke(this, this);
             }
         }
+
         public Ability[] OnActAbilities
         {
             get => _onActAbilities;
@@ -79,6 +81,7 @@ namespace Features.Cards.InPlay
                 ValueChanged?.Invoke(this, this);
             }
         }
+
         public Ability[] OnSpinAbilities
         {
             get => _onSpinAbilities;
@@ -88,6 +91,7 @@ namespace Features.Cards.InPlay
                 ValueChanged?.Invoke(this, this);
             }
         }
+
         public Ability[] OnTurnStartAbilities
         {
             get => _onTurnStartAbilities;
@@ -97,6 +101,7 @@ namespace Features.Cards.InPlay
                 ValueChanged?.Invoke(this, this);
             }
         }
+
         public Ability[] OnTurnEndAbilities
         {
             get => _onTurnEndAbilities;
@@ -120,15 +125,16 @@ namespace Features.Cards.InPlay
             }
         }
 
-        public int ActCost { get => _actCost;
-
+        public int ActCost
+        {
+            get => _actCost;
             set
             {
                 _actCost = value;
                 ValueChanged?.Invoke(this, this);
-            } }
-
-
+            }
+        }
+        
         private string _cardName;
         private int _attack;
         private Ability[] _onAttackAbilities;
@@ -156,7 +162,6 @@ namespace Features.Cards.InPlay
             _attackType = cardScriptableObject.attackType;
             _actCost = cardScriptableObject.actCost;
             _runCard = cardScriptableObject;
-
         }
     }
 }
