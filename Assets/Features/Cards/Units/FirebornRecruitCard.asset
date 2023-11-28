@@ -15,7 +15,12 @@ MonoBehaviour:
   cardName: Fireborn Recruit
   hp: 20
   attack: 1
-  abilities: 00000000
-  cardSprite: {fileID: 21300000, guid: 1f6617523fa86cb4cb3de712c076203c, type: 3}
+  onAttackAbilities: []
+  onDealDamageAbilities: []
+  onSpinAbilities: []
+  onTurnStartAbilities: []
+  onTurnEndAbilities: []
+  onActAbilities: []
   attackType: 0
+  cardSprite: {fileID: 21300000, guid: 1f6617523fa86cb4cb3de712c076203c, type: 3}
   actCost: 1

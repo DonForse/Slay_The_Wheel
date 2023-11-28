@@ -10,7 +10,7 @@ namespace Features.PostBattles
         public event EventHandler Completed;
         public void Initialize(HeroRunCardScriptableObject heroRunCardScriptableObject, int expObtained)
         {
-            _experienceObtained.Show(heroRunCardScriptableObject, expObtained);
+            StartCoroutine(_experienceObtained.Show(heroRunCardScriptableObject, expObtained));
             _experienceObtained.Completed += OnExpCompleted;
         }
 

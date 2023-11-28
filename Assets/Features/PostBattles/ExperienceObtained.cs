@@ -16,51 +16,59 @@ namespace Features.PostBattles
         [SerializeField] private LevelUpsScriptableObject levelUpsScriptableObject;
         [SerializeField] private Button continueButton;
         [SerializeField] private SelectLevelUpUpgrade selectUpgrade;
+        private int _expRemaining;
+        private HeroRunCardScriptableObject _hero;
         public event EventHandler Completed;
 
-        public void Show(HeroRunCardScriptableObject heroCardScriptableObject, int experienceObtained)
+        public IEnumerator Show(HeroRunCardScriptableObject heroCardScriptableObject, int experienceObtained)
         {
+            _hero = heroCardScriptableObject;
+            _expRemaining = experienceObtained;
+            
             continueButton.gameObject.SetActive(false);
             container.SetActive(true);
-            var info = levelUpsScriptableObject.LevelUpInformations[heroCardScriptableObject.Level];
-            progressBar.InitialFillValue = heroCardScriptableObject.Exp / (float)info.ExpToLevel;
-            if (heroCardScriptableObject.Exp + experienceObtained >= info.ExpToLevel)
+            yield return new WaitForSeconds(1.2f);
+            var info = levelUpsScriptableObject.LevelUpInformations[_hero.Level];
+            progressBar.InitialFillValue = _hero.Exp / (float)info.ExpToLevel;
+            if (_hero.Exp + experienceObtained >= info.ExpToLevel)
             {
                 progressBar.UpdateBar01(1);
-                StartCoroutine(ShowLevelUp(info, heroCardScriptableObject, experienceObtained));
+                yield return ShowLevelUp(info, experienceObtained);
             }
             else
             {
-                progressBar.UpdateBar01(Mathf.FloorToInt(heroCardScriptableObject.Exp + experienceObtained) / (float)info.ExpToLevel);
-                heroCardScriptableObject.Exp += experienceObtained;
+                progressBar.UpdateBar01(Mathf.FloorToInt(_hero.Exp + experienceObtained) / (float)info.ExpToLevel);
+                _hero.Exp += experienceObtained;
                 continueButton.gameObject.SetActive(true);
             }
-            // levelUpsScriptableObject.LevelUpInformations.Firs
-            // if (heroCard.Exp + experienceObtained)
         }
 
-        private IEnumerator ShowLevelUp(LevelUpInformation info, HeroRunCardScriptableObject heroCardScriptableObject, int experienceObtained)
+        private IEnumerator ShowLevelUp(LevelUpInformation info, int experienceObtained)
         {
-            var expRemaining = info.ExpToLevel - (heroCardScriptableObject.Exp + experienceObtained);
-            heroCardScriptableObject.Level++;
-            if (heroCardScriptableObject.Level > levelUpsScriptableObject.LevelUpInformations.Count)
-                heroCardScriptableObject.Level = levelUpsScriptableObject.LevelUpInformations.Count;
-            heroCardScriptableObject.Exp = 0;
-            heroCardScriptableObject.Exp += expRemaining;
-            info = levelUpsScriptableObject.LevelUpInformations[heroCardScriptableObject.Level];
-            progressBar.UpdateBar01(Mathf.FloorToInt(expRemaining / (float)info.ExpToLevel));
-            container.SetActive(false);
-            selectUpgrade.Show(info.LevelUpUpgrades, heroCardScriptableObject);
-            selectUpgrade.Selected += OnUpgradeSelected;
+            if (_hero.Exp + experienceObtained < info.ExpToLevel) yield break;
             
+            _expRemaining = experienceObtained - info.ExpToLevel - _hero.Exp;
+            _hero.Level++;
+            if (_hero.Level > levelUpsScriptableObject.LevelUpInformations.Count)
+                _hero.Level = levelUpsScriptableObject.LevelUpInformations.Count;
+            _hero.Exp = 0;
+            info = levelUpsScriptableObject.LevelUpInformations[_hero.Level];
+            yield return new WaitForSeconds(2f);
+
+
+            selectUpgrade.Show(info.LevelUpUpgrades, _hero);
+            selectUpgrade.Selected += OnUpgradeSelected;
+            container.SetActive(false);
+            progressBar.InitialFillValue = 0f;
+            progressBar.UpdateBar01(0);
             yield break;
         }
 
         private void OnUpgradeSelected(object sender, LevelUpUpgrade e)
         {
-            container.SetActive(true);
             selectUpgrade.Hide();
-            continueButton.gameObject.SetActive(true);
+            container.SetActive(true);
+            StartCoroutine(Show(_hero, _expRemaining));
         }
 
         [UsedImplicitly]
