@@ -27,20 +27,23 @@ namespace Features.PostBattles
             
             continueButton.gameObject.SetActive(false);
             container.SetActive(true);
-            yield return new WaitForSeconds(1.2f);
+            yield return WaitSceneOpen();
             var info = levelUpsScriptableObject.LevelUpInformations[_hero.Level];
+            
             progressBar.InitialFillValue = _hero.Exp / (float)info.ExpToLevel;
+            
             if (_hero.Exp + experienceObtained >= info.ExpToLevel)
-            {
-                progressBar.UpdateBar01(1);
                 yield return ShowLevelUp(info, experienceObtained);
-            }
             else
-            {
-                progressBar.UpdateBar01(Mathf.FloorToInt(_hero.Exp + experienceObtained) / (float)info.ExpToLevel);
-                _hero.Exp += experienceObtained;
-                continueButton.gameObject.SetActive(true);
-            }
+                yield return ShowExperienceRemainingObtained(experienceObtained, info);
+        }
+
+        private IEnumerator ShowExperienceRemainingObtained(int experienceObtained, LevelUpInformation info)
+        {
+            progressBar.UpdateBar01(Mathf.FloorToInt(_hero.Exp + experienceObtained) / (float)info.ExpToLevel);
+            yield return WaitForProgressBarAnimation();
+            _hero.Exp += experienceObtained;
+            continueButton.gameObject.SetActive(true);
         }
 
         private IEnumerator ShowLevelUp(LevelUpInformation info, int experienceObtained)
@@ -53,7 +56,9 @@ namespace Features.PostBattles
                 _hero.Level = levelUpsScriptableObject.LevelUpInformations.Count;
             _hero.Exp = 0;
             info = levelUpsScriptableObject.LevelUpInformations[_hero.Level];
-            yield return new WaitForSeconds(2f);
+            
+            progressBar.UpdateBar01(1);
+            yield return WaitForProgressBarAnimation();
 
 
             selectUpgrade.Show(info.LevelUpUpgrades, _hero);
@@ -61,7 +66,6 @@ namespace Features.PostBattles
             container.SetActive(false);
             progressBar.InitialFillValue = 0f;
             progressBar.UpdateBar01(0);
-            yield break;
         }
 
         private void OnUpgradeSelected(object sender, LevelUpUpgrade e)
@@ -81,5 +85,9 @@ namespace Features.PostBattles
         {
             container.SetActive(false);
         }
+
+
+        private static WaitForSeconds WaitSceneOpen() => new(1.2f);
+        private static WaitForSeconds WaitForProgressBarAnimation() => new(2f);
     }
 }
