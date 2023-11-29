@@ -62,6 +62,9 @@ namespace Features.Cards.InPlay
             _cardScriptableObject.AttackValueChanged += UpdateAttack;
             _cardScriptableObject.ArmorValueChanged += UpdateArmor;
             UpdateCardScriptableObjectValues(null, _cardScriptableObject);
+            UpdateHealth(null,(_cardScriptableObject.Health,_cardScriptableObject.Health));
+            UpdateAttack(null,(_cardScriptableObject.Attack,_cardScriptableObject.Attack));
+            UpdateArmor(null,(_cardScriptableObject.Armor,_cardScriptableObject.Armor));
             yield return inPlayCardFeedbacks.PlayOnAppearFeedback();
         }
 

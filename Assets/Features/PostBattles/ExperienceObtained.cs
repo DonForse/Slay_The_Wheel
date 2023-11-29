@@ -16,22 +16,27 @@ namespace Features.PostBattles
         [SerializeField] private LevelUpsScriptableObject levelUpsScriptableObject;
         [SerializeField] private Button continueButton;
         [SerializeField] private SelectLevelUpUpgrade selectUpgrade;
+        [SerializeField] private Image heroImage;
+        [SerializeField]private Button buttonSelectUpgrade;
         private int _expRemaining;
         private HeroRunCardScriptableObject _hero;
+        [SerializeField] private ParticleSystem fireworksVfx;
         public event EventHandler Completed;
 
         public IEnumerator Show(HeroRunCardScriptableObject heroCardScriptableObject, int experienceObtained)
         {
             _hero = heroCardScriptableObject;
+            heroImage.sprite = _hero.baseCard.cardSprite;
             _expRemaining = experienceObtained;
             
             continueButton.gameObject.SetActive(false);
+            buttonSelectUpgrade.gameObject.SetActive(false);
             container.SetActive(true);
-            yield return WaitSceneOpen();
             var info = levelUpsScriptableObject.LevelUpInformations[_hero.Level];
             
             progressBar.InitialFillValue = _hero.Exp / (float)info.ExpToLevel;
-            
+            yield return WaitSceneOpen();
+
             if (_hero.Exp + experienceObtained >= info.ExpToLevel)
                 yield return ShowLevelUp(info, experienceObtained);
             else
@@ -55,17 +60,12 @@ namespace Features.PostBattles
             if (_hero.Level > levelUpsScriptableObject.LevelUpInformations.Count)
                 _hero.Level = levelUpsScriptableObject.LevelUpInformations.Count;
             _hero.Exp = 0;
-            info = levelUpsScriptableObject.LevelUpInformations[_hero.Level];
             
             progressBar.UpdateBar01(1);
             yield return WaitForProgressBarAnimation();
 
-
-            selectUpgrade.Show(info.LevelUpUpgrades, _hero);
-            selectUpgrade.Selected += OnUpgradeSelected;
-            container.SetActive(false);
-            progressBar.InitialFillValue = 0f;
-            progressBar.UpdateBar01(0);
+            fireworksVfx.Play();
+            buttonSelectUpgrade.gameObject.SetActive(true);
         }
 
         private void OnUpgradeSelected(object sender, LevelUpUpgrade e)
@@ -79,6 +79,19 @@ namespace Features.PostBattles
         public void Continue()
         {
             Completed?.Invoke(this, null);
+        }
+
+        [UsedImplicitly]
+        public void OpenUpgradeSelection()
+        {
+            var info = levelUpsScriptableObject.LevelUpInformations[_hero.Level];
+            selectUpgrade.Show(info.LevelUpUpgrades, _hero);
+            selectUpgrade.Selected += OnUpgradeSelected;
+            
+            fireworksVfx.Stop();
+            container.SetActive(false);
+            progressBar.InitialFillValue = 0f;
+            progressBar.UpdateBar01(0);
         }
 
         public void Hide()
