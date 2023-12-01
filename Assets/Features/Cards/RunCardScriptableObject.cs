@@ -1,3 +1,5 @@
+using System;
+using System.Collections.Generic;
 using Features.Battles;
 using UnityEngine;
 
@@ -10,12 +12,12 @@ namespace Features.Cards
         public string cardName;
         public int hp;
         public int attack;
-        public Ability[] onDealDamageAbilities;
-        public Ability[] onAttackAbilities;
-        public Ability[] onActAbilities;
-        public Ability[] onSpinAbilities;
-        public Ability[] onTurnStartAbilities;
-        public Ability[] onTurnEndAbilities;
+        public List<Ability> onDealDamageAbilities;
+        public List<Ability> onAttackAbilities;
+        public List<Ability> onActAbilities;
+        public List<Ability> onSpinAbilities;
+        public List<Ability> onTurnStartAbilities;
+        public List<Ability> onTurnEndAbilities;
 
         public readonly AttackType attackType;
         public int actCost;
@@ -25,12 +27,12 @@ namespace Features.Cards
             cardName = cardScriptableObject.cardName;
             hp = cardScriptableObject.hp;
             attack = cardScriptableObject.attack;
-            onDealDamageAbilities = cardScriptableObject.onDealDamageAbilities;
-            onAttackAbilities = cardScriptableObject.onAttackAbilities;
-            onActAbilities = cardScriptableObject.onActAbilities;
-            onSpinAbilities = cardScriptableObject.onSpinAbilities;
-            onTurnStartAbilities = cardScriptableObject.onTurnStartAbilities;
-            onTurnEndAbilities = cardScriptableObject.onTurnEndAbilities;
+            onDealDamageAbilities = new(cardScriptableObject.onDealDamageAbilities?? Array.Empty<Ability>());
+            onAttackAbilities = new(cardScriptableObject.onAttackAbilities?? Array.Empty<Ability>());
+            onActAbilities = new(cardScriptableObject.onActAbilities?? Array.Empty<Ability>());
+            onSpinAbilities = new(cardScriptableObject.onSpinAbilities?? Array.Empty<Ability>());
+            onTurnStartAbilities = new(cardScriptableObject.onTurnStartAbilities?? Array.Empty<Ability>());
+            onTurnEndAbilities = new(cardScriptableObject.onTurnEndAbilities?? Array.Empty<Ability>());
             attackType = cardScriptableObject.attackType;
             actCost = cardScriptableObject.actCost;
             baseCard = cardScriptableObject;

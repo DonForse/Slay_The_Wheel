@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using Features.Battles;
 using UnityEngine;
 
@@ -52,7 +53,7 @@ namespace Features.Cards.InPlay
             }
         }
 
-        public Ability[] OnDealDamageAbilities
+        public List<Ability> OnDealDamageAbilities
         {
             get => _onDealDamageAbilities;
             set
@@ -62,7 +63,7 @@ namespace Features.Cards.InPlay
             }
         }
 
-        public Ability[] OnAttackAbilities
+        public List<Ability> OnAttackAbilities
         {
             get => _onAttackAbilities;
             set
@@ -72,7 +73,7 @@ namespace Features.Cards.InPlay
             }
         }
 
-        public Ability[] OnActAbilities
+        public List<Ability> OnActAbilities
         {
             get => _onActAbilities;
             set
@@ -82,7 +83,7 @@ namespace Features.Cards.InPlay
             }
         }
 
-        public Ability[] OnSpinAbilities
+        public List<Ability> OnSpinAbilities
         {
             get => _onSpinAbilities;
             set
@@ -92,7 +93,7 @@ namespace Features.Cards.InPlay
             }
         }
 
-        public Ability[] OnTurnStartAbilities
+        public List<Ability> OnTurnStartAbilities
         {
             get => _onTurnStartAbilities;
             set
@@ -102,7 +103,7 @@ namespace Features.Cards.InPlay
             }
         }
 
-        public Ability[] OnTurnEndAbilities
+        public List<Ability> OnTurnEndAbilities
         {
             get => _onTurnEndAbilities;
             set
@@ -137,12 +138,12 @@ namespace Features.Cards.InPlay
         
         private string _cardName;
         private int _attack;
-        private Ability[] _onAttackAbilities;
-        private Ability[] _onDealDamageAbilities;
-        private Ability[] _onSpinAbilities;
-        private Ability[] _onTurnStartAbilities;
-        private Ability[] _onTurnEndAbilities;
-        private Ability[] _onActAbilities;
+        private List<Ability> _onAttackAbilities;
+        private List<Ability> _onDealDamageAbilities;
+        private List<Ability> _onSpinAbilities;
+        private List<Ability> _onTurnStartAbilities;
+        private List<Ability> _onTurnEndAbilities;
+        private List<Ability> _onActAbilities;
         private AttackType _attackType;
         private Sprite _cardSprite;
         private int _actCost;

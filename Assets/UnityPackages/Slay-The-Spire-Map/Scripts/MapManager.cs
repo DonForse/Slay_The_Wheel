@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using Features;
 using Newtonsoft.Json;
 using UnityEngine;
 
@@ -13,9 +14,9 @@ namespace UnityPackages.Slay_The_Spire_Map.Scripts
 
         private void Start()
         {
-            if (PlayerPrefs.HasKey("Map"))
+            if (PlayerPrefs.HasKey(GetKey()))
             {
-                var mapJson = PlayerPrefs.GetString("Map");
+                var mapJson =  PlayerPrefs.GetString(GetKey());
                 var map = JsonConvert.DeserializeObject<Map>(mapJson);
                 // using this instead of .Contains()
                 if (map.path.Any(p => p.Equals(map.GetBossNode().point)))
@@ -49,7 +50,7 @@ namespace UnityPackages.Slay_The_Spire_Map.Scripts
 
             var json = JsonConvert.SerializeObject(CurrentMap, Formatting.Indented,
                 new JsonSerializerSettings {ReferenceLoopHandling = ReferenceLoopHandling.Ignore});
-            PlayerPrefs.SetString("Map", json);
+            PlayerPrefs.SetString(GetKey(), json);
             PlayerPrefs.Save();
         }
 
@@ -57,5 +58,7 @@ namespace UnityPackages.Slay_The_Spire_Map.Scripts
         {
             SaveMap();
         }
+
+        private static string GetKey() => RunRepository.GetCurrent() + "_Map";
     }
 }

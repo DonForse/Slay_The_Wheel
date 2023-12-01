@@ -45,7 +45,7 @@ namespace Features.PostBattles
                     burnAll = new Ability() { Type = AbilityEnum.BurnAll, Amount = 0 };
                 burnAll.Amount++;
                 asd.Add(burnAll);
-                _heroCardScriptableObject.onDealDamageAbilities = asd.ToArray();
+                _heroCardScriptableObject.onDealDamageAbilities = asd.ToList();
             }
             if (e == LevelUpUpgrade.Atk)
             {

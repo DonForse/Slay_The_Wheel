@@ -29,17 +29,9 @@ namespace Features
         private int bossBattlesAmount = 0;
 
         private int expFromBattle = 0;
-
-        private static void ClearRunData()
-        {
-            PlayerPrefs.DeleteAll();
-            PlayerPrefs.Save();
-        }
-
+        
         IEnumerator Start()
         {
-            ClearRunData();
-
             DontDestroyOnLoad(this.gameObject);
             AddInitialCards();
 
@@ -212,7 +204,7 @@ namespace Features
                         ability = new Ability(){Type =  AbilityEnum.Burn, Amount = 0};
                     ability.Amount++;
                     abs.Add(ability);
-                    card.onDealDamageAbilities = abs.ToArray();
+                    card.onDealDamageAbilities = abs.ToList();
                 }
 
                 return;
