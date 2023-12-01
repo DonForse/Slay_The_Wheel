@@ -7,13 +7,14 @@ using Features.Maps.Relics;
 using Features.Maps.Shop;
 using Features.Maps.Shop.Packs;
 using UnityEngine;
+using UnityEngine.Serialization;
 using UnityPackages.Slay_The_Spire_Map.Scripts;
 
 namespace Features.Maps
 {
     public class Map : MonoBehaviour
     {
-        [SerializeField] private ShopNode shopNode;
+        [FormerlySerializedAs("shopNode")] [SerializeField] private BoosterPackNode boosterPackNode;
         [SerializeField] private List<CardPackScriptableObject> packs;
         [SerializeField] private List<RelicScriptableObject> relics;
         [SerializeField] private MapPlayerTracker mapPlayerTracker;
@@ -32,14 +33,14 @@ namespace Features.Maps
         {
             mapPlayerTracker.NodeSelected += OnNodeSelected;
             mapPlayerTracker.Locked = false;
-            shopNode.PackSelected += OnPackSelected;
+            boosterPackNode.PackSelected += OnPackSelected;
             relicsNode.RelicSelected += OnRelicSelected;
         }
 
         private void OnDestroy()
         {
             mapPlayerTracker.NodeSelected -= OnNodeSelected;
-            shopNode.PackSelected -= OnPackSelected;
+            boosterPackNode.PackSelected -= OnPackSelected;
             relicsNode.RelicSelected += OnRelicSelected;
         }
 
@@ -65,7 +66,7 @@ namespace Features.Maps
                     // mapPlayerTracker.Locked = false;
                     break;
                 case NodeType.Store:
-                    shopNode.Show(packs.ToList());
+                    boosterPackNode.Show(packs.ToList());
                     break;
                 case NodeType.Boss:
                     BossEnemySelected?.Invoke(this, null);
@@ -80,11 +81,11 @@ namespace Features.Maps
             }
         }
 
-        private void OnPackSelected(object sender, CardPackScriptableObject pack)
+        private void OnPackSelected(object sender, List<BaseCardScriptableObject> cards)
         {
-            shopNode.Hide();
+            boosterPackNode.Hide();
             mapPlayerTracker.Locked = false;
-            SelectedPack?.Invoke(this, pack.Cards);
+            SelectedPack?.Invoke(this, cards);
         }
 
         private void OnRelicSelected(object sender, Relic e)

@@ -149,7 +149,7 @@ GameObject:
   - component: {fileID: 2093962637141408670}
   - component: {fileID: 2537325601614038748}
   m_Layer: 5
-  m_Name: ShopPack
+  m_Name: BoosterPack
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

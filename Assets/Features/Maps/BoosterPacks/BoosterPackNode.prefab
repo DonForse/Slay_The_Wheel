@@ -87,7 +87,7 @@ GameObject:
   - component: {fileID: 5773192641510987141}
   - component: {fileID: 8930411133353412035}
   m_Layer: 0
-  m_Name: Shop
+  m_Name: BoosterPackNode
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -122,10 +122,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1639ba313538430a8b4eb1efbfcfe187, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  amountOfPacks: 0
+  amountOfPacks: 3
   packSelectionCanvas: {fileID: 8212973754455072432}
   packSelectionContainer: {fileID: 1627978935520745246}
-  shopPackPrefab: {fileID: 2537325601614038748, guid: 91e771ab7832a914b9bc7a490ea4d737, type: 3}
+  boosterPackPrefab: {fileID: 2537325601614038748, guid: 91e771ab7832a914b9bc7a490ea4d737, type: 3}
   revealCardCanvas: {fileID: 5264451983347298599}
   cardReveals:
   - {fileID: 7127140320609563702}

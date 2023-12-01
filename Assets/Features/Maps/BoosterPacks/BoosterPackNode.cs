@@ -1,25 +1,29 @@
 using System;
 using System.Collections.Generic;
+using Features.Cards;
 using Features.Maps.Shop.Packs;
 using UnityEngine;
+using UnityEngine.Serialization;
 using UnityEngine.UI;
 using Random = UnityEngine.Random;
 
 namespace Features.Maps.Shop
 {
-    public class ShopNode : MonoBehaviour
+    public class BoosterPackNode : MonoBehaviour
     {
+        private const int AmountOfCards = 5;
         [SerializeField][Range(0,8)] private int amountOfPacks;
         [SerializeField] private GameObject packSelectionCanvas;
         
         [SerializeField] private GameObject packSelectionContainer;
         
-        [SerializeField] private ShopPack shopPackPrefab;
+        [SerializeField] private BoosterPack boosterPackPrefab;
         [SerializeField] private GameObject revealCardCanvas;
         [SerializeField] private List<CardReveal> cardReveals;
         [SerializeField] private Button continueButton;
         private CardPackScriptableObject _packSelected;
-        public event EventHandler<CardPackScriptableObject> PackSelected;
+        private List<BaseCardScriptableObject> _cardsObtained;
+        public event EventHandler<List<BaseCardScriptableObject>> PackSelected;
 
         private void OnEnable()
         {
@@ -42,7 +46,7 @@ namespace Features.Maps.Shop
 
             for (int i = 0; i < amountOfPacks; i++)
             {
-                var shopPack  =Instantiate(shopPackPrefab, packSelectionContainer.transform);
+                var shopPack  =Instantiate(boosterPackPrefab, packSelectionContainer.transform);
                 shopPack.Set(packs[Random.Range(0, packs.Count)]);
                 shopPack.OnClick += OnPackSelected;
             }
@@ -62,16 +66,33 @@ namespace Features.Maps.Shop
             packSelectionCanvas.SetActive(false);
             _packSelected = e;
             revealCardCanvas.SetActive(true);
-            for (int i = 0; i < e.Cards.Count; i++)
+
+            _cardsObtained = new List<BaseCardScriptableObject>();
+            for (int i = 0; i < AmountOfCards; i++)
             {
-                cardReveals[i].Set(e.Cards[i]);
+                var random= Random.Range(0f, 1f);
+
+                BaseCardScriptableObject selectedCard = null;
+                foreach (var item in e.Cards)
+                {
+                    if (random > item.dropRatePercentage)
+                        continue;
+                    selectedCard = item.card;
+                    break;
+                }
+
+                if (selectedCard == null)
+                    selectedCard = e.defaultCard;
+
+                _cardsObtained.Add(selectedCard);
+                cardReveals[i].Set(selectedCard);
             }
             continueButton.enabled = true;
         }
 
         private void SendPackSelected()
         {
-            PackSelected?.Invoke(this, _packSelected);
+            PackSelected?.Invoke(this, _cardsObtained);
         }
     }
 }

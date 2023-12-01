@@ -6,7 +6,7 @@ using UnityEngine.UI;
 
 namespace Features.Maps.Shop
 {
-    public class ShopPack : MonoBehaviour
+    public class BoosterPack : MonoBehaviour
     {
         private CardPackScriptableObject _pack;
         [SerializeField] private Button button;

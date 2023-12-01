@@ -15,6 +15,7 @@ namespace Features.Cards
         public Ability[] onTurnStartAbilities;
         public Ability[] onTurnEndAbilities;
         public Ability[] onActAbilities;
+        public Ability[] onBattleStartAbilities;
         public AttackType attackType;
         public Sprite cardSprite;
         public int actCost;
