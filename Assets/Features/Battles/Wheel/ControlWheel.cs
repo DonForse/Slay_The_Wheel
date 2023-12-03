@@ -1,7 +1,6 @@
 using System;
 using System.Collections;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 namespace Features.Battles.Wheel
 {
@@ -18,7 +17,12 @@ namespace Features.Battles.Wheel
         
         public abstract event EventHandler TurnRight;
         public abstract event EventHandler TurnLeft;
-        public virtual void Enable() => this.enabled = true;
+        public virtual void Enable()
+        {
+            this.enabled = true;
+            RotateToNewPosition();
+        }
+
         public virtual void Disable() => this.enabled = false;
         
         public void SetTurnRightAction(Func<IEnumerator> callback)

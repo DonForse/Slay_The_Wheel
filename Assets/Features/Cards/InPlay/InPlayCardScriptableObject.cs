@@ -135,7 +135,19 @@ namespace Features.Cards.InPlay
                 ValueChanged?.Invoke(this, this);
             }
         }
+
+        public List<Effect> Effects
+        {
+            get => _effects;
+            set
+            {
+                _effects = value;
+                ValueChanged?.Invoke(this,this);
+            }
+        }
         
+        
+
         private string _cardName;
         private int _attack;
         private List<Ability> _onAttackAbilities;
@@ -144,6 +156,7 @@ namespace Features.Cards.InPlay
         private List<Ability> _onTurnStartAbilities;
         private List<Ability> _onTurnEndAbilities;
         private List<Ability> _onActAbilities;
+        private List<Effect> _effects;
         private AttackType _attackType;
         private Sprite _cardSprite;
         private int _actCost;
@@ -162,6 +175,7 @@ namespace Features.Cards.InPlay
             _onTurnEndAbilities = cardScriptableObject.onTurnEndAbilities;
             _attackType = cardScriptableObject.attackType;
             _actCost = cardScriptableObject.actCost;
+            _effects = new List<Effect>();
             _runCard = cardScriptableObject;
         }
     }

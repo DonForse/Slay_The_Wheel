@@ -29,8 +29,15 @@ namespace Features.Cards.InPlay
         [SerializeField] private InPlayCardHoverZoom zoomControl;
         
         public bool IsDead => _cardScriptableObject.IsDead;
-        
-        public List<Effect> Effects = new();
+
+        public List<Effect> Effects => _cardScriptableObject.Effects;
+
+        public List<Ability> Abilities => _cardScriptableObject.OnDealDamageAbilities
+            .Concat(_cardScriptableObject.OnAttackAbilities)
+            .Concat(_cardScriptableObject.OnActAbilities)
+            .Concat(_cardScriptableObject.OnSpinAbilities)
+            .Concat(_cardScriptableObject.OnTurnStartAbilities)
+            .Concat(_cardScriptableObject.OnTurnEndAbilities).ToList();
 
         public string CardName => _cardScriptableObject.CardName;
         public PlayerController OwnerPlayer;
@@ -138,8 +145,9 @@ namespace Features.Cards.InPlay
         {
             hpText.text = "0";
             atkText.text = "0";
-            Effects = new List<Effect>();
+            _cardScriptableObject.Effects.Clear();
             spriteRenderer.sprite = cardBack;
+            UpdateCardScriptableObjectValues(null, _cardScriptableObject);
             yield return inPlayCardFeedbacks.PlayOnDeadFeedback();
         }
 
