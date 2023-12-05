@@ -5,7 +5,7 @@ namespace Features.Cards.InPlay
     public class InPlayCardHoverDescriptions : MonoBehaviour
     {
         [SerializeField] private InPlayCard playCard;
-        [SerializeField]private GameObject descriptionBoxPrefab;
+        [SerializeField]private EffectDescriptionBox descriptionBoxPrefab;
         [SerializeField]private Transform floatingDescriptionsContainer;
 
         private void OnMouseEnter()
@@ -14,6 +14,7 @@ namespace Features.Cards.InPlay
                 return;
             foreach (var effect in playCard.Effects)
             {
+                Instantiate(descriptionBoxPrefab, floatingDescriptionsContainer);
             }
             
             foreach (var effect in playCard.Abilities)
