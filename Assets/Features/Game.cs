@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using System.Linq;
 using Features.Battles;
 using Features.Cards;
+using Features.Common;
+using Features.GameResources.Relics;
 using Features.Maps;
 using Features.PostBattles;
 using UnityEngine;
@@ -16,9 +18,7 @@ namespace Features
     {
         [SerializeField] private DeckConfigurationScriptableObject deck;
         [SerializeField] private BaseCardsScriptableObject enemiesDb;
-
         private List<RunCardScriptableObject> _deck;
-        private List<Relic> _relics = new();
         private Battle _battleGo;
         private Map _mapGo;
         private PostBattle _postBattle;
@@ -29,9 +29,11 @@ namespace Features
         private int bossBattlesAmount = 0;
 
         private int expFromBattle = 0;
-        
+        private PlayerPrefsRelicsRepository _playerPrefsRelicsRepository;
+
         IEnumerator Start()
         {
+            _playerPrefsRelicsRepository = Provider.PlayerPrefsRelicsRepository();
             DontDestroyOnLoad(this.gameObject);
             AddInitialCards();
 
@@ -182,7 +184,7 @@ namespace Features
 
         private void OnSelectedRelic(object sender, Relic e)
         {
-            _relics.Add(e);
+            _playerPrefsRelicsRepository.Add(e.RelicBase.id);
             if (e.RelicBase.id == RelicType.HealthySnack)
             {
                 foreach (var card in _deck)
