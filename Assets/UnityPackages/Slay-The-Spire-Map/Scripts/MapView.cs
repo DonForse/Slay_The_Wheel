@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -343,6 +344,11 @@ namespace UnityPackages.Slay_The_Spire_Map.Scripts
         {
             var config = GetConfig(mapManager.CurrentMap.configName);
             return config.nodeBlueprints.FirstOrDefault(n => n.name == blueprintName);
+        }
+
+        public virtual IEnumerator PanMapEndToStart(float duration)
+        {
+            yield return null;
         }
     }
 }

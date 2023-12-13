@@ -19,23 +19,24 @@ namespace UnityPackages.Slay_The_Spire_Map.Scripts
                 var mapJson =  PlayerPrefs.GetString(GetKey());
                 var map = JsonConvert.DeserializeObject<Map>(mapJson);
                 // using this instead of .Contains()
-                if (map.path.Any(p => p.Equals(map.GetBossNode().point)))
+                if (HasReachedBossNode(map))
                 {
-                    // payer has already reached the boss, generate a new map
                     GenerateNewMap();
+                    StartCoroutine(view.PanMapEndToStart(4f));
                 }
                 else
                 {
                     CurrentMap = map;
-                    // player has not reached the boss yet, load the current map
-                    view.ShowMap(map);
                 }
             }
             else
             {
                 GenerateNewMap();
+                StartCoroutine(view.PanMapEndToStart(4f));
             }
         }
+
+        private static bool HasReachedBossNode(Map map) => map.path.Any(p => p.Equals(map.GetBossNode().point));
 
         public void GenerateNewMap()
         {

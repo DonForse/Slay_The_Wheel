@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -204,6 +205,18 @@ namespace UnityPackages.Slay_The_Spire_Map.Scripts
             if (dottedLine != null) dottedLine.ScaleMaterial();
 
             lineConnections.Add(new LineConnection(null, lineRenderer, from, to));
+        }
+
+        public override IEnumerator PanMapEndToStart(float duration)
+        {
+            var t = duration;
+            var scrollRect = GetScrollRectForMap();
+            while (t > 0)
+            {
+                scrollRect.normalizedPosition = new Vector2(scrollRect.normalizedPosition.x, Mathf.Lerp(1, 0, duration - t));
+                yield return null;
+                t -= Time.deltaTime;
+            }
         }
     }
 }
