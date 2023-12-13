@@ -348,6 +348,15 @@ namespace UnityPackages.Slay_The_Spire_Map.Scripts
 
         public virtual IEnumerator PanMapEndToStart(float duration)
         {
+            var t = duration;
+            var scrollRect = mapParent.GetComponent<ScrollNonUI>();
+            // while (t > 0)
+            // {
+            //     scrollRect.normalizedPosition = new Vector2(scrollRect.normalizedPosition.x, Mathf.Lerp(1, 0, duration - t));
+            //     yield return null;
+            //     t -= Time.deltaTime;
+            // }
+            
             yield return null;
         }
     }
