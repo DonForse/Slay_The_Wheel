@@ -50,16 +50,11 @@ namespace Features.Battles
             _applyAbilityStrategies = new()
             {
                 new BurnOnApplyAbilityStrategy(),
-                new BurnAllOnApplyAbilityStrategy(),
                 new RotateLeftOnApplyAbilityStrategy(),
                 new RotateRightOnApplyAbilityStrategy(),
-                new AddAtkLeftOnApplyAbilityStrategy(),
-                new AddAtkRightOnApplyAbilityStrategy(),
-                new AddShieldLeftOnApplyAbilityStrategy(),
-                new AddShieldRightOnApplyAbilityStrategy(),
                 new DealAttackDamageOnApplyAbilityStrategy(this), 
                 new MultiAttackOnApplyAbilityStrategy(this),
-                new GainArmorOnApplyAbilityStrategy(),
+                new GainShieldOnApplyAbilityStrategy(),
                 new GainAttackOnApplyAbilityStrategy()
             };
             _attackStrategies = new()
@@ -522,7 +517,7 @@ namespace Features.Battles
                     foreach (var strategy in _applyAbilityStrategies)
                     {
                         if (strategy.IsValid(ability.Type))
-                            yield return strategy.Execute(card, ability.Amount, defender, attacker);
+                            yield return strategy.Execute(ability, card,  defender, attacker);
                     }
                 }
             }
@@ -537,7 +532,7 @@ namespace Features.Battles
                     foreach (var strategy in _applyAbilityStrategies)
                     {
                         if (strategy.IsValid(ability.Type))
-                            yield return strategy.Execute(card, ability.Amount, defender, attacker);
+                            yield return strategy.Execute(ability, card,  defender, attacker);
                     }
                 }
             }
@@ -551,7 +546,7 @@ namespace Features.Battles
                 foreach (var strategy in _applyAbilityStrategies)
                 {
                     if (strategy.IsValid(ability.Type))
-                        yield return strategy.Execute(damageDealerCard, ability.Amount, damageReceiverCard.OwnerPlayer,
+                        yield return strategy.Execute(ability, damageDealerCard,  damageReceiverCard.OwnerPlayer,
                             damageDealerCard.OwnerPlayer);
                 }
             }
@@ -569,7 +564,7 @@ namespace Features.Battles
                     foreach (var strategy in _applyAbilityStrategies)
                     {
                         if (strategy.IsValid(ability.Type))
-                            yield return strategy.Execute(card, ability.Amount,
+                            yield return strategy.Execute(ability, card, 
                                 defenderPlayerController, attackerPlayerController);
                     }
                 }
@@ -588,7 +583,7 @@ namespace Features.Battles
                 foreach (var strategy in _applyAbilityStrategies)
                 {
                     if (strategy.IsValid(ability.Type))
-                        yield return strategy.Execute(attackerCard, ability.Amount,
+                        yield return strategy.Execute(ability, attackerCard, 
                             defenderPlayerController, attackerPlayerController);
                 }
             }

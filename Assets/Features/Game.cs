@@ -8,6 +8,7 @@ using Features.Common;
 using Features.GameResources.Relics;
 using Features.Maps;
 using Features.PostBattles;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using Random = UnityEngine.Random;
@@ -203,8 +204,23 @@ namespace Features
                     var ability = abs.FirstOrDefault(x=>x.Type == AbilityEnum.Burn);
                     abs.Remove(ability);
                     if (ability == null)
-                        ability = new Ability(){Type =  AbilityEnum.Burn, Amount = 0};
-                    ability.Amount++;
+                        ability = new Ability(){Type =  AbilityEnum.Burn,AbilityData = new []{new AbilityData()
+                        {
+                            Amount = 0, Target = TargetEnum.Enemy
+                        }}};
+                    else
+                    {
+                        if (ability.AbilityData.All(x => x.Target != TargetEnum.Enemy))
+                        {
+                            ability.AbilityData.AddRange(new []{new AbilityData()
+                            {
+                                Amount = 0, Target = TargetEnum.Enemy
+                            }});
+                        }
+                    }
+
+                    var abilityBurnSingle = ability.AbilityData.First(x => x.Target == TargetEnum.Enemy);
+                    abilityBurnSingle.Amount++;
                     abs.Add(ability);
                     card.onDealDamageAbilities = abs.ToList();
                 }

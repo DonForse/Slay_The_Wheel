@@ -7,6 +7,6 @@ namespace Features.Battles.Core.Abilities
     public interface IOnApplyAbilityStrategy
     {
         bool IsValid(AbilityEnum abilityEnum);
-        IEnumerator Execute(InPlayCard executor, int amount, PlayerController defender, PlayerController attacker);
+        IEnumerator Execute(Ability ability, InPlayCard executor, PlayerController defender, PlayerController attacker);
     }
 }

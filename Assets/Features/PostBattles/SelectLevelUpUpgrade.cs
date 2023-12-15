@@ -4,6 +4,7 @@ using System.Linq;
 using Features.Battles;
 using Features.Cards;
 using Features.Cards.Heroes;
+using Unity.VisualScripting;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
@@ -38,14 +39,44 @@ namespace Features.PostBattles
         {
             if (e == LevelUpUpgrade.Burn)
             {
-                var asd = _heroCardScriptableObject.onDealDamageAbilities.ToList();
-                var burnAll=asd.FirstOrDefault(x => x.Type == AbilityEnum.BurnAll);
-                asd.Remove(burnAll);
-                if (burnAll == null)
-                    burnAll = new Ability() { Type = AbilityEnum.BurnAll, Amount = 0 };
-                burnAll.Amount++;
-                asd.Add(burnAll);
-                _heroCardScriptableObject.onDealDamageAbilities = asd.ToList();
+                var heroAbilities = _heroCardScriptableObject.onDealDamageAbilities.ToList();
+                var burn = heroAbilities.FirstOrDefault(x => x.Type == AbilityEnum.Burn);
+
+                heroAbilities.Remove(burn);
+
+                if (burn == null)
+                    burn = new Ability()
+                    {
+                        Type = AbilityEnum.Burn,
+                        AbilityData = new[]
+                        {
+                            new AbilityData()
+                            {
+                                Amount = 0,
+                                Target =
+                                    TargetEnum.AllEnemies
+                            }
+                        }
+                    };
+                else
+                {
+                    var burnAll = burn.AbilityData.FirstOrDefault(x => x.Target == TargetEnum.AllEnemies);
+                    if (burnAll == null)
+                    {
+                        var newBurn = burn.AbilityData.ToList();
+                        newBurn.Add(new AbilityData()
+                        {
+                            Amount = 0,
+                            Target =
+                                TargetEnum.AllEnemies
+                        });
+                        burn.AbilityData = newBurn.ToArray();
+                    }
+
+                }
+                burn.AbilityData.First(x => x.Target == TargetEnum.AllEnemies).Amount++;
+                heroAbilities.Add(burn);
+                _heroCardScriptableObject.onDealDamageAbilities = heroAbilities.ToList();
             }
             if (e == LevelUpUpgrade.Atk)
             {

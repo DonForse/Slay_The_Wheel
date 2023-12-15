@@ -16,7 +16,7 @@ namespace Features.Battles.Core.Abilities
 
         public bool IsValid(AbilityEnum abilityEnum) => abilityEnum == AbilityEnum.DealAttackDamage;
 
-        public IEnumerator Execute(InPlayCard executor, int value, PlayerController defender, PlayerController attacker)
+        public IEnumerator Execute(Ability ability,InPlayCard executor, PlayerController defender, PlayerController attacker)
         {
             var defenderCard = defender.GetFrontCard();
             yield return executor.PlayRangedAttack(defenderCard);

@@ -93,7 +93,7 @@ namespace Features.Cards.InPlay
             {
                 var abilityIcon = abilitiesIconsScriptableObject.abilitiesIcons.FirstOrDefault(x => x.ability == ability.Type);
                 var go  =Instantiate(indicatorPrefab, abilitiesContainer);
-                go.Set(abilityIcon?.image, ability.Amount);
+                go.Set(abilityIcon?.image, ability);
             }
             
             abilitiesContainer.gameObject.SetActive(abilitiesContainer.childCount > 0);
@@ -110,7 +110,7 @@ namespace Features.Cards.InPlay
             {
                 var abilityIcon = effectsIconsScriptableObject.effectIcons.FirstOrDefault(x => x.effect == effect.Type);
                 var go  =Instantiate(indicatorPrefab, effectsContainer);
-                go.Set(abilityIcon?.image, effect.Amount);
+                go.Set(abilityIcon?.image, effect);
             }
            
             effectsContainer.gameObject.SetActive(effectsContainer.childCount > 0);
@@ -156,7 +156,7 @@ namespace Features.Cards.InPlay
             yield return inPlayCardFeedbacks.PlayOnGetHitFeedback(damage, source);
         }
 
-        public IEnumerator PlayGainArmor()
+        public IEnumerator PlayGainShield()
         {
             yield return inPlayCardFeedbacks.PlayOnArmorGain();
         }

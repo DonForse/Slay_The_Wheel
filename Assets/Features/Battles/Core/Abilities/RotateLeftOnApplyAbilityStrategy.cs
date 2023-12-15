@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Linq;
 using Features.Battles.Wheel;
 using Features.Cards.InPlay;
 
@@ -11,9 +12,9 @@ namespace Features.Battles.Core.Abilities
             return abilityEnum == AbilityEnum.RotateLeft;
         }
 
-        public IEnumerator Execute(InPlayCard executor, int amount, PlayerController defender, PlayerController attacker)
+        public IEnumerator Execute(Ability ability,InPlayCard executor, PlayerController defender, PlayerController attacker)
         {
-            yield return defender.Rotate(ActDirection.Left, amount);
+            yield return defender.Rotate(ActDirection.Left, ability.AbilityData.First().Amount);
         }
     }
 }
