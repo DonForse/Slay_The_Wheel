@@ -149,7 +149,7 @@ GameObject:
   - component: {fileID: 6199123728269009383}
   - component: {fileID: 4607878682997896786}
   m_Layer: 0
-  m_Name: RelicSelectionView
+  m_Name: ChestRewardSelectionView
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -174,7 +174,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
   m_AnchoredPosition: {x: 550, y: -300}
-  m_SizeDelta: {x: 400, y: 600}
+  m_SizeDelta: {x: 400, y: 200}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &5117464301171705917
 MonoBehaviour:

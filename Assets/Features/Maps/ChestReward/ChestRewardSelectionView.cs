@@ -1,15 +1,19 @@
 using System;
+using Febucci.UI;
 using JetBrains.Annotations;
 using TMPro;
 using UnityEngine;
 
-namespace Features.Maps.Relics
+namespace Features.Maps.ChestReward
 {
-    public class RelicSelectionView : MonoBehaviour
+    public class ChestRewardSelectionView : MonoBehaviour
     {
         [SerializeField] private TMP_Text relicName;
         private Relic _relic;
         public event EventHandler<Relic> Selected;
+
+      
+
 
         public void Set(Relic relic)
         {

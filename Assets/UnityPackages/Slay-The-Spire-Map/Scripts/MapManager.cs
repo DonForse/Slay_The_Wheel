@@ -27,6 +27,7 @@ namespace UnityPackages.Slay_The_Spire_Map.Scripts
                 else
                 {
                     CurrentMap = map;
+                    view.ShowMap(map);
                 }
             }
             else

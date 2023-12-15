@@ -503,13 +503,8 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 62426f435ffb1ce44aae921673a567ca, type: 2}
   - {fileID: 11400000, guid: 5f04bea5235f2b741a86044aa058e92a, type: 2}
   - {fileID: 11400000, guid: e922eb68846d7b5489c03f8ec68bdd98, type: 2}
-  relics:
-  - {fileID: 11400000, guid: 8f66663ddfe96d449a265dcc31bb8916, type: 2}
-  - {fileID: 11400000, guid: eba1c16f3c053784887a3a1b67e6d90a, type: 2}
-  - {fileID: 11400000, guid: f6f669fc41075a3479dcc4e8dcf39bbf, type: 2}
-  - {fileID: 11400000, guid: 49846d6db91b6db47aff01089de8e101, type: 2}
   mapPlayerTracker: {fileID: 12968217}
-  relicsNode: {fileID: 2350127535072768674}
+  chestRewardNode: {fileID: 2350127535072768674}
 --- !u!4 &1429207044
 Transform:
   m_ObjectHideFlags: 0
@@ -813,11 +808,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 1480728060023353324, guid: d85ebe19e98f8ec43b8ca4ebed18c783, type: 3}
       propertyPath: m_Name
-      value: RelicsNode
-      objectReference: {fileID: 0}
-    - target: {fileID: 4081835420399226036, guid: d85ebe19e98f8ec43b8ca4ebed18c783, type: 3}
-      propertyPath: m_Name
-      value: RelicSelectionCanvas
+      value: ChestRewardNode
       objectReference: {fileID: 0}
     - target: {fileID: 8602619582397420909, guid: d85ebe19e98f8ec43b8ca4ebed18c783, type: 3}
       propertyPath: m_RootOrder

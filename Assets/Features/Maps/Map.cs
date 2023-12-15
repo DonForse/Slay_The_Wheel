@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Cinemachine;
 using Features.Cards;
-using Features.Maps.Relics;
+using Features.Maps.ChestReward;
 using Features.Maps.Shop;
 using Features.Maps.Shop.Packs;
 using UnityEngine;
@@ -16,9 +16,8 @@ namespace Features.Maps
     {
         [FormerlySerializedAs("shopNode")] [SerializeField] private BoosterPackNode boosterPackNode;
         [SerializeField] private List<CardPackScriptableObject> packs;
-        [SerializeField] private List<RelicScriptableObject> relics;
         [SerializeField] private MapPlayerTracker mapPlayerTracker;
-        [SerializeField] private RelicsNode relicsNode;
+        [FormerlySerializedAs("relicsNode")] [SerializeField] private ChestRewardNode chestRewardNode;
         private List<MapSpot> _possibleNextPositions;
 
         public event EventHandler<List<BaseCardScriptableObject>> SelectedPack;
@@ -34,14 +33,14 @@ namespace Features.Maps
             mapPlayerTracker.NodeSelected += OnNodeSelected;
             mapPlayerTracker.Locked = false;
             boosterPackNode.PackSelected += OnPackSelected;
-            relicsNode.RelicSelected += OnRelicSelected;
+            chestRewardNode.RelicSelected += OnChestRewardSelected;
         }
 
         private void OnDestroy()
         {
             mapPlayerTracker.NodeSelected -= OnNodeSelected;
             boosterPackNode.PackSelected -= OnPackSelected;
-            relicsNode.RelicSelected += OnRelicSelected;
+            chestRewardNode.RelicSelected += OnChestRewardSelected;
         }
 
         private void OnNodeSelected(object sender, NodeType e)
@@ -62,7 +61,7 @@ namespace Features.Maps
                     break;
                 case NodeType.Treasure:
 
-                    relicsNode.Show(relics.ToList());
+                    chestRewardNode.Show();
                     // mapPlayerTracker.Locked = false;
                     break;
                 case NodeType.Store:
@@ -88,9 +87,9 @@ namespace Features.Maps
             SelectedPack?.Invoke(this, cards);
         }
 
-        private void OnRelicSelected(object sender, Relic e)
+        private void OnChestRewardSelected(object sender, Relic e)
         {
-            relicsNode.Hide();
+            chestRewardNode.Hide();
             mapPlayerTracker.Locked = false;
             SelectedRelic?.Invoke(this, e);
         }
