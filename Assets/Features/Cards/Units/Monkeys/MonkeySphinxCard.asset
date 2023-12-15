@@ -19,15 +19,9 @@ MonoBehaviour:
   onDealDamageAbilities: []
   onSpinAbilities: []
   onTurnStartAbilities: []
-  onTurnEndAbilities:
-  - Type: 10
-    Amount: 5
+  onTurnEndAbilities: []
   onActAbilities: []
-  onBattleStartAbilities:
-  - Type: 9
-    Amount: 0
-  - Type: 8
-    Amount: 0
+  onBattleStartAbilities: []
   attackType: 0
   cardSprite: {fileID: 21300000, guid: b7ec49d37c3a58a48a15e8634f50954b, type: 3}
   actCost: 1
