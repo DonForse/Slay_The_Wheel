@@ -5,6 +5,8 @@ namespace Features.Maps
         HealthySnack,
         FireChauldron,
         PerroSalchicha,
-        GordoBachicha
+        GordoBachicha,
+        Curse,
+        Neutral
     }
 }

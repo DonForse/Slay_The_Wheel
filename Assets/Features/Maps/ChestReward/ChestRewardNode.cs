@@ -3,6 +3,7 @@ using System.Linq;
 using Features.Common;
 using Febucci.UI;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 namespace Features.Maps.ChestReward
 {
@@ -42,8 +43,10 @@ namespace Features.Maps.ChestReward
         {
             var playerRelics = Provider.PlayerPrefsRelicsRepository().Get();
             var goodRelics = relicsScriptableObject.relics.Where(relic =>
-                relic.Spectrum == RelicSpectrumType.Good 
-                && !playerRelics.Contains(relic.id)).ToList();
+                relic.Spectrum == RelicSpectrumType.Good
+                && !playerRelics.Contains(relic.id))
+                .OrderBy(x => UnityEngine.Random.Range(0, 100))
+                .ToList();
             
             foreach (Transform child in relicsContainer.transform)
             {
