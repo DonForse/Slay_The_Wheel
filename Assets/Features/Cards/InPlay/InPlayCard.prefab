@@ -291,8 +291,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   playCard: {fileID: 9020182488548676372}
-  descriptionBoxPrefab: {fileID: 2176219982370040531, guid: 5ace3f05fb0a44d4a9121829fc8fe07d, type: 3}
+  descriptionBoxPrefab: {fileID: 7185808179952768550, guid: 5ace3f05fb0a44d4a9121829fc8fe07d, type: 3}
   floatingDescriptionsContainer: {fileID: 487992931192189169}
+  effectsIconsScriptableObject: {fileID: 11400000, guid: b3fffa19363b5a347988196d44aa6fdb, type: 2}
+  abilityIconsScriptableObject: {fileID: 11400000, guid: 21f1e1d1aedacaf46a86ccacf3598fb7, type: 2}
 --- !u!95 &8524329497729110065
 Animator:
   serializedVersion: 5

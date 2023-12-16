@@ -1,6 +1,6 @@
 namespace Features.Battles.Core
 {
-    public enum ActDirection
+    public enum WheelRotation
     {
         Left = 1,
         Right = 2

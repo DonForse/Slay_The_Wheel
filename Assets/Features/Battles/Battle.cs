@@ -50,6 +50,7 @@ namespace Features.Battles
             _applyAbilityStrategies = new()
             {
                 new AddBurnOnApplyAbilityStrategy(),
+                new AddOilOnApplyAbilityStrategy(),
                 new RotateLeftOnApplyAbilityStrategy(),
                 new RotateRightOnApplyAbilityStrategy(),
                 new DealAttackDamageOnApplyAbilityStrategy(this), 
@@ -106,7 +107,7 @@ namespace Features.Battles
 
             _busQueue.EnqueueAction(Act(attacker,
                 enemyController,
-                playerController, ActDirection.Right));
+                playerController, WheelRotation.Right));
         }
 
         private void OnPlayerActed(object sender, InPlayCard attacker)
@@ -122,7 +123,7 @@ namespace Features.Battles
 
             _busQueue.EnqueueAction(Act(attacker,
                 playerController,
-                enemyController, ActDirection.Right));
+                enemyController, WheelRotation.Right));
         }
 
         private IEnumerator RevertAct(PlayerController playerController)
@@ -134,7 +135,7 @@ namespace Features.Battles
         }
 
         private IEnumerator ProcessAct(InPlayCard attacker, PlayerController attackerPlayerController,
-            PlayerController defenderPlayerController, ActDirection fromRight)
+            PlayerController defenderPlayerController, WheelRotation fromRight)
         {
             if (attacker.IsDead)
             {
@@ -186,7 +187,7 @@ namespace Features.Battles
 
         private IEnumerator ProcessAttackerDiedActing(PlayerController attackerPlayerController)
         {
-            yield return attackerPlayerController.PutAliveUnitAtFront(ActDirection.Right);
+            yield return attackerPlayerController.PutAliveUnitAtFront(WheelRotation.Right);
 
             if (attackerPlayerController.AllUnitsDead())
                 yield return EndBattle(attackerPlayerController);
@@ -201,7 +202,7 @@ namespace Features.Battles
         }
 
         private IEnumerator Act(InPlayCard attacker, PlayerController attackerPlayerController,
-            PlayerController defenderPlayerController, ActDirection actDirection)
+            PlayerController defenderPlayerController, WheelRotation wheelRotation)
         {
             var attackerCard = attacker.GetCard();
             _busQueue.EnqueueAction(ActStartCoroutine(attackerPlayerController));
@@ -215,7 +216,7 @@ namespace Features.Battles
 
             _busQueue.EnqueueAction(ApplyWheelSpinEffects(attackerPlayerController));
             _busQueue.EnqueueAction(
-                ProcessAct(attacker, attackerPlayerController, defenderPlayerController, actDirection));
+                ProcessAct(attacker, attackerPlayerController, defenderPlayerController, wheelRotation));
             yield break;
         }
 
@@ -228,7 +229,7 @@ namespace Features.Battles
             }
 
             yield return ApplyOnAttackAbilitiesEffects(attackerCard.OwnerPlayer, defender);
-            yield return defender.PutAliveUnitAtFront(ActDirection.Right);
+            yield return defender.PutAliveUnitAtFront(WheelRotation.Right);
         }
 
         public IEnumerator ApplyDamage(int damage, InPlayCard damageReceiver, [CanBeNull] InPlayCard damageDealer,
@@ -466,7 +467,7 @@ namespace Features.Battles
             while (burns > 0 && !enemyController.AllUnitsDead())
             {
                 if (enemyController.AllUnitsDead()) yield break;
-                yield return enemyController.Rotate(ActDirection.Right, burns);
+                yield return enemyController.Rotate(WheelRotation.Right, burns);
                 burns = enemyController.Cards.Max(x =>
                     x.Effects.Count(ability => ability.Type == EffectEnum.Fire));
             }
@@ -503,6 +504,11 @@ namespace Features.Battles
                     card.UpdateEffect(EffectEnum.Fire, -1);
                     yield return ApplyDamage(burns.Amount, card, null, controller, AbilityEnum.Burn);
                 }
+            }
+            if (controller.GetFrontCard().Effects.Any(x=>x.Type == EffectEnum.Oil && x.Amount > 0))
+            {
+                controller.GetFrontCard().UpdateEffect(EffectEnum.Oil, -1);
+                yield return controller.RepeatRotate(1);
             }
 
             yield break;

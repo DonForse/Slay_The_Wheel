@@ -24,7 +24,8 @@ namespace Features.Battles.Wheel
         // private List<RunCard> _cardsToAdd;
         public int frontCardIndex;
         private Func<IEnumerator> _wheelMovedCallback;
-        private ActDirection _lastActionDirection;
+        private WheelRotation _lastActionDirection;
+        private WheelRotation _lastRotation;
         private static readonly int OnMoved = Animator.StringToHash("on_moved");
         public event EventHandler<InPlayCard> Acted;
         public event EventHandler<InPlayCard> WheelTurn;
@@ -64,7 +65,7 @@ namespace Features.Battles.Wheel
         
         public bool AllUnitsDead() => Cards.All(x => x.IsDead);
 
-        public IEnumerator PutAliveUnitAtFront(ActDirection toTheRight)
+        public IEnumerator PutAliveUnitAtFront(WheelRotation toTheRight)
         {
             while (Cards[frontCardIndex].IsDead)
             {
@@ -97,7 +98,8 @@ namespace Features.Battles.Wheel
         {
             if (AllUnitsDead())
                 yield break;
-            _lastActionDirection = ActDirection.Left;
+            _lastActionDirection = WheelRotation.Left;
+            _lastRotation = WheelRotation.Left;
             IncrementFrontCardIndex();
             animator.SetTrigger(OnMoved);
             yield return new WaitForSeconds(0.3f);
@@ -109,8 +111,8 @@ namespace Features.Battles.Wheel
             if (AllUnitsDead())
                 yield break;
 
-            _lastActionDirection = ActDirection.Right; 
-            
+            _lastActionDirection = WheelRotation.Right; 
+            _lastRotation = WheelRotation.Right;
             DecrementFrontCardIndex();
             animator.SetTrigger(OnMoved);
             yield return new WaitForSeconds(0.3f);
@@ -121,6 +123,7 @@ namespace Features.Battles.Wheel
         {
             if (AllUnitsDead())
                 yield break;
+            _lastRotation = WheelRotation.Left;
             
             IncrementFrontCardIndex();
             yield return _wheelMovedCallback.Invoke();
@@ -130,6 +133,8 @@ namespace Features.Battles.Wheel
         {
             if (AllUnitsDead())
                 yield break;
+            _lastRotation = WheelRotation.Right;
+
             DecrementFrontCardIndex();
             yield return _wheelMovedCallback.Invoke();
         }
@@ -187,7 +192,15 @@ namespace Features.Battles.Wheel
             return cards.Distinct().ToList();
         }
 
-        public IEnumerator Rotate(ActDirection direction, int count)
+        public IEnumerator RepeatRotate(int count)
+        {
+            for (int i = 0; i < count; i++)
+            {
+                yield return wheelMovement.TurnTowardsDirection(_lastRotation, true);
+            }
+        }
+
+        public IEnumerator Rotate(WheelRotation direction, int count)
         {
             for (int i = 0; i < count; i++)
             {
@@ -204,8 +217,8 @@ namespace Features.Battles.Wheel
 
         public IEnumerator RevertLastMovement()
         {
-            yield return wheelMovement.TurnTowardsDirection(_lastActionDirection == ActDirection.Left ? ActDirection.Right : ActDirection.Left, false);
-            if (_lastActionDirection == ActDirection.Left)
+            yield return wheelMovement.TurnTowardsDirection(_lastActionDirection == WheelRotation.Left ? WheelRotation.Right : WheelRotation.Left, false);
+            if (_lastActionDirection == WheelRotation.Left)
                 DecrementFrontCardIndex();
             else
                 IncrementFrontCardIndex();

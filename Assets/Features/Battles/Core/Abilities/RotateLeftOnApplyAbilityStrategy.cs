@@ -14,7 +14,7 @@ namespace Features.Battles.Core.Abilities
 
         public IEnumerator Execute(Ability ability,InPlayCard executor, PlayerController enemyWheel, PlayerController executorWheel)
         {
-            yield return enemyWheel.Rotate(ActDirection.Left, ability.AbilityData.First().Amount);
+            yield return enemyWheel.Rotate(WheelRotation.Left, ability.AbilityData.First().Amount);
         }
     }
 }

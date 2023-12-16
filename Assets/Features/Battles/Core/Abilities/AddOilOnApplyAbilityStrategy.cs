@@ -5,7 +5,7 @@ using Features.Cards.InPlay;
 
 namespace Features.Battles.Core.Abilities
 {
-    public class AddSlipperyOnApplyAbilityStrategy : IOnApplyAbilityStrategy
+    public class AddOilOnApplyAbilityStrategy : IOnApplyAbilityStrategy
     {
         public bool IsValid(AbilityEnum abilityEnum) => abilityEnum == AbilityEnum.Slippery;
 
@@ -16,7 +16,7 @@ namespace Features.Battles.Core.Abilities
                 var targets = TargetSystem.GetTargets(data.Target, executor, executorWheel, enemyWheel);
                 foreach (var target in targets)
                 {
-                    target.UpdateEffect(EffectEnum.Slip, data.Amount);
+                    target.UpdateEffect(EffectEnum.Oil, data.Amount);
                 }
             }
             yield break;

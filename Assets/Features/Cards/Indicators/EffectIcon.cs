@@ -9,5 +9,6 @@ namespace Features.Cards.Indicators
     {
         public EffectEnum effect;
         public Sprite image;
+        public string description;
     }
 }

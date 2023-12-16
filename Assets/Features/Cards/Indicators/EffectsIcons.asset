@@ -15,3 +15,8 @@ MonoBehaviour:
   effectIcons:
   - effect: 0
     image: {fileID: 21300000, guid: f32dc0c4c3a8e0c40b3f6e9406dea01c, type: 3}
+    description: Receive <b>{amount}</b><color=red>damage</color> per stack on spin,
+      then reduce by half
+  - effect: 1
+    image: {fileID: 21300000, guid: 7c856c8cfb6b3e74e8147de74cb7c450, type: 3}
+    description: <color=#B5AC49>Slide</color>past this unit and spin again
