@@ -12,9 +12,9 @@ namespace Features.Battles.Core.Abilities
             return abilityEnum == AbilityEnum.RotateRight;
         }
 
-        public IEnumerator Execute(Ability ability,InPlayCard executor, PlayerController defender, PlayerController attacker)
+        public IEnumerator Execute(Ability ability,InPlayCard executor, PlayerController enemyWheel, PlayerController executorWheel)
         {
-            yield return defender.Rotate(ActDirection.Right, ability.AbilityData.First().Amount);
+            yield return enemyWheel.Rotate(ActDirection.Right, ability.AbilityData.First().Amount);
         }
     }
 }

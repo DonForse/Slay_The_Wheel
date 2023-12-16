@@ -49,7 +49,7 @@ namespace Features.Battles
         {
             _applyAbilityStrategies = new()
             {
-                new BurnOnApplyAbilityStrategy(),
+                new AddBurnOnApplyAbilityStrategy(),
                 new RotateLeftOnApplyAbilityStrategy(),
                 new RotateRightOnApplyAbilityStrategy(),
                 new DealAttackDamageOnApplyAbilityStrategy(this), 

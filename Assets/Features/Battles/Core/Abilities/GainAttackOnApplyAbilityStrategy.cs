@@ -9,34 +9,15 @@ namespace Features.Battles.Core.Abilities
     {
         public bool IsValid(AbilityEnum abilityEnum) => abilityEnum == AbilityEnum.GainAtk;
 
-        public IEnumerator Execute(Ability ability, InPlayCard executor, PlayerController defender,
-            PlayerController attacker)
+        public IEnumerator Execute(Ability ability, InPlayCard executor, PlayerController enemyWheel,
+            PlayerController executorWheel)
         {
             foreach (var data in ability.AbilityData)
             {
-                switch (data.Target)
+                var targets = TargetSystem.GetTargets(data.Target, executor, executorWheel, enemyWheel);
+                foreach (var target in targets)
                 {
-                    case TargetEnum.Self:
-                        executor.GetCard().Attack += data.Amount;
-                        break;
-                    case TargetEnum.Left:
-                        var leftNeighbor = executor.OwnerPlayer.GetNeighborsCards(executor,1, 2)[0];
-                        if (!leftNeighbor.IsDead)
-                            leftNeighbor.GetCard().Attack += data.Amount;;
-                        break;
-                    case TargetEnum.Right:
-                        var rightNeighbor = executor.OwnerPlayer.GetNeighborsCards(executor,1, 2)[1];
-                        if (!rightNeighbor.IsDead)
-                            rightNeighbor.GetCard().Attack += data.Amount;;
-                        break;
-                    case TargetEnum.AllAllies:
-                        break;
-                    case TargetEnum.Enemy:
-                        break;
-                    case TargetEnum.AllEnemies:
-                        break;
-                    default:
-                        throw new ArgumentOutOfRangeException();
+                    target.GetCard().Attack += data.Amount;
                 }
             }
 

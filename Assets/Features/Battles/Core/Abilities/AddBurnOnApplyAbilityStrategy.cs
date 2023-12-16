@@ -6,11 +6,11 @@ using Features.Cards.InPlay;
 
 namespace Features.Battles.Core.Abilities
 {
-    public class GainShieldOnApplyAbilityStrategy : IOnApplyAbilityStrategy
+    public class AddBurnOnApplyAbilityStrategy : IOnApplyAbilityStrategy
     {
-        public bool IsValid(AbilityEnum abilityEnum) => abilityEnum == AbilityEnum.GainShield;
+        public bool IsValid(AbilityEnum abilityEnum) => abilityEnum == AbilityEnum.Burn;
 
-        public IEnumerator Execute(Ability ability, InPlayCard executor, PlayerController enemyWheel,
+        public IEnumerator Execute(Ability ability,InPlayCard executor, PlayerController enemyWheel,
             PlayerController executorWheel)
         {
             foreach (var data in ability.AbilityData)
@@ -18,8 +18,7 @@ namespace Features.Battles.Core.Abilities
                 var targets = TargetSystem.GetTargets(data.Target, executor, executorWheel, enemyWheel);
                 foreach (var target in targets)
                 {
-                    target.GetCard().Armor += data.Amount;
-                    yield return target.PlayGainShield();
+                    target.UpdateEffect(EffectEnum.Fire, data.Amount);
                 }
             }
             yield break;

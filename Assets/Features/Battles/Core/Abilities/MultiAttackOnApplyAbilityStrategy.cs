@@ -19,14 +19,21 @@ namespace Features.Battles.Core.Abilities
 
         public bool IsValid(AbilityEnum abilityEnum) => !_executingMultiAttack && abilityEnum == AbilityEnum.MultiAttack;
 
-        public IEnumerator Execute(Ability ability,InPlayCard executor, PlayerController defender, PlayerController attacker)
+        public IEnumerator Execute(Ability ability,InPlayCard executor, PlayerController enemyWheel, PlayerController executorWheel)
         {
-            _executingMultiAttack = true;
-            for (int i = 0; i < ability.AbilityData.First().Amount; i++)
+            foreach (var data in ability.AbilityData)
             {
-                yield return _battle.ApplyFrontCardAttack(executor, defender);
+                var targets = TargetSystem.GetTargets(data.Target, executor, executorWheel, enemyWheel);
+                foreach (var target in targets)
+                {
+                    _executingMultiAttack = true;
+                    for (int i = 0; i < data.Amount; i++)
+                    {
+                        yield return _battle.ApplyFrontCardAttack(executor, enemyWheel);
+                    }
+                    _executingMultiAttack = false;
+                }
             }
-            _executingMultiAttack = false;
         }
     }
 }

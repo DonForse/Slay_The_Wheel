@@ -3,6 +3,7 @@ namespace Features.Battles
     public enum AbilityEnum
     {
         Burn,
+        Slippery,
         RotateRight,
         RotateLeft,
         GainShield,

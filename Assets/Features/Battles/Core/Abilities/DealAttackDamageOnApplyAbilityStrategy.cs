@@ -16,11 +16,18 @@ namespace Features.Battles.Core.Abilities
 
         public bool IsValid(AbilityEnum abilityEnum) => abilityEnum == AbilityEnum.DealAttackDamage;
 
-        public IEnumerator Execute(Ability ability,InPlayCard executor, PlayerController defender, PlayerController attacker)
+        public IEnumerator Execute(Ability ability,InPlayCard executor, PlayerController enemyWheel, PlayerController executorWheel)
         {
-            var defenderCard = defender.GetFrontCard();
-            yield return executor.PlayRangedAttack(defenderCard);
-            yield return _battle.ApplyDamage(executor.GetCard().Attack, defenderCard, executor, defender, null);
+            foreach (var data in ability.AbilityData)
+            {
+                var targets = TargetSystem.GetTargets(data.Target, executor, executorWheel, enemyWheel);
+                foreach (var target in targets)
+                {
+                    yield return executor.PlayRangedAttack(target);
+                    yield return _battle.ApplyDamage(executor.GetCard().Attack, target, executor, enemyWheel, null);
+                }
+            }
+            
             yield break;
         }
     }
