@@ -51,6 +51,7 @@ namespace Features.Battles
             {
                 new AddBurnOnApplyAbilityStrategy(),
                 new AddOilOnApplyAbilityStrategy(),
+                new AddBombOnApplyAbilityStrategy(),
                 new RotateLeftOnApplyAbilityStrategy(),
                 new RotateRightOnApplyAbilityStrategy(),
                 new DealAttackDamageOnApplyAbilityStrategy(this), 
@@ -85,6 +86,8 @@ namespace Features.Battles
             playerController.SetWheelMovedCallback(OnPlayerWheelMoved);
             enemyController.SetWheelMovedCallback(OnEnemyWheelMoved);
 
+            yield return ApplyOnBattleStartAbilities();
+            
             SetActions(3);
         }
 
@@ -541,6 +544,23 @@ namespace Features.Battles
                             yield return strategy.Execute(ability, card,  defender, attacker);
                     }
                 }
+
+                var bomb = card.Effects.FirstOrDefault(x => x.Type == EffectEnum.Bomb);
+                if (bomb != null && bomb.Amount > 0)
+                {
+                    if (bomb.Amount == 1)
+                    {
+                        foreach (var enemyCard in defender.Cards)
+                        {
+                            yield return ApplyDamage(40, enemyCard, card, defender, null);
+                            
+                        }
+
+                        yield return ApplyDamage(200, card, null, attacker, null);
+                    }
+
+                    card.UpdateEffect(EffectEnum.Bomb, -1);
+                }
             }
         }
 
@@ -595,6 +615,35 @@ namespace Features.Battles
             }
 
             yield return null;
+        }
+        
+        private IEnumerator ApplyOnBattleStartAbilities()
+        {
+            foreach (var card in playerController.Cards)
+            {
+                foreach (var ability in card.GetCard().OnBattleStartAbilities)
+                {
+                    foreach (var strategy in _applyAbilityStrategies)
+                    {
+                        if (strategy.IsValid(ability.Type))
+                            yield return strategy.Execute(ability, card,
+                                enemyController, playerController);
+                    }
+                }
+            }
+            
+            foreach (var card in enemyController.Cards)
+            {
+                foreach (var ability in card.GetCard().OnBattleStartAbilities)
+                {
+                    foreach (var strategy in _applyAbilityStrategies)
+                    {
+                        if (strategy.IsValid(ability.Type))
+                            yield return strategy.Execute(ability, card,
+                                playerController, enemyController);
+                    }
+                }
+            }
         }
     }
 }

@@ -66,12 +66,14 @@ namespace Features
                 var bigSpider = enemiesDb.cards.FirstOrDefault(x => x.cardName.Equals("Big Spider"));
                 var zombie = enemiesDb.cards.FirstOrDefault(x => x.cardName.Contains("Zombie"));
                 var spider = enemiesDb.cards.FirstOrDefault(x => x.cardName.Contains("Spider"));
+                var bomby = enemiesDb.cards.FirstOrDefault(x => x.cardName.Contains("Bomby"));
                 return minorBattlesAmount switch
                 {
-                    1 => (new List<RunCardScriptableObject>() { new RunCardScriptableObject(slime), new RunCardScriptableObject(slime), new RunCardScriptableObject(slime) }, 3),
-                    2 => (new List<RunCardScriptableObject>() { new RunCardScriptableObject(slime), new RunCardScriptableObject(slime), new RunCardScriptableObject(slime), new RunCardScriptableObject(zombie)}, 4),
-                    3 => (new List<RunCardScriptableObject>() { new RunCardScriptableObject(zombie), new RunCardScriptableObject(kobold), new RunCardScriptableObject(zombie) }, 3),
-                    _ => (new List<RunCardScriptableObject>() { new RunCardScriptableObject(spider), new RunCardScriptableObject(kobold), new RunCardScriptableObject(spider) }, 3)
+                    1 => (new List<RunCardScriptableObject>() { new(slime), new(slime), new(slime) }, 3),
+                    2 => (new List<RunCardScriptableObject>() { new(slime), new(slime), new(slime), new(zombie)}, 4),
+                    3 => (new List<RunCardScriptableObject>() { new(zombie), new(kobold), new(zombie) }, 3),
+                    4 => (new List<RunCardScriptableObject>() { new(zombie), new(bomby), new(zombie),  new(bomby) }, 4),
+                    _ => (new List<RunCardScriptableObject>() { new(spider), new(kobold), new(spider) }, 3)
                 };
             }
 
@@ -84,16 +86,17 @@ namespace Features
                 var bigSpider = enemiesDb.cards.FirstOrDefault(x => x.cardName.Equals("Big Spider"));
                 return majorBattlesAmount switch
                 {
-                    1 => (new List<RunCardScriptableObject>() { new RunCardScriptableObject(spider), new RunCardScriptableObject(spider), new RunCardScriptableObject(spider), new RunCardScriptableObject(spider), new RunCardScriptableObject(spider), new RunCardScriptableObject(spider), new RunCardScriptableObject(bigSpider)}, 5) ,
-                    _ => (new List<RunCardScriptableObject>() { new RunCardScriptableObject(zombie), new RunCardScriptableObject(zombie), new RunCardScriptableObject(zombie), new RunCardScriptableObject(zombie),
-                        new RunCardScriptableObject(zombie), new RunCardScriptableObject(zombie), new RunCardScriptableObject(zombie), new RunCardScriptableObject(zombie), new RunCardScriptableObject(zombie), new RunCardScriptableObject(zombie) }, 5)
+                    1 => (new List<RunCardScriptableObject>() { new(spider), new(spider), new(spider), 
+                        new(spider), new(spider), new(spider), new(bigSpider)}, 5) ,
+                    _ => (new List<RunCardScriptableObject>() { new(zombie), new(zombie), new(zombie), new(zombie),
+                        new(zombie), new(zombie), new(zombie), new(zombie), new(zombie), new(zombie) }, 5)
                 };
             }
 
             var dinosaur = enemiesDb.cards.FirstOrDefault(x => x.cardName.Contains("Cookie Dinosaur"));
             return bossBattlesAmount switch
             {
-                _=> (new List<RunCardScriptableObject>() { new RunCardScriptableObject(dinosaur)},1)  
+                _=> (new List<RunCardScriptableObject>() { new(dinosaur)},1)  
             };
         }
 

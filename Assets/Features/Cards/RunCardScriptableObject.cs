@@ -18,6 +18,8 @@ namespace Features.Cards
         public List<Ability> onSpinAbilities;
         public List<Ability> onTurnStartAbilities;
         public List<Ability> onTurnEndAbilities;
+        public List<Ability> onBattleStartAbilities;
+        // public List<Ability> onBattleEndAbilities;
 
         public readonly AttackType attackType;
         public int actCost;
@@ -33,6 +35,8 @@ namespace Features.Cards
             onSpinAbilities = new(cardScriptableObject.onSpinAbilities?? Array.Empty<Ability>());
             onTurnStartAbilities = new(cardScriptableObject.onTurnStartAbilities?? Array.Empty<Ability>());
             onTurnEndAbilities = new(cardScriptableObject.onTurnEndAbilities?? Array.Empty<Ability>());
+            onBattleStartAbilities = new(cardScriptableObject.onBattleStartAbilities ?? Array.Empty<Ability>());
+            // onBattleEndAbilities = new(cardScriptableObject.onBattleStartAbilities ?? Array.Empty<Ability>());
             attackType = cardScriptableObject.attackType;
             actCost = cardScriptableObject.actCost;
             baseCard = cardScriptableObject;

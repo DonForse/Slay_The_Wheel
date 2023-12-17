@@ -20,3 +20,7 @@ MonoBehaviour:
   - effect: 1
     image: {fileID: 21300000, guid: 7c856c8cfb6b3e74e8147de74cb7c450, type: 3}
     description: <color=#B5AC49>Slide</color>past this unit and spin again
+  - effect: 2
+    image: {fileID: 21300000, guid: 74e3b6e566b90464ab978ee9032a6390, type: 3}
+    description: <color=red>Self destroy</color>and does <b>40</b> damage to all
+      enemies

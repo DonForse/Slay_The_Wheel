@@ -12,5 +12,6 @@ namespace Features.Battles
         Counter,
         DealAttackDamage,
         MultiAttack,
+        SelfBomb
     }
 }

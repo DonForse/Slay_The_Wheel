@@ -29,7 +29,7 @@ namespace Features.Battles
                     _deck.Add(new RunCardScriptableObject(card.card));
             }
 
-            var slime = enemiesDb.cards.FirstOrDefault(x => x.cardName.Contains("Slime"));
+            var slime = enemiesDb.cards.FirstOrDefault(x => x.cardName.Contains("Bomby"));
             _deck = _deck.OrderBy(x=>Random.Range(0, 100)).ToList();
             yield return battle.Initialize(_deck,
                 new List<RunCardScriptableObject>() { new RunCardScriptableObject(slime), new RunCardScriptableObject(slime), new RunCardScriptableObject(slime) }, 5, 3, _heroCardScriptableObject);
