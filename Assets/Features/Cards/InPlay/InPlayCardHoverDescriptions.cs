@@ -19,7 +19,8 @@ namespace Features.Cards.InPlay
             {
                 var go = Instantiate(descriptionBoxPrefab, floatingDescriptionsContainer);
                 var effectIcon= effectsIconsScriptableObject.effectIcons.FirstOrDefault(x => x.effect == effect.Type);
-                go.Set(effectIcon.description, effectIcon.image,effect.Amount);
+                if (effectIcon != null) 
+                    go.Set(effectIcon.description, effectIcon.image, effect.Amount);
             }
             
             foreach (var ability in playCard.Abilities)
@@ -29,7 +30,8 @@ namespace Features.Cards.InPlay
                     var go = Instantiate(descriptionBoxPrefab, floatingDescriptionsContainer);
                     var abilityIcon= abilityIconsScriptableObject.abilitiesIcons.FirstOrDefault(x => x.ability == ability.Type);
 
-                    go.Set(abilityIcon.description, abilityIcon.image, abilityData.Amount);
+                    if (abilityIcon != null) 
+                        go.Set(abilityIcon.description, abilityIcon.image, abilityData.Amount);
                 }
             }
         }
@@ -40,9 +42,6 @@ namespace Features.Cards.InPlay
             {
                 Destroy(child.gameObject);
             }
-
-            if (playCard == null)
-                return;
         }
     }
 }
