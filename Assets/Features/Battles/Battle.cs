@@ -235,9 +235,7 @@ namespace Features.Battles
             yield return defender.PutAliveUnitAtFront(WheelRotation.Right);
         }
 
-        public IEnumerator ApplyDamage(int damage, InPlayCard damageReceiver, [CanBeNull] InPlayCard damageDealer,
-            PlayerController defenderPlayerController,
-            AbilityEnum? source)
+        public IEnumerator ApplyDamage(int damage, InPlayCard damageReceiver, [CanBeNull] InPlayCard damageDealer, AbilityEnum? source)
         {
             var defenderCard = damageReceiver.GetCard();
             StartCoroutine(damageReceiver.PlayGetHitAnimation(damage, source));
@@ -255,31 +253,33 @@ namespace Features.Battles
             if (defenderCard.Health > 0)
                 yield break;
 
+            yield return ApplyDeathRattleEffect(damageReceiver);
+            
             yield return damageReceiver.SetDead();
 
-            if (defenderPlayerController == enemyController)
+            if (damageReceiver.OwnerPlayer == enemyController)
             {
                 if (_enemiesDeck.Count > 0)
                 {
                     var runCards = new List<InPlayCardScriptableObject>();
                     var cards = DrawCards(1, ref _enemiesDeck, ref runCards);
                     if (cards == null || cards.Count == 0)
-                        _busQueue.EnqueueInterruptAction(EndBattle(defenderPlayerController));
+                        _busQueue.EnqueueInterruptAction(EndBattle(damageReceiver.OwnerPlayer));
                     else
                         _busQueue.EnqueueInterruptAction(
-                            damageReceiver.SetCard(cards.First(), defenderPlayerController));
+                            damageReceiver.SetCard(cards.First(), damageReceiver.OwnerPlayer));
                 }
 
-                if (_enemiesDeck.Count == 0 && defenderPlayerController.AllUnitsDead())
+                if (_enemiesDeck.Count == 0 && damageReceiver.OwnerPlayer.AllUnitsDead())
                 {
-                    _busQueue.EnqueueInterruptAction(EndBattle(defenderPlayerController));
+                    _busQueue.EnqueueInterruptAction(EndBattle(damageReceiver.OwnerPlayer));
                 }
             }
             else
             {
                 if (_heroCardScriptableObject.IsDead)
                 {
-                    _busQueue.EnqueueInterruptAction(EndBattle(defenderPlayerController));
+                    _busQueue.EnqueueInterruptAction(EndBattle(damageReceiver.OwnerPlayer));
                     yield break;
                     ;
                 }
@@ -288,16 +288,28 @@ namespace Features.Battles
                 {
                     var cards = DrawCards(1, ref _playerBattleDeck, ref _playerDiscardPile);
                     if (cards == null || cards.Count == 0)
-                        _busQueue.EnqueueInterruptAction(EndBattle(defenderPlayerController));
+                        _busQueue.EnqueueInterruptAction(EndBattle(damageReceiver.OwnerPlayer));
                     else
                         _busQueue.EnqueueInterruptAction(
-                            damageReceiver.SetCard(cards.First(), defenderPlayerController));
+                            damageReceiver.SetCard(cards.First(), damageReceiver.OwnerPlayer));
                 }
 
                 if (_playerBattleDeck.Count == 0 && _playerDiscardPile.Count == 0 &&
-                    defenderPlayerController.AllUnitsDead())
+                    damageReceiver.OwnerPlayer.AllUnitsDead())
                 {
-                    _busQueue.EnqueueInterruptAction(EndBattle(defenderPlayerController));
+                    _busQueue.EnqueueInterruptAction(EndBattle(damageReceiver.OwnerPlayer));
+                }
+            }
+        }
+
+        private IEnumerator ApplyDeathRattleEffect(InPlayCard damageReceiver)
+        {
+            foreach (var ability in damageReceiver.GetCard().OnDeadAbilities)
+            {
+                foreach (var strategy in _applyAbilityStrategies)
+                {
+                    if (strategy.IsValid(ability.Type))
+                        yield return strategy.Execute(ability, damageReceiver,  GetEnemyWheel(damageReceiver), damageReceiver.OwnerPlayer);
                 }
             }
         }
@@ -330,8 +342,8 @@ namespace Features.Battles
             yield return null;
         }
 
-        private bool IsPlayerTurn() => turn % 2 == 0;
 
+        private bool IsPlayerTurn() => turn % 2 == 0;
 
         private IEnumerator StartPlayerTurn()
         {
@@ -345,6 +357,7 @@ namespace Features.Battles
             enemyController.LockWheel();
             playerController.UnlockWheel();
         }
+
 
         private bool CompletedActions() => _actions <= 0;
 
@@ -505,7 +518,7 @@ namespace Features.Battles
                 if (burns != null)
                 {
                     card.UpdateEffect(EffectEnum.Fire, -1);
-                    yield return ApplyDamage(burns.Amount, card, null, controller, AbilityEnum.Burn);
+                    yield return ApplyDamage(burns.Amount, card, null, AbilityEnum.Burn);
                 }
             }
             if (controller.GetFrontCard().Effects.Any(x=>x.Type == EffectEnum.Oil && x.Amount > 0))
@@ -552,11 +565,10 @@ namespace Features.Battles
                     {
                         foreach (var enemyCard in defender.Cards)
                         {
-                            yield return ApplyDamage(40, enemyCard, card, defender, null);
-                            
+                            yield return ApplyDamage(40, enemyCard, card, null);
                         }
 
-                        yield return ApplyDamage(200, card, null, attacker, null);
+                        yield return ApplyDamage(200, card, null, null);
                     }
 
                     card.UpdateEffect(EffectEnum.Bomb, -1);
@@ -616,7 +628,7 @@ namespace Features.Battles
 
             yield return null;
         }
-        
+
         private IEnumerator ApplyOnBattleStartAbilities()
         {
             foreach (var card in playerController.Cards)
@@ -645,5 +657,7 @@ namespace Features.Battles
                 }
             }
         }
+
+        private PlayerController GetEnemyWheel(InPlayCard damageReceiver) => damageReceiver.OwnerPlayer == enemyController ? playerController : enemyController;
     }
 }

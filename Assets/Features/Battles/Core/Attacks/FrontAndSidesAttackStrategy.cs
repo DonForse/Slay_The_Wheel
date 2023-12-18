@@ -21,7 +21,7 @@ namespace Features.Battles.Core.Attacks
             yield return attackerCard.PlayAttack();
             var defenders = defenderPlayerController.GetFrontNeighborsCards(0, 2).ToList();
             foreach (var defender in defenders)
-                yield return _battle.ApplyDamage(attackerCard.GetCard().Attack, defender, attackerCard,defenderPlayerController, null);
+                yield return _battle.ApplyDamage(attackerCard.GetCard().Attack, defender, attackerCard, null);
             yield break;
         }
     }

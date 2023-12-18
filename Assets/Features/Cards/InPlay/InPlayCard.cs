@@ -37,7 +37,9 @@ namespace Features.Cards.InPlay
             .Concat(_cardScriptableObject.OnActAbilities)
             .Concat(_cardScriptableObject.OnSpinAbilities)
             .Concat(_cardScriptableObject.OnTurnStartAbilities)
-            .Concat(_cardScriptableObject.OnTurnEndAbilities).ToList();
+            .Concat(_cardScriptableObject.OnTurnEndAbilities)
+            .Concat(_cardScriptableObject.OnDeadAbilities)
+            .Concat(_cardScriptableObject.OnBattleStartAbilities).ToList();
 
         public string CardName => _cardScriptableObject.CardName;
         public PlayerController OwnerPlayer;
@@ -55,13 +57,7 @@ namespace Features.Cards.InPlay
             _cardScriptableObject = runCardScriptableObject;
             spriteRenderer.sprite = runCardScriptableObject.CardSprite;
 
-            SetAbilityIcons(
-                runCardScriptableObject.OnDealDamageAbilities
-                    .Concat(runCardScriptableObject.OnAttackAbilities)
-                    .Concat(runCardScriptableObject.OnActAbilities)
-                    .Concat(runCardScriptableObject.OnSpinAbilities)
-                    .Concat(runCardScriptableObject.OnTurnStartAbilities)
-                    .Concat(runCardScriptableObject.OnTurnEndAbilities).ToArray());
+            SetAbilityIcons(Abilities.ToArray());
             SetEffectIcons(Effects.ToArray());
 
             _cardScriptableObject.ValueChanged += UpdateCardScriptableObjectValues;

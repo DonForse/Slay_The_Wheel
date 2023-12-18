@@ -24,7 +24,7 @@ namespace Features.Battles.Core.Abilities
                 foreach (var target in targets)
                 {
                     yield return executor.PlayRangedAttack(target);
-                    yield return _battle.ApplyDamage(executor.GetCard().Attack, target, executor, enemyWheel, null);
+                    yield return _battle.ApplyDamage(executor.GetCard().Attack, target, executor, null);
                 }
             }
             

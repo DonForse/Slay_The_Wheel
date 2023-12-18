@@ -123,6 +123,16 @@ namespace Features.Cards.InPlay
             }
         }
 
+        public List<Ability> OnDeadAbilities
+        {
+            get => _onDeadAbilities;
+            set
+            {
+                _onDeadAbilities = value;
+                ValueChanged?.Invoke(this, this);
+            }
+        }
+
         public bool IsDead => _runCard.hp <= 0;
 
         public AttackType AttackType
@@ -155,8 +165,6 @@ namespace Features.Cards.InPlay
                 ValueChanged?.Invoke(this,this);
             }
         }
-        
-        
 
         private string _cardName;
         private int _attack;
@@ -167,6 +175,7 @@ namespace Features.Cards.InPlay
         private List<Ability> _onTurnEndAbilities;
         private List<Ability> _onActAbilities;
         private List<Ability> _onBattleStartAbilities;
+        public List<Ability> _onDeadAbilities;
         private List<Effect> _effects;
         private AttackType _attackType;
         private Sprite _cardSprite;
@@ -182,6 +191,7 @@ namespace Features.Cards.InPlay
             _onAttackAbilities = cardScriptableObject.onAttackAbilities;
             _onActAbilities = cardScriptableObject.onActAbilities;
             _onSpinAbilities = cardScriptableObject.onSpinAbilities;
+            _onDeadAbilities = cardScriptableObject.onDeadAbilities;
             _onTurnStartAbilities = cardScriptableObject.onTurnStartAbilities;
             _onTurnEndAbilities = cardScriptableObject.onTurnEndAbilities;
             _onBattleStartAbilities = cardScriptableObject.onBattleStartAbilities;
