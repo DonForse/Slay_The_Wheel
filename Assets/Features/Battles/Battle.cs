@@ -6,6 +6,7 @@ using Features.Battles.Actions;
 using Features.Battles.Core;
 using Features.Battles.Core.Abilities;
 using Features.Battles.Core.Attacks;
+using Features.Battles.Core.Effects;
 using Features.Battles.Spells;
 using Features.Battles.Wheel;
 using Features.Cards;
@@ -43,6 +44,7 @@ namespace Features.Battles
 
         private List<IOnApplyAbilityStrategy> _applyAbilityStrategies = new();
         private List<IAttackStrategy> _attackStrategies = new();
+        private List<IOnApplyEffectStrategy> _applyEffectStrategies;
 
         public IEnumerator Initialize(List<RunCardScriptableObject> deck, List<RunCardScriptableObject> enemies, int playerWheelSize,
             int enemyWheelSize, RunCardScriptableObject heroCardScriptableObject)
@@ -65,6 +67,12 @@ namespace Features.Battles
                 new FrontAttackStrategy(this),
                 new FrontAndSidesAttackStrategy(this),
                 new AllAttackStrategy(this)
+            };
+            _applyEffectStrategies = new()
+            {
+                new BurnOnApplyEffectStrategy(this),
+                new OilOnApplyEffectStrategy(),
+                new BombOnApplyEffectStrategy(this)
             };
 
             _playerBattleDeck = deck.Select(card=> new InPlayCardScriptableObject(card)).ToList();
@@ -512,20 +520,26 @@ namespace Features.Battles
 
         private IEnumerator ApplyWheelSpinEffects(PlayerController controller)
         {
-            foreach (var card in controller.Cards)
+            var cardAtFront = controller.GetFrontCard();
+            foreach (var effect in cardAtFront.Effects)
             {
-                var cardActiveEffects = card.Effects;
-                var burns = cardActiveEffects.FirstOrDefault(a => a.Type == EffectEnum.Fire);
-                if (burns != null)
+                foreach (var strategy in _applyEffectStrategies)
                 {
-                    card.UpdateEffect(EffectEnum.Fire, -1);
-                    yield return ApplyDamage(burns.Amount, card, null, AbilityEnum.AddBurn);
+                    if (strategy.IsValid(effect, BattleEventEnum.PutAtFront))
+                        strategy.Execute(effect, cardAtFront);
                 }
             }
-            if (controller.GetFrontCard().Effects.Any(x=>x.Type == EffectEnum.Oil && x.Amount > 0))
+            
+            foreach (var card in controller.Cards)
             {
-                controller.GetFrontCard().UpdateEffect(EffectEnum.Oil, -1);
-                yield return controller.RepeatRotate(1);
+                foreach (var effect in card.Effects)
+                {
+                    foreach (var strategy in _applyEffectStrategies)
+                    {
+                        if (strategy.IsValid(effect, BattleEventEnum.Spin))
+                            strategy.Execute(effect, card);
+                    }
+                }
             }
 
             yield break;
@@ -559,20 +573,13 @@ namespace Features.Battles
                     }
                 }
 
-                var bomb = card.Effects.FirstOrDefault(x => x.Type == EffectEnum.Bomb);
-                if (bomb != null && bomb.Amount > 0)
+                foreach (var effect in card.Effects)
                 {
-                    if (bomb.Amount == 1)
+                    foreach (var strategy in _applyEffectStrategies)
                     {
-                        foreach (var enemyCard in defender.Cards)
-                        {
-                            yield return ApplyDamage(40, enemyCard, card, null);
-                        }
-
-                        yield return ApplyDamage(200, card, null, null);
+                        if (strategy.IsValid(effect, BattleEventEnum.Spin))
+                            strategy.Execute(effect, card);
                     }
-
-                    card.UpdateEffect(EffectEnum.Bomb, -1);
                 }
             }
         }
@@ -659,6 +666,7 @@ namespace Features.Battles
             }
         }
 
-        private PlayerController GetEnemyWheel(InPlayCard damageReceiver) => damageReceiver.OwnerPlayer == enemyController ? playerController : enemyController;
+        public PlayerController GetEnemyWheel(InPlayCard damageReceiver) 
+            => damageReceiver.OwnerPlayer == enemyController ? playerController : enemyController;
     }
 }
