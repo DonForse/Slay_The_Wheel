@@ -7,7 +7,7 @@ namespace Features.Battles.Core.Abilities
 {
     public class AddOilOnApplyAbilityStrategy : IOnApplyAbilityStrategy
     {
-        public bool IsValid(AbilityEnum abilityEnum) => abilityEnum == AbilityEnum.Slippery;
+        public bool IsValid(AbilityEnum abilityEnum) => abilityEnum == AbilityEnum.AddOil;
 
         public IEnumerator Execute(Ability ability, InPlayCard executor, PlayerController enemyWheel, PlayerController executorWheel)
         {

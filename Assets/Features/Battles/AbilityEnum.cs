@@ -2,16 +2,19 @@ namespace Features.Battles
 {
     public enum AbilityEnum
     {
-        Burn,
-        Slippery,
+        AddBurn,
+        AddOil,
         RotateRight,
         RotateLeft,
-        GainShield,
-        GainAtk,
+        AddShield,
+        AddAtk,
         Reflect,
         Counter,
         DealAttackDamage,
         MultiAttack,
-        SelfBomb
+        AddBomb,
+        AddVulnerable,
+        AddWeak,
+        AddFragile,
     }
 }

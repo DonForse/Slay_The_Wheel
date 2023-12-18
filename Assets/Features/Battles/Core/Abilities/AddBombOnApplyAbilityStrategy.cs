@@ -8,7 +8,7 @@ namespace Features.Battles.Core.Abilities
 {
     public class AddBombOnApplyAbilityStrategy : IOnApplyAbilityStrategy
     {
-        public bool IsValid(AbilityEnum abilityEnum) => abilityEnum == AbilityEnum.SelfBomb;
+        public bool IsValid(AbilityEnum abilityEnum) => abilityEnum == AbilityEnum.AddBomb;
 
         public IEnumerator Execute(Ability ability,InPlayCard executor, PlayerController enemyWheel,
             PlayerController executorWheel)

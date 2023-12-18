@@ -49,6 +49,7 @@ namespace Features.Battles
         {
             _applyAbilityStrategies = new()
             {
+                new AddVulnerableOnApplyAbilityStrategy(),
                 new AddBurnOnApplyAbilityStrategy(),
                 new AddOilOnApplyAbilityStrategy(),
                 new AddBombOnApplyAbilityStrategy(),
@@ -56,8 +57,8 @@ namespace Features.Battles
                 new RotateRightOnApplyAbilityStrategy(),
                 new DealAttackDamageOnApplyAbilityStrategy(this), 
                 new MultiAttackOnApplyAbilityStrategy(this),
-                new GainShieldOnApplyAbilityStrategy(),
-                new GainAttackOnApplyAbilityStrategy()
+                new AddShieldOnApplyAbilityStrategy(),
+                new AddAttackOnApplyAbilityStrategy()
             };
             _attackStrategies = new()
             {
@@ -518,7 +519,7 @@ namespace Features.Battles
                 if (burns != null)
                 {
                     card.UpdateEffect(EffectEnum.Fire, -1);
-                    yield return ApplyDamage(burns.Amount, card, null, AbilityEnum.Burn);
+                    yield return ApplyDamage(burns.Amount, card, null, AbilityEnum.AddBurn);
                 }
             }
             if (controller.GetFrontCard().Effects.Any(x=>x.Type == EffectEnum.Oil && x.Amount > 0))

@@ -40,14 +40,14 @@ namespace Features.PostBattles
             if (e == LevelUpUpgrade.Burn)
             {
                 var heroAbilities = _heroCardScriptableObject.onDealDamageAbilities.ToList();
-                var burn = heroAbilities.FirstOrDefault(x => x.Type == AbilityEnum.Burn);
+                var burn = heroAbilities.FirstOrDefault(x => x.Type == AbilityEnum.AddBurn);
 
                 heroAbilities.Remove(burn);
 
                 if (burn == null)
                     burn = new Ability()
                     {
-                        Type = AbilityEnum.Burn,
+                        Type = AbilityEnum.AddBurn,
                         AbilityData = new[]
                         {
                             new AbilityData()

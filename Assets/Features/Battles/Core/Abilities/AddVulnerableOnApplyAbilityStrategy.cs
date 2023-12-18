@@ -1,15 +1,14 @@
-using System;
 using System.Collections;
 using Features.Battles.Wheel;
 using Features.Cards.InPlay;
 
 namespace Features.Battles.Core.Abilities
 {
-    public class GainAttackOnApplyAbilityStrategy : IOnApplyAbilityStrategy
+    public class AddVulnerableOnApplyAbilityStrategy : IOnApplyAbilityStrategy
     {
-        public bool IsValid(AbilityEnum abilityEnum) => abilityEnum == AbilityEnum.GainAtk;
+        public bool IsValid(AbilityEnum abilityEnum) => abilityEnum == AbilityEnum.AddVulnerable;
 
-        public IEnumerator Execute(Ability ability, InPlayCard executor, PlayerController enemyWheel,
+        public IEnumerator Execute(Ability ability,InPlayCard executor, PlayerController enemyWheel,
             PlayerController executorWheel)
         {
             foreach (var data in ability.AbilityData)
@@ -17,10 +16,9 @@ namespace Features.Battles.Core.Abilities
                 var targets = TargetSystem.GetTargets(data.Target, executor, executorWheel, enemyWheel);
                 foreach (var target in targets)
                 {
-                    target.GetCard().Attack += data.Amount;
+                    target.UpdateEffect(EffectEnum.Vulnerable, data.Amount);
                 }
             }
-
             yield break;
         }
     }

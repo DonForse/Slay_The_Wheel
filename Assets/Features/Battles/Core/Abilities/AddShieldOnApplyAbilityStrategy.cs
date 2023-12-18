@@ -1,16 +1,14 @@
-using System;
 using System.Collections;
 using Features.Battles.Wheel;
-using Features.Cards;
 using Features.Cards.InPlay;
 
 namespace Features.Battles.Core.Abilities
 {
-    public class AddBurnOnApplyAbilityStrategy : IOnApplyAbilityStrategy
+    public class AddShieldOnApplyAbilityStrategy : IOnApplyAbilityStrategy
     {
-        public bool IsValid(AbilityEnum abilityEnum) => abilityEnum == AbilityEnum.AddBurn;
+        public bool IsValid(AbilityEnum abilityEnum) => abilityEnum == AbilityEnum.AddShield;
 
-        public IEnumerator Execute(Ability ability,InPlayCard executor, PlayerController enemyWheel,
+        public IEnumerator Execute(Ability ability, InPlayCard executor, PlayerController enemyWheel,
             PlayerController executorWheel)
         {
             foreach (var data in ability.AbilityData)
@@ -18,7 +16,8 @@ namespace Features.Battles.Core.Abilities
                 var targets = TargetSystem.GetTargets(data.Target, executor, executorWheel, enemyWheel);
                 foreach (var target in targets)
                 {
-                    target.UpdateEffect(EffectEnum.Fire, data.Amount);
+                    target.GetCard().Armor += data.Amount;
+                    yield return target.PlayGainShield();
                 }
             }
             yield break;

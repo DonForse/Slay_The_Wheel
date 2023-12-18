@@ -204,10 +204,10 @@ namespace Features
                 foreach (var card in _deck)
                 {
                     var abs = card.onDealDamageAbilities.ToList();
-                    var ability = abs.FirstOrDefault(x=>x.Type == AbilityEnum.Burn);
+                    var ability = abs.FirstOrDefault(x=>x.Type == AbilityEnum.AddBurn);
                     abs.Remove(ability);
                     if (ability == null)
-                        ability = new Ability(){Type =  AbilityEnum.Burn,AbilityData = new []{new AbilityData()
+                        ability = new Ability(){Type =  AbilityEnum.AddBurn,AbilityData = new []{new AbilityData()
                         {
                             Amount = 0, Target = TargetEnum.Enemy
                         }}};

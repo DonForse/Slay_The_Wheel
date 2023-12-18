@@ -57,7 +57,7 @@ namespace Features.Cards.InPlay.Feedback
                     case null:
                         SetNormalColor();
                         break;
-                    case AbilityEnum.Burn:
+                    case AbilityEnum.AddBurn:
                         SetFireColor();
                         break;
                     default:

@@ -4,6 +4,7 @@ namespace Features.Battles
     {
         Fire,
         Oil,
-        Bomb
+        Bomb,
+        Vulnerable
     }
 }
