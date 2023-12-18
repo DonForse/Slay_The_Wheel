@@ -6,6 +6,7 @@ namespace Features.Cards
         Skip,
         Spin,
         PutAtFront,
-        TurnStart
+        TurnStart,
+        TurnEnd
     }
 }

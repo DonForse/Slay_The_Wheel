@@ -248,6 +248,12 @@ namespace Features.Battles
         {
             var defenderCard = damageReceiver.GetCard();
             StartCoroutine(damageReceiver.PlayGetHitAnimation(damage, source));
+            var vulnerable = damageReceiver.GetCard().Effects.FirstOrDefault(x => x.Type == EffectEnum.Vulnerable);
+            if (vulnerable.Amount > 0)
+            {
+                damage += Mathf.FloorToInt(damage / 2f);
+            }
+
             var difDamage = Mathf.Max(damage - damageReceiver.GetCard().Armor, 0);
 
             damageReceiver.GetCard().Armor = Mathf.Max(0, damageReceiver.GetCard().Armor - damage);
@@ -557,6 +563,14 @@ namespace Features.Battles
                             yield return strategy.Execute(ability, card,  defender, attacker);
                     }
                 }
+                foreach (var effect in card.Effects)
+                {
+                    foreach (var strategy in _applyEffectStrategies)
+                    {
+                        if (strategy.IsValid(effect, BattleEventEnum.TurnEnd))
+                            strategy.Execute(effect, card);
+                    }
+                }
             }
         }
 
@@ -577,7 +591,7 @@ namespace Features.Battles
                 {
                     foreach (var strategy in _applyEffectStrategies)
                     {
-                        if (strategy.IsValid(effect, BattleEventEnum.Spin))
+                        if (strategy.IsValid(effect, BattleEventEnum.TurnStart))
                             strategy.Execute(effect, card);
                     }
                 }
