@@ -22,8 +22,8 @@ namespace Features.Battles.Core.Effects
 
         public IEnumerator Execute(Effect effect, InPlayCard cardWithTheEffect)
         {
-            cardWithTheEffect.UpdateEffect(EffectEnum.Fire, -Mathf.CeilToInt(effect.Amount/2f));
             yield return _battle.ApplyDamage(effect.Amount, cardWithTheEffect, null, AbilityEnum.AddBurn);
+            cardWithTheEffect.UpdateEffect(EffectEnum.Fire, -Mathf.CeilToInt(effect.Amount/2f));
         }
     }
 }
