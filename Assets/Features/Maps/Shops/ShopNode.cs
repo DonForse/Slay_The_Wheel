@@ -24,7 +24,7 @@ namespace Features.Maps.Shops
             var goodRelics = relicsScriptableObject.relics.Where(relic =>
                     relic.Spectrum == RelicSpectrumType.Good
                     && !playerRelics.Contains(relic.id))
-                .OrderBy(x => UnityEngine.Random.Range(0, 100))
+                .OrderBy(x => Random.Range(0, 100))
                 .ToList();
             for (int i = 0; i < amountOfCards; i++)
             {
