@@ -21,5 +21,6 @@ namespace Features.Cards
         public AttackType attackType;
         public Sprite cardSprite;
         public int actCost;
+        public int goldCost;
     }
 }

@@ -1,18 +1,21 @@
 using System;
 using System.Collections.Generic;
 using Features.Cards;
+using Features.Maps.Shop;
 using Features.Maps.Shop.Packs;
 using UnityEngine;
-using UnityEngine.Serialization;
 using UnityEngine.UI;
 using Random = UnityEngine.Random;
 
-namespace Features.Maps.Shop
+namespace Features.Maps.BoosterPacks
 {
     public class BoosterPackNode : MonoBehaviour
     {
         private const int AmountOfCards = 5;
         [SerializeField][Range(0,8)] private int amountOfPacks;
+        
+        [SerializeField] private List<CardPackScriptableObject> packs;
+        
         [SerializeField] private GameObject packSelectionCanvas;
         
         [SerializeField] private GameObject packSelectionContainer;
@@ -21,6 +24,8 @@ namespace Features.Maps.Shop
         [SerializeField] private GameObject revealCardCanvas;
         [SerializeField] private List<CardReveal> cardReveals;
         [SerializeField] private Button continueButton;
+        
+        
         private CardPackScriptableObject _packSelected;
         private List<BaseCardScriptableObject> _cardsObtained;
         public event EventHandler<List<BaseCardScriptableObject>> PackSelected;
@@ -35,7 +40,7 @@ namespace Features.Maps.Shop
             continueButton.onClick.RemoveListener(SendPackSelected);
         }
 
-        public void Show(List<CardPackScriptableObject> packs)
+        public void Show()
         {
             this.gameObject.SetActive(true);
             continueButton.enabled = false;

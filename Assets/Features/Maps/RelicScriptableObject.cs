@@ -9,5 +9,7 @@ namespace Features.Maps
         public RelicSpectrumType Spectrum;
         public RelicType id;
         public string name;
+        public Sprite sprite;
+        public int goldCost;
     }
 }

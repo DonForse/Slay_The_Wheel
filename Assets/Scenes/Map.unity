@@ -499,10 +499,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   boosterPackNode: {fileID: 2582435810264017659}
-  packs:
-  - {fileID: 11400000, guid: 62426f435ffb1ce44aae921673a567ca, type: 2}
-  - {fileID: 11400000, guid: 5f04bea5235f2b741a86044aa058e92a, type: 2}
-  - {fileID: 11400000, guid: e922eb68846d7b5489c03f8ec68bdd98, type: 2}
+  shopNode: {fileID: 3185074319210914175}
   mapPlayerTracker: {fileID: 12968217}
   chestRewardNode: {fileID: 2350127535072768674}
 --- !u!4 &1429207044
@@ -926,6 +923,22 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 8930411133353412035, guid: f711d7418759ecc42b548fdca2a2d3ef, type: 3}
+      propertyPath: packs.Array.size
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 8930411133353412035, guid: f711d7418759ecc42b548fdca2a2d3ef, type: 3}
+      propertyPath: packs.Array.data[0]
+      value: 
+      objectReference: {fileID: 11400000, guid: 62426f435ffb1ce44aae921673a567ca, type: 2}
+    - target: {fileID: 8930411133353412035, guid: f711d7418759ecc42b548fdca2a2d3ef, type: 3}
+      propertyPath: packs.Array.data[1]
+      value: 
+      objectReference: {fileID: 11400000, guid: 5f04bea5235f2b741a86044aa058e92a, type: 2}
+    - target: {fileID: 8930411133353412035, guid: f711d7418759ecc42b548fdca2a2d3ef, type: 3}
+      propertyPath: packs.Array.data[2]
+      value: 
+      objectReference: {fileID: 11400000, guid: e922eb68846d7b5489c03f8ec68bdd98, type: 2}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -1001,26 +1014,16 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 3395604208619973527, guid: 41325468ab05f684eab4f2a69631c043, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 3185074319210914175}
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 41325468ab05f684eab4f2a69631c043, type: 3}
---- !u!1 &3185074319210914174 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 3395604208619973527, guid: 41325468ab05f684eab4f2a69631c043, type: 3}
+--- !u!114 &3185074319210914175 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 8689556962258949135, guid: 41325468ab05f684eab4f2a69631c043, type: 3}
   m_PrefabInstance: {fileID: 3185074319210914173}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &3185074319210914175
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3185074319210914174}
+  m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9c5cc3cc529b4bb5a70fad47668e3aad, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  amountOfCards: 8

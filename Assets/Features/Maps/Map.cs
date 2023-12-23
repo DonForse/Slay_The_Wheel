@@ -1,23 +1,20 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using Cinemachine;
 using Features.Cards;
+using Features.Maps.BoosterPacks;
 using Features.Maps.ChestReward;
-using Features.Maps.Shop;
-using Features.Maps.Shop.Packs;
+using Features.Maps.Shops;
 using UnityEngine;
-using UnityEngine.Serialization;
 using UnityPackages.Slay_The_Spire_Map.Scripts;
 
 namespace Features.Maps
 {
     public class Map : MonoBehaviour
     {
-        [FormerlySerializedAs("shopNode")] [SerializeField] private BoosterPackNode boosterPackNode;
-        [SerializeField] private List<CardPackScriptableObject> packs;
+        [SerializeField] private BoosterPackNode boosterPackNode;
+        [SerializeField] private ShopNode shopNode;
         [SerializeField] private MapPlayerTracker mapPlayerTracker;
-        [FormerlySerializedAs("relicsNode")] [SerializeField] private ChestRewardNode chestRewardNode;
+        [SerializeField] private ChestRewardNode chestRewardNode;
         private List<MapSpot> _possibleNextPositions;
 
         public event EventHandler<List<BaseCardScriptableObject>> SelectedPack;
@@ -65,13 +62,14 @@ namespace Features.Maps
                     // mapPlayerTracker.Locked = false;
                     break;
                 case NodeType.Store:
-                    boosterPackNode.Show(packs.ToList());
+                    shopNode.Show();
                     break;
                 case NodeType.Boss:
                     BossEnemySelected?.Invoke(this, null);
                     mapPlayerTracker.Locked = false;
                     break;
                 case NodeType.Mystery:
+                    boosterPackNode.Show();
                     mapPlayerTracker.Locked = false;
 
                     break;
