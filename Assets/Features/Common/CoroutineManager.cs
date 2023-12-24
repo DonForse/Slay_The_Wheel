@@ -8,7 +8,7 @@ namespace Features.Common
 {
     public class CoroutineManager : MonoBehaviour
     {
-        public IEnumerator ExecuteCoroutines(IEnumerator[] coroutines)
+        public IEnumerator ExecuteCoroutines(params IEnumerator[] coroutines)
         {
             bool[] coroutineCompleted = new bool[coroutines.Length];
 

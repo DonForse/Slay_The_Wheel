@@ -8,7 +8,6 @@ using Features.Battles.Core.Abilities;
 using Features.Battles.Core.Attacks;
 using Features.Battles.Core.Effects;
 using Features.Battles.Spells;
-using Features.Battles.States;
 using Features.Battles.Wheel;
 using Features.Cards;
 using Features.Cards.InPlay;
@@ -46,7 +45,6 @@ namespace Features.Battles
         private List<IOnApplyAbilityStrategy> _applyAbilityStrategies = new();
         private List<IAttackStrategy> _attackStrategies = new();
         private List<IOnApplyEffectStrategy> _applyEffectStrategies;
-        private IBattleState currentState;
 
         public IEnumerator Initialize(List<RunCardScriptableObject> deck, List<RunCardScriptableObject> enemies,
             int enemyWheelSize, HeroRunCardScriptableObject heroCard)
@@ -98,9 +96,8 @@ namespace Features.Battles
             enemyController.SetWheelMovedCallback(OnEnemyWheelMoved);
 
 
-            yield return coroutineManager.ExecuteCoroutines(new[]
-                { enemyController.ShowCards(), playerController.ShowCards() });
-            yield return coroutineManager.ExecuteCoroutines(new[] { ApplyOnBattleStartAbilities() });
+            yield return coroutineManager.ExecuteCoroutines(enemyController.ShowCards(), playerController.ShowCards());
+            yield return coroutineManager.ExecuteCoroutines(ApplyOnBattleStartAbilities());
             // currentState = new BattleStartState(this);
             // currentState.EnterState();
             SetActions(3);
