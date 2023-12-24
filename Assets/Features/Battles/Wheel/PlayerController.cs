@@ -38,12 +38,12 @@ namespace Features.Battles.Wheel
             wheelMovement = GetComponent<AutomaticControlWheel>();
         }
 
-        public IEnumerator InitializeWheel(bool player, int wheelSize, List<InPlayCardScriptableObject> cards)
+        public void InitializeWheel(bool player, int wheelSize, List<InPlayCardScriptableObject> cards)
         {
             Positions = new();
             WheelData.Size = wheelSize;
             CalculatePositions();
-            yield return SetRunCards(player, cards);
+            SetRunCards(player, cards);
 
             frontCardIndex = 0;
             input.SetTurnRightAction(OnTurnRightAction);
@@ -144,7 +144,7 @@ namespace Features.Battles.Wheel
             animator.SetTrigger($"Rotate_{turningOrientation}");
         }
 
-        private IEnumerator SetRunCards(bool player, List<InPlayCardScriptableObject>cards)
+        private void SetRunCards(bool player, List<InPlayCardScriptableObject>cards)
         {
             var amountToSet = Mathf.Min(WheelData.Size, cards.Count);
             for (int i = 0; i < amountToSet; i++)
@@ -153,7 +153,7 @@ namespace Features.Battles.Wheel
                 Cards.Add(inPlayCard);
                 inPlayCard.SetPlayer(player);
                 inPlayCard.transform.localPosition = Positions[i];
-                yield return inPlayCard.SetCard(cards[i], this);
+                inPlayCard.SetCard(cards[i], this);
             }
         }
 
@@ -249,6 +249,14 @@ namespace Features.Battles.Wheel
             }
 
             return cards.Distinct().ToList();
+        }
+
+        public IEnumerator ShowCards()
+        {
+            foreach (var card in Cards)
+            {
+                yield return card.PlayOnAppearFeedback();
+            }
         }
     }
 }

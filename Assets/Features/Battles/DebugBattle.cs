@@ -10,11 +10,10 @@ namespace Features.Battles
     {
         [SerializeField] private DeckConfigurationScriptableObject _deckConfigurationScriptableObject;
         [SerializeField] private BaseCardsScriptableObject enemiesDb;
-
         [SerializeField] private Battle battle;
 
         private List<RunCardScriptableObject> _deck;
-        private RunCardScriptableObject _heroCardScriptableObject;
+        private HeroRunCardScriptableObject _heroCardScriptableObject;
 
         // Start is called before the first frame update
         IEnumerator Start()
@@ -22,7 +21,7 @@ namespace Features.Battles
         
             _deck = new List<RunCardScriptableObject>();
             var heroCardDb = _deckConfigurationScriptableObject.hero;
-            _heroCardScriptableObject = new RunCardScriptableObject(heroCardDb);
+            _heroCardScriptableObject = new HeroRunCardScriptableObject(heroCardDb);
             foreach (var card in _deckConfigurationScriptableObject.cards)
             {
                 for (int i = 0; i < card.Amount; i++)
@@ -32,7 +31,10 @@ namespace Features.Battles
             var slime = enemiesDb.cards.FirstOrDefault(x => x.cardName.Contains("Bomby"));
             _deck = _deck.OrderBy(x=>Random.Range(0, 100)).ToList();
             yield return battle.Initialize(_deck,
-                new List<RunCardScriptableObject>() { new RunCardScriptableObject(slime), new RunCardScriptableObject(slime), new RunCardScriptableObject(slime) }, 5, 3, _heroCardScriptableObject);
+                new List<RunCardScriptableObject>() 
+                    { new RunCardScriptableObject(slime), new RunCardScriptableObject(slime), new RunCardScriptableObject(slime) }, 
+                 3,
+                _heroCardScriptableObject);
         }
 
         // Update is called once per frame

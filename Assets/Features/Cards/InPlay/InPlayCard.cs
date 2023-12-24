@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -51,7 +52,7 @@ namespace Features.Cards.InPlay
                 viewContainer.transform.localRotation = new Quaternion(0, 0, 180, 0);
         }
 
-        public IEnumerator SetCard(InPlayCardScriptableObject runCardScriptableObject, PlayerController owner)
+        public void SetCard(InPlayCardScriptableObject runCardScriptableObject, PlayerController owner)
         {
             OwnerPlayer = owner;
             _cardScriptableObject = runCardScriptableObject;
@@ -68,7 +69,11 @@ namespace Features.Cards.InPlay
             UpdateHealth(null,(_cardScriptableObject.Health,_cardScriptableObject.Health));
             UpdateAttack(null,(_cardScriptableObject.Attack,_cardScriptableObject.Attack));
             UpdateArmor(null,(_cardScriptableObject.Armor,_cardScriptableObject.Armor));
-            yield return inPlayCardFeedbacks.PlayOnAppearFeedback();
+        }
+
+        private void Awake()
+        {
+            viewContainer.gameObject.SetActive(false);
         }
 
         private void OnDisable()
@@ -193,6 +198,11 @@ namespace Features.Cards.InPlay
         public IEnumerator PlayRangedAttack(InPlayCard defender)
         {
             yield return inPlayCardFeedbacks.PlayOnRangedAttackedFeedback(defender.transform);
+        }
+
+        public IEnumerator PlayOnAppearFeedback()
+        {
+            yield return inPlayCardFeedbacks.PlayOnAppearFeedback();
         }
     }
 }

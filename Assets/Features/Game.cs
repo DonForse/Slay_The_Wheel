@@ -129,7 +129,7 @@ namespace Features
             SceneManager.LoadScene("Battle");
             yield return new WaitForSeconds(.5f);
             _battleGo = GameObject.Find("Battle").GetComponent<Battle>();
-            yield return _battleGo.Initialize(_deck,battleEnemies, 5, enemyWheelSize, _heroCardScriptableObject);
+            yield return _battleGo.Initialize(_deck,battleEnemies, enemyWheelSize, _heroCardScriptableObject);
 
             if (_battleGo != null)
                 _battleGo.BattleFinished += BattleComplete;

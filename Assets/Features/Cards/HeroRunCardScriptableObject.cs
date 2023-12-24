@@ -9,6 +9,7 @@ namespace Features.Cards
     {
         public int Exp;
         public int Level;
+        public int WheelSize = 5;
         public HeroRunCardScriptableObject(BaseCardScriptableObject cardScriptableObject) : base(cardScriptableObject)
         {
             
