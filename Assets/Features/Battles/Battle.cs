@@ -33,9 +33,9 @@ namespace Features.Battles
         // public DamageSystem damageSystem;
         private int _actions;
         private int turn = 0;
-        private List<InPlayCardScriptableObject> _playerBattleDeck;
-        private List<InPlayCardScriptableObject> _playerDiscardPile;
-        private List<InPlayCardScriptableObject> _enemiesDeck;
+        private BattleDeckManager _playerBattleDeckManager;
+
+        private BattleDeckManager _enemiesBattleDeckManager;
         private InPlayCardScriptableObject _heroCardScriptableObject;
         private bool acting;
         public event EventHandler<bool> BattleFinished;
@@ -74,16 +74,18 @@ namespace Features.Battles
                 new OilOnApplyEffectStrategy(),
                 new BombOnApplyEffectStrategy(this)
             };
+            _playerBattleDeckManager = new BattleDeckManager();
+            _playerBattleDeckManager.Initialize(deck);
 
-            _playerBattleDeck = deck.Select(card => new InPlayCardScriptableObject(card)).ToList();
-            _playerDiscardPile = new();
-            _enemiesDeck = enemies.Skip(enemyWheelSize).Select(card => new InPlayCardScriptableObject(card)).ToList();
+            _enemiesBattleDeckManager = new BattleDeckManager();
+            _enemiesBattleDeckManager.Initialize(enemies);
+
             _heroCardScriptableObject = new InPlayCardScriptableObject(heroCard);
-            var enemiesTemp = enemies.Select(card => new InPlayCardScriptableObject(card)).ToList();
 
-            var cards = DrawCards(heroCard.WheelSize - 1, ref _playerBattleDeck, ref _playerDiscardPile);
+            var cards = _playerBattleDeckManager.DrawCards(heroCard.WheelSize - 1);
             cards = new List<InPlayCardScriptableObject>() { _heroCardScriptableObject }.Concat(cards).ToList();
 
+            var enemiesTemp = _enemiesBattleDeckManager.DrawCards(enemyWheelSize);
             enemyController.InitializeWheel(false, enemyWheelSize, enemiesTemp);
             playerController.InitializeWheel(true, heroCard.WheelSize, cards);
 
@@ -98,8 +100,6 @@ namespace Features.Battles
 
             yield return coroutineManager.ExecuteCoroutines(enemyController.ShowCards(), playerController.ShowCards());
             yield return coroutineManager.ExecuteCoroutines(ApplyOnBattleStartAbilities());
-            // currentState = new BattleStartState(this);
-            // currentState.EnterState();
             SetActions(3);
         }
 
@@ -179,20 +179,20 @@ namespace Features.Battles
             yield return null;
         }
 
-        private List<InPlayCardScriptableObject> DrawCards(int amountToDraw, ref List<InPlayCardScriptableObject> deck,
-            ref List<InPlayCardScriptableObject> discardPile)
-        {
-            discardPile = discardPile.Where(x => !x.IsDead).ToList();
-            if (deck.Count < amountToDraw)
-            {
-                deck = deck.Concat(discardPile).ToList();
-                discardPile.Clear();
-            }
-
-            var cards = deck.Take(amountToDraw).ToList();
-            deck = deck.Skip(amountToDraw).ToList();
-            return cards;
-        }
+        // private List<InPlayCardScriptableObject> DrawCards(int amountToDraw, ref List<InPlayCardScriptableObject> deck,
+        //     ref List<InPlayCardScriptableObject> discardPile)
+        // {
+        //     discardPile = discardPile.Where(x => !x.IsDead).ToList();
+        //     if (deck.Count < amountToDraw)
+        //     {
+        //         deck = deck.Concat(discardPile).ToList();
+        //         discardPile.Clear();
+        //     }
+        //
+        //     var cards = deck.Take(amountToDraw).ToList();
+        //     deck = deck.Skip(amountToDraw).ToList();
+        //     return cards;
+        // }
 
         private IEnumerator ActStartCoroutine(PlayerController attackerPlayerController)
         {
@@ -279,57 +279,45 @@ namespace Features.Battles
 
             if (damageReceiver.OwnerPlayer == enemyController)
             {
-                if (_enemiesDeck.Count > 0)
+                if (_enemiesBattleDeckManager.HasCards())
                 {
-                    var runCards = new List<InPlayCardScriptableObject>();
-                    var cards = DrawCards(1, ref _enemiesDeck, ref runCards);
-                    if (cards == null || cards.Count == 0)
-                    {
-                        _busQueue.EnqueueInterruptAction(EndBattle(damageReceiver.OwnerPlayer));
-                        yield break;
-                    }
-                    else
-                    {
-                        damageReceiver.SetCard(cards.First(), damageReceiver.OwnerPlayer);
-                        yield return damageReceiver.PlayOnAppearFeedback();
-                    }
+                    var cards = _enemiesBattleDeckManager.DrawCards(1);
+
+                    damageReceiver.SetCard(cards.First(), damageReceiver.OwnerPlayer);
+                    yield return damageReceiver.PlayOnAppearFeedback();
+                    yield break;
                 }
 
-                if (_enemiesDeck.Count == 0 && damageReceiver.OwnerPlayer.AllUnitsDead())
+                if (damageReceiver.OwnerPlayer.AllUnitsDead())
                 {
                     _busQueue.EnqueueInterruptAction(EndBattle(damageReceiver.OwnerPlayer));
                     yield break;
                 }
+
+                yield break;
             }
-            else
+
+            if (_heroCardScriptableObject.IsDead)
             {
-                if (_heroCardScriptableObject.IsDead)
-                {
-                    _busQueue.EnqueueInterruptAction(EndBattle(damageReceiver.OwnerPlayer));
-                    yield break;
-                }
+                _busQueue.EnqueueInterruptAction(EndBattle(damageReceiver.OwnerPlayer));
+                yield break;
+            }
 
-                if (_playerBattleDeck.Count > 0)
-                {
-                    var cards = DrawCards(1, ref _playerBattleDeck, ref _playerDiscardPile);
-                    if (cards == null || cards.Count == 0)
-                    {
-                        _busQueue.EnqueueInterruptAction(EndBattle(damageReceiver.OwnerPlayer));
-                        yield break;
-                    }
-                    else
-                    {
-                        damageReceiver.SetCard(cards.First(), damageReceiver.OwnerPlayer);
-                        yield return damageReceiver.PlayOnAppearFeedback();
-                    }
-                }
+            //TODO: Quiero que se autoagreguen las cartas? ver refactor de batalla con cartas.
+            if (_playerBattleDeckManager.HasCards())
+            {
+                var cards = _playerBattleDeckManager.DrawCards(1);
+                
+                damageReceiver.SetCard(cards.First(), damageReceiver.OwnerPlayer);
+                yield return damageReceiver.PlayOnAppearFeedback();
+                yield break;
+            }
 
-                if (_playerBattleDeck.Count == 0 && _playerDiscardPile.Count == 0 &&
-                    damageReceiver.OwnerPlayer.AllUnitsDead())
-                {
-                    _busQueue.EnqueueInterruptAction(EndBattle(damageReceiver.OwnerPlayer));
-                    yield break;
-                }
+            //TODO: Esta condicion tampoco tiene tanto sentido xq el hero esta siempre y solo perdes cuando muere el hero.
+            if (damageReceiver.OwnerPlayer.AllUnitsDead())
+            {
+                _busQueue.EnqueueInterruptAction(EndBattle(damageReceiver.OwnerPlayer));
+                yield break;
             }
         }
 
@@ -527,13 +515,13 @@ namespace Features.Battles
         private IEnumerator ShuffleCoroutine()
         {
             acting = true;
-            var slots = playerController.Cards.Count;
-            var cards = DrawCards(slots - 1, ref _playerBattleDeck, ref _playerDiscardPile);
+            var cards = _playerBattleDeckManager.DrawCards( playerController.Cards.Count - 1);
             var cardsInWheel = playerController.Cards.Select(x => x.GetCard()).ToList();
             cardsInWheel.Remove(_heroCardScriptableObject);
             cards = new List<InPlayCardScriptableObject>() { _heroCardScriptableObject }.Concat(cards).ToList();
-            _playerDiscardPile = _playerDiscardPile.Concat(cardsInWheel).ToList();
-            for (int i = 0; i < slots; i++)
+            _playerBattleDeckManager.DiscardCards(cardsInWheel);
+            
+            for (int i = 0; i < cards.Count; i++)
             {
                 playerController.Cards[i].SetCard(cards[i], playerController);
                 yield return playerController.Cards[i].PlayOnAppearFeedback();
@@ -550,7 +538,7 @@ namespace Features.Battles
                 foreach (var strategy in _applyEffectStrategies)
                 {
                     if (strategy.IsValid(effect, BattleEventEnum.PutAtFront))
-                        strategy.Execute(effect, cardAtFront);
+                        yield return strategy.Execute(effect, cardAtFront);
                 }
             }
 
@@ -561,7 +549,7 @@ namespace Features.Battles
                     foreach (var strategy in _applyEffectStrategies)
                     {
                         if (strategy.IsValid(effect, BattleEventEnum.Spin))
-                            strategy.Execute(effect, card);
+                            yield return strategy.Execute(effect, card);
                     }
                 }
             }
@@ -587,7 +575,7 @@ namespace Features.Battles
                     foreach (var strategy in _applyEffectStrategies)
                     {
                         if (strategy.IsValid(effect, BattleEventEnum.TurnEnd))
-                            strategy.Execute(effect, card);
+                            yield return strategy.Execute(effect, card);
                     }
                 }
             }
@@ -611,7 +599,7 @@ namespace Features.Battles
                     foreach (var strategy in _applyEffectStrategies)
                     {
                         if (strategy.IsValid(effect, BattleEventEnum.TurnStart))
-                            strategy.Execute(effect, card);
+                            yield return strategy.Execute(effect, card);
                     }
                 }
             }
