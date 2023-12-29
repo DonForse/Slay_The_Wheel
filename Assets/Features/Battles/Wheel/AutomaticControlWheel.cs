@@ -12,12 +12,12 @@ namespace Features.Battles.Wheel
 
         public IEnumerator TurnTowardsDirection(WheelRotation wheelRotation, bool executeCallback)
         {
-            startAngle = playerController.WheelData.RotationAngle;
             yield return MoveTowardsDirection(wheelRotation, executeCallback);
         }
 
         private IEnumerator MoveTowardsDirection(WheelRotation wheelRotation, bool executeCallback)
         {
+            startAngle = playerController.WheelData.RotationAngle;
             var rotationInput = wheelRotation == WheelRotation.Right ? 1 : -1;
             var anglePerItem = (1.5f * Mathf.PI) / (playerController.WheelData.Size);
 

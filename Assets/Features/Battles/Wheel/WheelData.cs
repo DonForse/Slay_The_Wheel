@@ -7,7 +7,7 @@ namespace Features.Battles.Wheel
     public class WheelData
     {
         [HideInInspector]public float RotationAngle;
-        [SerializeField]public float Radius;
+        [SerializeField] public float Radius;
         [HideInInspector]public int Size;
     }
 }
