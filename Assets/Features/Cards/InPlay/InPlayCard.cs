@@ -33,14 +33,15 @@ namespace Features.Cards.InPlay
 
         public List<Effect> Effects => _cardScriptableObject.Effects;
 
-        public List<Ability> Abilities => _cardScriptableObject.OnDealDamageAbilities
-            .Concat(_cardScriptableObject.OnAttackAbilities)
-            .Concat(_cardScriptableObject.OnActAbilities)
-            .Concat(_cardScriptableObject.OnSpinAbilities)
-            .Concat(_cardScriptableObject.OnTurnStartAbilities)
-            .Concat(_cardScriptableObject.OnTurnEndAbilities)
-            .Concat(_cardScriptableObject.OnDeadAbilities)
-            .Concat(_cardScriptableObject.OnBattleStartAbilities).ToList();
+        // public List<Ability> Abilities => _cardScriptableObject.OnDealDamageAbilities
+        //     .Concat(_cardScriptableObject.OnAttackAbilities)
+        //     .Concat(_cardScriptableObject.OnActAbilities)
+        //     .Concat(_cardScriptableObject.OnSpinAbilities)
+        //     .Concat(_cardScriptableObject.OnTurnStartAbilities)
+        //     .Concat(_cardScriptableObject.OnTurnEndAbilities)
+        //     .Concat(_cardScriptableObject.OnDeadAbilities)
+        //     .Concat(_cardScriptableObject.OnBattleStartAbilities).ToList();
+        public List<Ability> Abilities => _cardScriptableObject.Abilities.ToList();
 
         public string CardName => _cardScriptableObject.CardName;
         public PlayerController OwnerPlayer;

@@ -1,5 +1,6 @@
 using System;
 using Features.Battles.Core;
+using Features.Cards;
 
 namespace Features.Battles
 {
@@ -8,5 +9,6 @@ namespace Features.Battles
     {
         public AbilityData[] AbilityData;
         public AbilityEnum Type;
+        public BattleEventEnum battleEventEnum;
     }
 }

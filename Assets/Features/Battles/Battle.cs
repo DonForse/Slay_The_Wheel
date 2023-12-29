@@ -14,6 +14,7 @@ using Features.Cards.InPlay;
 using Features.Common;
 using JetBrains.Annotations;
 using UnityEngine;
+using UnityEngine.Serialization;
 using Random = UnityEngine.Random;
 
 namespace Features.Battles
@@ -21,12 +22,12 @@ namespace Features.Battles
     public class Battle : MonoBehaviour
     {
         [SerializeField] private CoroutineManager coroutineManager;
-        [SerializeField] private PlayerController playerController;
-        [SerializeField] private PlayerController enemyController;
+        [SerializeField] internal PlayerController playerController;
+        [SerializeField] internal PlayerController enemyController;
         [SerializeField] private BotControlWheel botControlWheel;
         [SerializeField] private BusQueue.BusQueue _busQueue;
         [SerializeField] private TurnMessage turnMessage;
-        [SerializeField] private ActionsView actionsView;
+        [FormerlySerializedAs("actionsView")] [SerializeField] private EnergyView energyView;
         [SerializeField] private SpellView[] spellViews;
 
         // [SerializeField] private BotPlayer botPlayer;
@@ -96,8 +97,7 @@ namespace Features.Battles
             enemyController.Acted += OnEnemyActed;
             playerController.SetWheelMovedCallback(OnPlayerWheelMoved);
             enemyController.SetWheelMovedCallback(OnEnemyWheelMoved);
-
-
+            
             yield return coroutineManager.ExecuteCoroutines(enemyController.ShowCards(), playerController.ShowCards());
             yield return coroutineManager.ExecuteCoroutines(ApplyOnBattleStartAbilities());
             SetActions(3);
@@ -323,7 +323,7 @@ namespace Features.Battles
 
         private IEnumerator ApplyDeathRattleEffect(InPlayCard damageReceiver)
         {
-            foreach (var ability in damageReceiver.GetCard().OnDeadAbilities)
+            foreach (var ability in damageReceiver.GetCard().Abilities)
             {
                 foreach (var strategy in _applyAbilityStrategies)
                 {
@@ -386,7 +386,7 @@ namespace Features.Battles
             _actions = amount;
             if (_actions < 0)
                 _actions = Mathf.Min(_actions, 0);
-            actionsView.ShowRemaining(_actions);
+            energyView.ShowRemaining(_actions);
             foreach (var spellView in spellViews)
             {
                 spellView.SetActivateable(spellView.actionCost <= _actions);
@@ -561,7 +561,7 @@ namespace Features.Battles
         {
             foreach (var card in attacker.Cards)
             {
-                foreach (var ability in card.GetCard().OnTurnEndAbilities)
+                foreach (var ability in card.GetCard().Abilities)
                 {
                     foreach (var strategy in _applyAbilityStrategies)
                     {
@@ -574,7 +574,7 @@ namespace Features.Battles
                 {
                     foreach (var strategy in _applyEffectStrategies)
                     {
-                        if (strategy.IsValid(effect, BattleEventEnum.TurnEnd))
+                        if (strategy.IsValid(effect, BattleEventEnum.EndTurn))
                             yield return strategy.Execute(effect, card);
                     }
                 }
@@ -585,7 +585,7 @@ namespace Features.Battles
         {
             foreach (var card in attacker.Cards)
             {
-                foreach (var ability in card.GetCard().OnTurnStartAbilities)
+                foreach (var ability in card.GetCard().Abilities)
                 {
                     foreach (var strategy in _applyAbilityStrategies)
                     {
@@ -598,7 +598,7 @@ namespace Features.Battles
                 {
                     foreach (var strategy in _applyEffectStrategies)
                     {
-                        if (strategy.IsValid(effect, BattleEventEnum.TurnStart))
+                        if (strategy.IsValid(effect, BattleEventEnum.StartTurn))
                             yield return strategy.Execute(effect, card);
                     }
                 }
@@ -608,7 +608,7 @@ namespace Features.Battles
         private IEnumerator ApplyOnDealDamageAbilities(InPlayCard damageDealerCard, InPlayCard damageReceiverCard)
         {
             var damageDealerRunCard = damageDealerCard.GetCard();
-            foreach (var ability in damageDealerRunCard.OnDealDamageAbilities)
+            foreach (var ability in damageDealerRunCard.Abilities)
             {
                 foreach (var strategy in _applyAbilityStrategies)
                 {
@@ -626,7 +626,7 @@ namespace Features.Battles
         {
             foreach (var card in attackerPlayerController.Cards)
             {
-                foreach (var ability in card.GetCard().OnActAbilities)
+                foreach (var ability in card.GetCard().Abilities)
                 {
                     foreach (var strategy in _applyAbilityStrategies)
                     {
@@ -645,7 +645,7 @@ namespace Features.Battles
         {
             var attackerCard = attackerPlayerController.GetFrontCard();
             var attackerRunCard = attackerPlayerController.GetFrontCard().GetCard();
-            foreach (var ability in attackerRunCard.OnAttackAbilities)
+            foreach (var ability in attackerRunCard.Abilities)
             {
                 foreach (var strategy in _applyAbilityStrategies)
                 {
@@ -662,7 +662,7 @@ namespace Features.Battles
         {
             foreach (var card in playerController.Cards)
             {
-                foreach (var ability in card.GetCard().OnBattleStartAbilities)
+                foreach (var ability in card.GetCard().Abilities)
                 {
                     foreach (var strategy in _applyAbilityStrategies)
                     {
@@ -675,7 +675,7 @@ namespace Features.Battles
 
             foreach (var card in enemyController.Cards)
             {
-                foreach (var ability in card.GetCard().OnBattleStartAbilities)
+                foreach (var ability in card.GetCard().Abilities)
                 {
                     foreach (var strategy in _applyAbilityStrategies)
                     {

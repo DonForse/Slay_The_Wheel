@@ -39,7 +39,7 @@ namespace Features.PostBattles
         {
             if (e == LevelUpUpgrade.Burn)
             {
-                var heroAbilities = _heroCardScriptableObject.onDealDamageAbilities.ToList();
+                var heroAbilities = _heroCardScriptableObject.abilities.ToList();
                 var burn = heroAbilities.FirstOrDefault(x => x.Type == AbilityEnum.AddBurn);
 
                 heroAbilities.Remove(burn);
@@ -76,7 +76,7 @@ namespace Features.PostBattles
                 }
                 burn.AbilityData.First(x => x.Target == TargetEnum.AllEnemies).Amount++;
                 heroAbilities.Add(burn);
-                _heroCardScriptableObject.onDealDamageAbilities = heroAbilities.ToList();
+                _heroCardScriptableObject.abilities = heroAbilities.ToList();
             }
             if (e == LevelUpUpgrade.Atk)
             {

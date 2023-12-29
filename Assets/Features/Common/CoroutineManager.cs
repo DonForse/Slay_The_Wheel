@@ -22,17 +22,7 @@ namespace Features.Common
             
             Debug.Log("All coroutines have finished.");
         }
-
-        private IEnumerator MyCoroutine()
-        {
-            // Simulate some work
-            var guid = Guid.NewGuid();
-            var time = Random.Range(1f, 10f);
-            Debug.Log(guid.ToString() + " " + time);
-            yield return new WaitForSeconds(time);
-            Debug.Log(guid.ToString());
-        }
-
+        
         private IEnumerator RunCoroutineWithCallback(IEnumerator coroutine, int index, bool[] coroutineCompleted)
         {
             yield return StartCoroutine(coroutine);

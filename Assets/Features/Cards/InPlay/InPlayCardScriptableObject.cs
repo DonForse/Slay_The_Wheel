@@ -53,85 +53,95 @@ namespace Features.Cards.InPlay
             }
         }
 
-        public List<Ability> OnDealDamageAbilities
+        public List<Ability> Abilities
         {
-            get => _onDealDamageAbilities;
+            get => _abilities;
             set
             {
-                _onDealDamageAbilities = value;
-                ValueChanged?.Invoke(this, this);
-            }
-        }
-
-        public List<Ability> OnAttackAbilities
-        {
-            get => _onAttackAbilities;
-            set
-            {
-                _onAttackAbilities = value;
-                ValueChanged?.Invoke(this, this);
-            }
-        }
-
-        public List<Ability> OnActAbilities
-        {
-            get => _onActAbilities;
-            set
-            {
-                _onActAbilities = value;
-                ValueChanged?.Invoke(this, this);
-            }
-        }
-
-        public List<Ability> OnSpinAbilities
-        {
-            get => _onSpinAbilities;
-            set
-            {
-                _onSpinAbilities = value;
-                ValueChanged?.Invoke(this, this);
-            }
-        }
-
-        public List<Ability> OnTurnStartAbilities
-        {
-            get => _onTurnStartAbilities;
-            set
-            {
-                _onTurnStartAbilities = value;
-                ValueChanged?.Invoke(this, this);
-            }
-        }
-
-        public List<Ability> OnTurnEndAbilities
-        {
-            get => _onTurnEndAbilities;
-            set
-            {
-                _onTurnEndAbilities = value;
+                _abilities = value;
                 ValueChanged?.Invoke(this, this);
             }
         }
         
-        public List<Ability> OnBattleStartAbilities
-        {
-            get => _onBattleStartAbilities;
-            set
-            {
-                _onBattleStartAbilities = value;
-                ValueChanged?.Invoke(this, this);
-            }
-        }
-
-        public List<Ability> OnDeadAbilities
-        {
-            get => _onDeadAbilities;
-            set
-            {
-                _onDeadAbilities = value;
-                ValueChanged?.Invoke(this, this);
-            }
-        }
+        // public List<Ability> OnDealDamageAbilities
+        // {
+        //     get => _onDealDamageAbilities;
+        //     set
+        //     {
+        //         _onDealDamageAbilities = value;
+        //         ValueChanged?.Invoke(this, this);
+        //     }
+        // }
+        //
+        // public List<Ability> OnAttackAbilities
+        // {
+        //     get => _onAttackAbilities;
+        //     set
+        //     {
+        //         _onAttackAbilities = value;
+        //         ValueChanged?.Invoke(this, this);
+        //     }
+        // }
+        //
+        // public List<Ability> OnActAbilities
+        // {
+        //     get => _onActAbilities;
+        //     set
+        //     {
+        //         _onActAbilities = value;
+        //         ValueChanged?.Invoke(this, this);
+        //     }
+        // }
+        //
+        // public List<Ability> OnSpinAbilities
+        // {
+        //     get => _onSpinAbilities;
+        //     set
+        //     {
+        //         _onSpinAbilities = value;
+        //         ValueChanged?.Invoke(this, this);
+        //     }
+        // }
+        //
+        // public List<Ability> OnTurnStartAbilities
+        // {
+        //     get => _onTurnStartAbilities;
+        //     set
+        //     {
+        //         _onTurnStartAbilities = value;
+        //         ValueChanged?.Invoke(this, this);
+        //     }
+        // }
+        //
+        // public List<Ability> OnTurnEndAbilities
+        // {
+        //     get => _onTurnEndAbilities;
+        //     set
+        //     {
+        //         _onTurnEndAbilities = value;
+        //         ValueChanged?.Invoke(this, this);
+        //     }
+        // }
+        //
+        // public List<Ability> OnBattleStartAbilities
+        // {
+        //     get => _onBattleStartAbilities;
+        //     set
+        //     {
+        //         _onBattleStartAbilities = value;
+        //         ValueChanged?.Invoke(this, this);
+        //     }
+        // }
+        //
+        // public List<Ability> OnDeadAbilities
+        // {
+        //     get => _onDeadAbilities;
+        //     set
+        //     {
+        //         _onDeadAbilities = value;
+        //         ValueChanged?.Invoke(this, this);
+        //     }
+        // }
 
         public bool IsDead => _runCard.hp <= 0;
 
@@ -168,33 +178,35 @@ namespace Features.Cards.InPlay
 
         private string _cardName;
         private int _attack;
-        private List<Ability> _onAttackAbilities;
-        private List<Ability> _onDealDamageAbilities;
-        private List<Ability> _onSpinAbilities;
-        private List<Ability> _onTurnStartAbilities;
-        private List<Ability> _onTurnEndAbilities;
-        private List<Ability> _onActAbilities;
-        private List<Ability> _onBattleStartAbilities;
-        public List<Ability> _onDeadAbilities;
+        // private List<Ability> _onAttackAbilities;
+        // private List<Ability> _onDealDamageAbilities;
+        // private List<Ability> _onSpinAbilities;
+        // private List<Ability> _onTurnStartAbilities;
+        // private List<Ability> _onTurnEndAbilities;
+        // private List<Ability> _onActAbilities;
+        // private List<Ability> _onBattleStartAbilities;
+        // private List<Ability> _onDeadAbilities;
         private List<Effect> _effects;
         private AttackType _attackType;
         private Sprite _cardSprite;
         private int _actCost;
         private readonly RunCardScriptableObject _runCard;
         private int _armor;
+        private List<Ability> _abilities;
 
         public InPlayCardScriptableObject(RunCardScriptableObject cardScriptableObject)
         {
             _cardName = cardScriptableObject.cardName;
             _attack = cardScriptableObject.attack;
-            _onDealDamageAbilities = cardScriptableObject.onDealDamageAbilities;
-            _onAttackAbilities = cardScriptableObject.onAttackAbilities;
-            _onActAbilities = cardScriptableObject.onActAbilities;
-            _onSpinAbilities = cardScriptableObject.onSpinAbilities;
-            _onDeadAbilities = cardScriptableObject.onDeadAbilities;
-            _onTurnStartAbilities = cardScriptableObject.onTurnStartAbilities;
-            _onTurnEndAbilities = cardScriptableObject.onTurnEndAbilities;
-            _onBattleStartAbilities = cardScriptableObject.onBattleStartAbilities;
+            // _onDealDamageAbilities = cardScriptableObject.onDealDamageAbilities;
+            // _onAttackAbilities = cardScriptableObject.onAttackAbilities;
+            // _onActAbilities = cardScriptableObject.onActAbilities;
+            // _onSpinAbilities = cardScriptableObject.onSpinAbilities;
+            // _onDeadAbilities = cardScriptableObject.onDeadAbilities;
+            // _onTurnStartAbilities = cardScriptableObject.onTurnStartAbilities;
+            // _onTurnEndAbilities = cardScriptableObject.onTurnEndAbilities;
+            // _onBattleStartAbilities = cardScriptableObject.onBattleStartAbilities;
+            _abilities = cardScriptableObject.abilities;
             // _onBattleEndAbilties = cardScriptableObject.onBattlesEndAbiltiies;
             _attackType = cardScriptableObject.attackType;
             _actCost = cardScriptableObject.actCost;

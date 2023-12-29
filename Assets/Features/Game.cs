@@ -203,7 +203,7 @@ namespace Features
             {
                 foreach (var card in _deck)
                 {
-                    var abs = card.onDealDamageAbilities.ToList();
+                    var abs = card.abilities.ToList();
                     var ability = abs.FirstOrDefault(x=>x.Type == AbilityEnum.AddBurn);
                     abs.Remove(ability);
                     if (ability == null)
@@ -225,7 +225,7 @@ namespace Features
                     var abilityBurnSingle = ability.AbilityData.First(x => x.Target == TargetEnum.Enemy);
                     abilityBurnSingle.Amount++;
                     abs.Add(ability);
-                    card.onDealDamageAbilities = abs.ToList();
+                    card.abilities = abs.ToList();
                 }
 
                 return;

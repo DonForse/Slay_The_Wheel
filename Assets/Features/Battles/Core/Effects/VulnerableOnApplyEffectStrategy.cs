@@ -10,7 +10,7 @@ namespace Features.Battles.Core.Effects
     {
         public bool IsValid(Effect effect, BattleEventEnum battleEventEnum)
         {
-            return battleEventEnum == BattleEventEnum.TurnEnd && effect.Type == EffectEnum.Vulnerable && effect.Amount > 0;
+            return battleEventEnum == BattleEventEnum.EndTurn && effect.Type == EffectEnum.Vulnerable && effect.Amount > 0;
         }
 
         public IEnumerator Execute(Effect effect, InPlayCard cardWithTheEffect)

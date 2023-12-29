@@ -2,7 +2,8 @@ using UnityEngine;
 
 namespace Features.Battles.Actions
 {
-    public class ActionsView : MonoBehaviour
+    //shuffle y skip
+    public class EnergyView : MonoBehaviour
     {
         [SerializeField] private GameObject iconActionPrefab;
         [SerializeField] private Transform container;

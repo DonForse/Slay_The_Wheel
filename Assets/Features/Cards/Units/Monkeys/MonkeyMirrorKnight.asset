@@ -15,12 +15,16 @@ MonoBehaviour:
   cardName: Monkey Mirror Knight
   hp: 30
   attack: 3
-  abilities: 
-  onHitAbilities: 09000000
-  onSpinAbilities: 
-  onTurnStartAbilities: 
-  onTurnEndAbilities: 
-  onActAbilities: 
+  abilities:
+  - AbilityData:
+    - Target: 5
+      Amount: 5
+    Type: 0
+    battleEventEnum: 0
+  - AbilityData: []
+    Type: 0
+    battleEventEnum: 0
   attackType: 0
   cardSprite: {fileID: 21300000, guid: 5145dc8953d246c489e582a4f9c106de, type: 3}
   actCost: 1
+  goldCost: 0

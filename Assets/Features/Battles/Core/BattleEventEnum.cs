@@ -1,3 +1,5 @@
+using Features.GameResources.Relics;
+
 namespace Features.Cards
 {
     public enum BattleEventEnum
@@ -6,7 +8,9 @@ namespace Features.Cards
         Skip,
         Spin,
         PutAtFront,
-        TurnStart,
-        TurnEnd
+        StartTurn,
+        EndTurn,
+        StartBattle,
+        EndBattle
     }
 }

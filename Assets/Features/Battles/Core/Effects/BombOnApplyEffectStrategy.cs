@@ -17,7 +17,7 @@ namespace Features.Battles.Core.Effects
 
         public bool IsValid(Effect effect, BattleEventEnum battleEventEnum)
         {
-            return battleEventEnum == BattleEventEnum.TurnStart && effect.Type == EffectEnum.Bomb && effect.Amount > 0;
+            return battleEventEnum == BattleEventEnum.StartTurn && effect.Type == EffectEnum.Bomb && effect.Amount > 0;
         }
 
         public IEnumerator Execute(Effect effect, InPlayCard cardWithTheEffect)
