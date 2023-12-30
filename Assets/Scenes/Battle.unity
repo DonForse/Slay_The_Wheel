@@ -4540,7 +4540,7 @@ MonoBehaviour:
   coroutineManager: {fileID: 928300993}
   playerController: {fileID: 1555398149}
   enemyController: {fileID: 652674504}
-  botControlWheel: {fileID: 0}
+  botControlWheel: {fileID: 387386814}
   _busQueue: {fileID: 1627362539}
   turnMessage: {fileID: 1719590909}
   energyView: {fileID: 1308500088}

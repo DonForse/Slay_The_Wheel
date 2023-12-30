@@ -546,7 +546,7 @@ namespace Features.Battles
 
             foreach (var card in controller.Cards)
             {
-                foreach (var effect in card.Effects)
+                foreach (var effect in card.Effects.ToList())
                 {
                     foreach (var strategy in _applyEffectStrategies)
                     {

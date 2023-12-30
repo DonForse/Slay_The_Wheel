@@ -28,7 +28,7 @@ namespace Features.Cards.InPlay
         [SerializeField] private AbilitiesIconsScriptableObject abilitiesIconsScriptableObject;
         [SerializeField] private InPlayCardFeedbacks inPlayCardFeedbacks;
         [SerializeField] private InPlayCardHoverZoom zoomControl;
-        
+
         public bool IsDead => _cardScriptableObject.IsDead;
 
         public List<Effect> Effects => _cardScriptableObject.Effects;
@@ -67,9 +67,9 @@ namespace Features.Cards.InPlay
             _cardScriptableObject.AttackValueChanged += UpdateAttack;
             _cardScriptableObject.ArmorValueChanged += UpdateArmor;
             UpdateCardScriptableObjectValues(null, _cardScriptableObject);
-            UpdateHealth(null,(_cardScriptableObject.Health,_cardScriptableObject.Health));
-            UpdateAttack(null,(_cardScriptableObject.Attack,_cardScriptableObject.Attack));
-            UpdateArmor(null,(_cardScriptableObject.Armor,_cardScriptableObject.Armor));
+            UpdateHealth(null, (_cardScriptableObject.Health, _cardScriptableObject.Health));
+            UpdateAttack(null, (_cardScriptableObject.Attack, _cardScriptableObject.Attack));
+            UpdateArmor(null, (_cardScriptableObject.Armor, _cardScriptableObject.Armor));
         }
 
         private void Awake()
@@ -93,11 +93,12 @@ namespace Features.Cards.InPlay
 
             foreach (var ability in abilities)
             {
-                var abilityIcon = abilitiesIconsScriptableObject.abilitiesIcons.FirstOrDefault(x => x.ability == ability.Type);
-                var go  =Instantiate(indicatorPrefab, abilitiesContainer);
+                var abilityIcon =
+                    abilitiesIconsScriptableObject.abilitiesIcons.FirstOrDefault(x => x.ability == ability.Type);
+                var go = Instantiate(indicatorPrefab, abilitiesContainer);
                 go.Set(abilityIcon?.image, ability);
             }
-            
+
             abilitiesContainer.gameObject.SetActive(abilitiesContainer.childCount > 0);
         }
 
@@ -107,14 +108,14 @@ namespace Features.Cards.InPlay
             {
                 Destroy(child.gameObject);
             }
-            
+
             foreach (var effect in effects)
             {
                 var abilityIcon = effectsIconsScriptableObject.effectIcons.FirstOrDefault(x => x.effect == effect.Type);
-                var go  =Instantiate(indicatorPrefab, effectsContainer);
+                var go = Instantiate(indicatorPrefab, effectsContainer);
                 go.Set(abilityIcon?.image, effect);
             }
-           
+
             effectsContainer.gameObject.SetActive(effectsContainer.childCount > 0);
         }
 
@@ -129,8 +130,10 @@ namespace Features.Cards.InPlay
 
             SetEffectIcons(Effects?.ToArray());
         }
+
         private void UpdateHealth(object sender, (int previous, int current) e) => hpText.text = e.current.ToString();
         private void UpdateAttack(object sender, (int previous, int current) e) => atkText.text = e.current.ToString();
+
         private void UpdateArmor(object sender, (int previous, int current) e)
         {
             armorText.text = e.current.ToString();
@@ -167,17 +170,16 @@ namespace Features.Cards.InPlay
         {
             if (IsDead) return;
             var effectInCard = Effects.FirstOrDefault(x => x.Type == effectType);
-            if (effectInCard != null)
-                Effects.Remove(effectInCard);
-            else
+            if (effectInCard == null)
+            {
                 effectInCard = new Effect();
+                Effects.Add(effectInCard);
+            }
 
             effectInCard = new Effect() { Type = effectType, Amount = effectInCard.Amount + amount };
 
             if (effectInCard.Amount > 0)
-                Effects.Add(effectInCard);
-
-            UpdateCardScriptableObjectValues(this, GetCard());
+                UpdateCardScriptableObjectValues(this, GetCard());
         }
 
         public IEnumerator PlayAttack()
