@@ -1,6 +1,8 @@
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using Features.Battles.Core;
+using Features.Cards.InPlay;
 using UnityEngine;
 using UnityEngine.Serialization;
 
@@ -9,7 +11,7 @@ namespace Features.Battles.Wheel
     public class WheelControllerDebug : MonoBehaviour
     {
         [FormerlySerializedAs("enableInput")] public bool toggleInput;
-        public bool setSize;
+        [FormerlySerializedAs("setSize")] public bool init;
         public bool rotateRight;
         public int rotateAmount;
         public int size;
@@ -23,14 +25,14 @@ namespace Features.Battles.Wheel
 
         public void SetSize()
         {
-            wheelController.SetSize(size);
+            wheelController.Initialize(size, new List<InPlayCardScriptableObject>());
         }
 
         private void Update()
         {
-            if (setSize)
+            if (init)
             {
-                setSize = false;
+                init = false;
                 SetSize();
             }
 
@@ -51,10 +53,10 @@ namespace Features.Battles.Wheel
         private void ToggleInput()
         {
             if (!_enabled)
-                wheelController.Enable();
+                wheelController.UnlockPlayerInput();
 
             if (_enabled)
-                wheelController.Disable();
+                wheelController.LockPlayerInput();
             _enabled = !_enabled;
         }
 
@@ -63,7 +65,7 @@ namespace Features.Battles.Wheel
             int amount = 0;
             while (amount < rotateAmount)
             {
-                yield return wheelController.MoveTowardsDirection(WheelRotation.Right);
+                yield return wheelController.TurnTowardsDirection(WheelRotation.Right);
                 amount++;
             }
         }

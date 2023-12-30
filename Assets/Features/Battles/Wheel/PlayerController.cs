@@ -10,60 +10,76 @@ namespace Features.Battles.Wheel
 {
     public class PlayerController : MonoBehaviour
     {
-        public WheelData WheelData = new();
-        public InPlayCard inPlayCardPrefab;
-        [HideInInspector] public List<InPlayCard> Cards = new();
-        [HideInInspector] public List<Vector2> Positions;
-        private IControlWheel input;
-        private ControlWheel[] wheelControllers;
-        private AutomaticControlWheel wheelMovement;
-        [SerializeField] Animator animator;
-
-        // private List<RunCard> _cardsToAdd;
+        [SerializeField] private InPlayCard inPlayCardPrefab;
+        [SerializeField] private WheelController wheelController;
+        [HideInInspector] public List<InPlayCard> Cards => _slots.Select(x => x.GetCard()).ToList();
         public int frontCardIndex;
         private Func<IEnumerator> _wheelMovedCallback;
         private WheelRotation _lastActionDirection;
         private WheelRotation _lastRotation;
-        private static readonly int OnMoved = Animator.StringToHash("on_moved");
         public event EventHandler<InPlayCard> Acted;
         public event EventHandler<InPlayCard> WheelTurn;
         public event EventHandler<InPlayCard> ActiveCardChanged;
 
-        private void Awake()
-        {
-            input = GetComponent<IControlWheel>();
-            wheelControllers = GetComponents<ControlWheel>();
-            wheelMovement = GetComponent<AutomaticControlWheel>();
-        }
-
+        private List<WheelSlot> _slots = new();
+        
         public void InitializeWheel(bool player, int wheelSize, List<InPlayCardScriptableObject> cards)
         {
-            Positions = new();
-            WheelData.Size = wheelSize;
-            CalculatePositions();
-            SetRunCards(player, cards);
+            // SetRunCards(player, cards);
 
             frontCardIndex = 0;
-            input.SetTurnRightAction(OnTurnRightAction);
-            input.SetTurnLeftAction(OnTurnLeftAction);
-            wheelMovement.SetTurnLeftAction(OnTurnLeft);
-            wheelMovement.SetTurnRightAction(OnTurnRight);
-            foreach (var controller in wheelControllers)
-            {
-                controller.SetOnBeforeRotation(OnBeforeRotation);
-            }
-            input.Enable();
+            
+            _slots = wheelController.Initialize(wheelSize, cards);
+            wheelController.RotatedLeft += OnTurnLeftAction;
+            wheelController.RotatedRight += OnTurnRightAction;
+            // input.SetTurnRightAction(OnTurnRightAction);
+            // input.SetTurnLeftAction(OnTurnLeftAction);
+            // wheelMovement.SetTurnLeftAction(OnTurnLeft);
+            // wheelMovement.SetTurnRightAction(OnTurnRight);
+            // input.Enable();
+            // void SetRunCards(bool player, List<InPlayCardScriptableObject>cards)
+            // {
+            //     var amountToSet = Mathf.Min(wheelSize, cards.Count);
+            //     for (int i = 0; i < amountToSet; i++)
+            //     {
+            //         var inPlayCard = Instantiate(inPlayCardPrefab, this.transform);
+            //         Cards.Add(inPlayCard);
+            //         inPlayCard.SetPlayer(player);
+            //         inPlayCard.SetCard(cards[i], this);
+            //     }
+            // }
         }
 
-        public void LockWheel() => input.Disable();
+        private void OnTurnRightAction(object sender, EventArgs e)
+        {
+            wheelController.LockPlayerInput();
+            if (AllUnitsDead())
+                return;
 
-        public void UnlockWheel() => input.Enable();
+            _lastActionDirection = WheelRotation.Right; 
+            _lastRotation = WheelRotation.Right;
+            UpdateIndex(WheelRotation.Right);
+            Acted?.Invoke(this, Cards[frontCardIndex]);
+            
+        }
+
+        private void OnTurnLeftAction(object sender, EventArgs e)
+        {
+            wheelController.LockPlayerInput();
+            if (AllUnitsDead())
+                return;
+
+            _lastActionDirection = WheelRotation.Left; 
+            _lastRotation = WheelRotation.Left;
+            UpdateIndex(WheelRotation.Left);
+            Acted?.Invoke(this, Cards[frontCardIndex]);
+        }
 
         public InPlayCard GetFrontCard() => Cards[frontCardIndex];
         
         public bool AllUnitsDead() => Cards.All(x => x.IsDead);
 
-        public IEnumerator PutAliveUnitAtFront(WheelRotation toTheRight)
+        public IEnumerator PutAliveUnitAtFront(WheelRotation direction)
         {
             while (Cards[frontCardIndex].IsDead)
             {
@@ -71,130 +87,18 @@ namespace Features.Battles.Wheel
                 {
                     yield break;
                 }
-                yield return wheelMovement.TurnTowardsDirection(toTheRight, true);
+                yield return wheelController.TurnTowardsDirection(direction);
+                UpdateIndex(direction);
                 yield return new WaitForSeconds(0.1f);
             }
-        }
-
-        private void DecrementFrontCardIndex()
-        {
-            frontCardIndex--;
-            if (frontCardIndex < 0)
-                frontCardIndex = Cards.Count - 1;
-            ActiveCardChanged?.Invoke(this,Cards[frontCardIndex]);
-        }
-
-        private void IncrementFrontCardIndex()
-        {
-            frontCardIndex++;
-            if (frontCardIndex > Cards.Count - 1)
-                frontCardIndex = 0;
-            ActiveCardChanged?.Invoke(this,Cards[frontCardIndex]);
-        }
-
-        private IEnumerator OnTurnLeftAction()
-        {
-            if (AllUnitsDead())
-                yield break;
-            _lastActionDirection = WheelRotation.Left;
-            _lastRotation = WheelRotation.Left;
-            IncrementFrontCardIndex();
-            animator.SetTrigger(OnMoved);
-            yield return new WaitForSeconds(0.3f);
-            Acted?.Invoke(this, Cards[frontCardIndex]);
-        }
-
-        private IEnumerator OnTurnRightAction()
-        {
-            if (AllUnitsDead())
-                yield break;
-
-            _lastActionDirection = WheelRotation.Right; 
-            _lastRotation = WheelRotation.Right;
-            DecrementFrontCardIndex();
-            animator.SetTrigger(OnMoved);
-            yield return new WaitForSeconds(0.3f);
-            Acted?.Invoke(this, Cards[frontCardIndex]);
-        }
-
-        private IEnumerator OnTurnLeft()
-        {
-            if (AllUnitsDead())
-                yield break;
-            _lastRotation = WheelRotation.Left;
-            
-            IncrementFrontCardIndex();
-            yield return _wheelMovedCallback.Invoke();
-        }
-
-        private IEnumerator OnTurnRight()
-        {
-            if (AllUnitsDead())
-                yield break;
-            _lastRotation = WheelRotation.Right;
-
-            DecrementFrontCardIndex();
-            yield return _wheelMovedCallback.Invoke();
-        }
-        
-        private void OnBeforeRotation(TurningOrientation turningOrientation)
-        {
-            animator.SetTrigger($"Rotate_{turningOrientation}");
-        }
-
-        private void SetRunCards(bool player, List<InPlayCardScriptableObject>cards)
-        {
-            var amountToSet = Mathf.Min(WheelData.Size, cards.Count);
-            for (int i = 0; i < amountToSet; i++)
-            {
-                var inPlayCard = Instantiate(inPlayCardPrefab, this.transform);
-                Cards.Add(inPlayCard);
-                inPlayCard.SetPlayer(player);
-                inPlayCard.transform.localPosition = Positions[i];
-                inPlayCard.SetCard(cards[i], this);
-            }
-        }
-
-        private void CalculatePositions()
-        {
-            var angleOffset = Mathf.PI / 2; // Offset to start at the top of the circle
-
-            for (var i = 0; i < WheelData.Size; i++)
-            {
-                // Calculate spherical coordinates with angle offset
-                var theta = 2 * Mathf.PI * i / WheelData.Size + angleOffset;
-                var x = WheelData.Radius * Mathf.Cos(theta);
-                var y = WheelData.Radius * Mathf.Sin(theta);
-
-                var position = new Vector2(x, y);
-                Positions.Add(position);
-            }
-        }
-
-        public IList<InPlayCard> GetFrontNeighborsCards(int startLevel, int finishLevel)
-        {
-            var cards = new List<InPlayCard>();
-            for (int i = startLevel; i < finishLevel; i++)
-            {
-                var currentNegativeIndex = frontCardIndex - i;
-                if (currentNegativeIndex < 0)
-                    currentNegativeIndex += Cards.Count;
-                var currentPositiveIndex = frontCardIndex + i;
-                if (currentPositiveIndex > Cards.Count - 1)
-                    currentPositiveIndex -= Cards.Count();
-
-                cards.Add(Cards[currentNegativeIndex]);
-                cards.Add(Cards[currentPositiveIndex]);
-            }
-
-            return cards.Distinct().ToList();
         }
 
         public IEnumerator RepeatRotate(int count)
         {
             for (int i = 0; i < count; i++)
             {
-                yield return wheelMovement.TurnTowardsDirection(_lastRotation, true);
+                yield return wheelController.TurnTowardsDirection(_lastRotation);
+                UpdateIndex(_lastRotation);
             }
         }
 
@@ -202,30 +106,24 @@ namespace Features.Battles.Wheel
         {
             for (int i = 0; i < count; i++)
             {
-                yield return wheelMovement.TurnTowardsDirection(direction, true);
+                yield return wheelController.TurnTowardsDirection(direction);
+                UpdateIndex(direction);
             }
 
             yield return PutAliveUnitAtFront(direction);
         }
 
-        public void SetWheelMovedCallback(Func<IEnumerator> onPlayerWheelMoved)
-        {
-            _wheelMovedCallback = onPlayerWheelMoved;
-        }
-
         public IEnumerator RevertLastMovement()
         {
-            yield return wheelMovement.TurnTowardsDirection(_lastActionDirection == WheelRotation.Left ? WheelRotation.Right : WheelRotation.Left, false);
-            if (_lastActionDirection == WheelRotation.Left)
-                DecrementFrontCardIndex();
-            else
-                IncrementFrontCardIndex();
+            yield return wheelController.TurnTowardsDirection(_lastActionDirection == WheelRotation.Left ? WheelRotation.Right : WheelRotation.Left);
+            UpdateIndex(_lastActionDirection.Inverse());
         }
 
         public IEnumerator RepeatActMove()
         {
-            yield return wheelMovement.TurnTowardsDirection(_lastActionDirection, true);
+            yield return wheelController.TurnTowardsDirection(_lastActionDirection);
 
+            UpdateIndex(_lastActionDirection);
             Acted?.Invoke(this, Cards[frontCardIndex]);
         }
 
@@ -249,12 +147,67 @@ namespace Features.Battles.Wheel
             return cards.Distinct().ToList();
         }
 
+        public IList<InPlayCard> GetFrontNeighborsCards(int startLevel, int finishLevel)
+        {
+            var cards = new List<InPlayCard>();
+            for (int i = startLevel; i < finishLevel; i++)
+            {
+                var currentNegativeIndex = frontCardIndex - i;
+                if (currentNegativeIndex < 0)
+                    currentNegativeIndex += Cards.Count;
+                var currentPositiveIndex = frontCardIndex + i;
+                if (currentPositiveIndex > Cards.Count - 1)
+                    currentPositiveIndex -= Cards.Count();
+
+                cards.Add(Cards[currentNegativeIndex]);
+                cards.Add(Cards[currentPositiveIndex]);
+            }
+
+            return cards.Distinct().ToList();
+        }
+
         public IEnumerator ShowCards()
         {
             foreach (var card in Cards)
             {
                 yield return card.PlayOnAppearFeedback();
             }
+        }
+
+        private void UpdateIndex(WheelRotation direction)
+        {
+            if (direction == WheelRotation.Left)
+                IncrementFrontCardIndex();
+            else
+                DecrementFrontCardIndex();
+        }
+        
+        private void DecrementFrontCardIndex()
+        {
+            frontCardIndex = (frontCardIndex - 1 + Cards.Count) % Cards.Count;
+            ActiveCardChanged?.Invoke(this,Cards[frontCardIndex]);
+            WheelTurn?.Invoke(this, Cards[frontCardIndex]);
+        }
+
+        private void IncrementFrontCardIndex()
+        {
+            frontCardIndex = (frontCardIndex + 1) % Cards.Count;
+            ActiveCardChanged?.Invoke(this,Cards[frontCardIndex]);
+            WheelTurn?.Invoke(this, Cards[frontCardIndex]);
+        }
+
+        public void LockInput()
+        {
+            wheelController.LockPlayerInput();
+            //spells.block
+            //cardsInHand.block
+        }
+
+        public void UnlockInput()
+        {
+            wheelController.UnlockPlayerInput();
+            //spells.unlock
+            //cardsInHand.unlock
         }
     }
 }

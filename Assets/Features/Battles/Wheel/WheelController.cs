@@ -2,47 +2,61 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using Features.Battles.Core;
+using Features.Cards.InPlay;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.Serialization;
 
 namespace Features.Battles.Wheel
 {
     public class WheelController : MonoBehaviour
     {
-        [SerializeField] private GameObject itemPrefab;
+        [SerializeField] private InPlayCard inPlayCardPrefab;
+        [SerializeField] private WheelSlot wheelSlotPrefab;
         [SerializeField] protected float rotationSpeed = 5;
-        protected float startAngle;
         [SerializeField] private WheelData wheelData;
         private bool _enabled;
+        private float _startAngle;
         private bool _isRotating;
         private List<Vector2> _positions = new();
-        private List<GameObject> items= new();
+        private List<WheelSlot> items= new();
         public event EventHandler RotatedRight;
         public event EventHandler RotatedLeft;
 
-        public void Enable() => _enabled = true;
-        public void Disable() => _enabled = false;
-        public void SetSize(int size)
+        public void UnlockPlayerInput() => _enabled = true;
+        public void LockPlayerInput() => _enabled = false;
+        public List<WheelSlot> Initialize(int size, List<InPlayCardScriptableObject> cards)
         {
             wheelData.Size = size;
             CalculatePositions();
             for (int i = 0; i < wheelData.Size; i++)
             {
-                var go = Instantiate(itemPrefab, this.transform);
+                var go = Instantiate(wheelSlotPrefab, this.transform);
+                go.Index = i;
                 go.transform.localPosition = _positions[i];
                 items.Add(go);
+                if (i < cards.Count)
+                {
+                    var card = Instantiate(inPlayCardPrefab, go.transform);
+                    card.SetCard(cards[i], GetComponentInParent<PlayerController>());
+                    go.SetCard(card);
+                }
+
+                
+
             }
 
             enabled = true;
+            return items;
         }
 
-        public IEnumerator MoveTowardsDirection(WheelRotation wheelRotation)
+        public IEnumerator TurnTowardsDirection(WheelRotation wheelRotation)
         {
-            startAngle = wheelData.RotationAngle;
+            _startAngle = wheelData.RotationAngle;
             var rotationInput = wheelRotation == WheelRotation.Right ? 1 : -1;
             var anglePerItem = (1.5f * Mathf.PI) / (wheelData.Size);
 
-            while (Mathf.Abs(wheelData.RotationAngle - startAngle) < anglePerItem)
+            while (Mathf.Abs(wheelData.RotationAngle - _startAngle) < anglePerItem)
             {
                 wheelData.RotationAngle += rotationInput * rotationSpeed * Time.deltaTime;
                 RotateToNewPosition();
@@ -68,7 +82,7 @@ namespace Features.Battles.Wheel
             {
                 if (EventSystem.current.IsPointerOverGameObject())
                     return;
-                startAngle = wheelData.RotationAngle;
+                _startAngle = wheelData.RotationAngle;
                 _isRotating = true;
             }
 
@@ -87,11 +101,11 @@ namespace Features.Battles.Wheel
 
             var anglePerItem = (1.5f * Mathf.PI) / (wheelData.Size);
 
-            if (Mathf.Abs(wheelData.RotationAngle - startAngle) >= anglePerItem)
+            if (Mathf.Abs(wheelData.RotationAngle - _startAngle) >= anglePerItem)
             {
                 _isRotating = false;
 
-                if ((wheelData.RotationAngle - startAngle) > 0)
+                if ((wheelData.RotationAngle - _startAngle) > 0)
                     RotatedRight?.Invoke(this,null);
                 else
                     RotatedLeft?.Invoke(this,null);
@@ -100,7 +114,7 @@ namespace Features.Battles.Wheel
         
             RotateToNewPosition();
         }
-        private void RollbackPosition() => wheelData.RotationAngle = startAngle;
+        private void RollbackPosition() => wheelData.RotationAngle = _startAngle;
 
         private void SnapToNearestPosition()
         {

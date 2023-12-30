@@ -24,7 +24,7 @@ namespace Features.Battles
         [SerializeField] private CoroutineManager coroutineManager;
         [SerializeField] internal PlayerController playerController;
         [SerializeField] internal PlayerController enemyController;
-        [SerializeField] private BotControlWheel botControlWheel;
+        [SerializeField] private WheelController botControlWheel;
         [SerializeField] private BusQueue.BusQueue _busQueue;
         [SerializeField] private TurnMessage turnMessage;
         [FormerlySerializedAs("actionsView")] [SerializeField] private EnergyView energyView;
@@ -90,13 +90,16 @@ namespace Features.Battles
             enemyController.InitializeWheel(false, enemyWheelSize, enemiesTemp);
             playerController.InitializeWheel(true, heroCard.WheelSize, cards);
 
-            enemyController.LockWheel();
-            playerController.UnlockWheel();
+            enemyController.LockInput();
+            playerController.UnlockInput();
 
             playerController.Acted += OnPlayerActed;
             enemyController.Acted += OnEnemyActed;
-            playerController.SetWheelMovedCallback(OnPlayerWheelMoved);
-            enemyController.SetWheelMovedCallback(OnEnemyWheelMoved);
+            playerController.WheelTurn += OnPlayerWheelMoved;
+            enemyController.WheelTurn += OnEnemyWheelMoved;
+
+            // playerController.SetWheelMovedCallback(OnPlayerWheelMoved);
+            // enemyController.SetWheelMovedCallback(OnEnemyWheelMoved);
             
             yield return coroutineManager.ExecuteCoroutines(enemyController.ShowCards(), playerController.ShowCards());
             yield return coroutineManager.ExecuteCoroutines(ApplyOnBattleStartAbilities());
@@ -175,7 +178,7 @@ namespace Features.Battles
         {
             acting = false;
             Debug.Log($"<color=green>{"ACT-END"}</color>");
-            attackerPlayerController.UnlockWheel();
+            attackerPlayerController.UnlockInput();
             yield return null;
         }
 
@@ -197,7 +200,7 @@ namespace Features.Battles
         private IEnumerator ActStartCoroutine(PlayerController attackerPlayerController)
         {
             acting = true;
-            attackerPlayerController.LockWheel();
+            attackerPlayerController.LockInput();
             yield return null;
         }
 
@@ -374,8 +377,8 @@ namespace Features.Battles
             }
 
             yield return turnMessage.Show(true);
-            enemyController.LockWheel();
-            playerController.UnlockWheel();
+            enemyController.LockInput();
+            playerController.UnlockInput();
         }
 
 
@@ -393,24 +396,23 @@ namespace Features.Battles
             }
         }
 
-        private IEnumerator OnEnemyWheelMoved()
+        private void OnEnemyWheelMoved(object sender, InPlayCard frontCard)
         {
             Debug.Log($"<color=yellow>{"OnEnemyWheelMoved"}</color>");
-            yield return ApplyWheelSpinEffects(enemyController);
+            _busQueue.EnqueueAction(ApplyWheelSpinEffects(enemyController));
         }
 
-        private IEnumerator OnPlayerWheelMoved()
+        private void OnPlayerWheelMoved(object sender, InPlayCard frontCard)
         {
-            Debug.Log($"<color=yellow>{"OnPlayerWheelMoved"}</color>");
-            yield return ApplyWheelSpinEffects(playerController);
+            _busQueue.EnqueueAction(ApplyWheelSpinEffects(playerController));
         }
 
         private IEnumerator PlayBotTurn()
         {
             yield return ApplyStartTurnAbilities(enemyController, playerController);
             yield return turnMessage.Show(false);
-            playerController.LockWheel();
-            enemyController.UnlockWheel();
+            playerController.LockInput();
+            enemyController.UnlockInput();
             StartCoroutine(BotAction());
         }
 
@@ -428,7 +430,7 @@ namespace Features.Battles
             if (IsPlayerTurn()) yield break;
             if (_actions <= 0)
                 yield break;
-            yield return botControlWheel.TurnTowardsDirection(Random.Range(0, 2) == 1);
+            yield return botControlWheel.TurnTowardsDirection(Random.Range(0, 2) == 1 ? WheelRotation.Right : WheelRotation.Left);
         }
 
 
@@ -498,7 +500,7 @@ namespace Features.Battles
         private IEnumerator WheelOfDeath()
         {
             acting = true;
-            playerController.LockWheel();
+            playerController.LockInput();
             var burns = enemyController.Cards.Max(x => x.Effects.Count(x => x.Type == EffectEnum.Fire));
             while (burns > 0 && !enemyController.AllUnitsDead())
             {
@@ -508,7 +510,7 @@ namespace Features.Battles
                     x.Effects.Count(ability => ability.Type == EffectEnum.Fire));
             }
 
-            playerController.UnlockWheel();
+            playerController.UnlockInput();
             acting = false;
         }
 

@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using Features.Battles.Core;
 using Features.Battles.Spells;
-using Features.Cards.InPlay;
 
 namespace Features.Battles.Wheel
 {
@@ -11,16 +10,13 @@ namespace Features.Battles.Wheel
         event EventHandler<WheelRotation> SpinWheel;
         event EventHandler<SpellView> ExecuteSpell;
         event EventHandler SwapCard;
+        event EventHandler TurnEnd; 
     }
 
     public class BattlePlayer
     {
         private IPlayerController _playerController;
-        public List<InPlayCardSlot> Slots = new();
-        
-        private IControlWheel input;
-        private ControlWheel[] wheelControllers;
-        private WheelController _wheelMovement;
+        public List<WheelSlot> Slots = new();
         
         public void Initialize()
         {
@@ -31,11 +27,5 @@ namespace Features.Battles.Wheel
         {
             throw new NotImplementedException();
         }
-    }
-
-    public class InPlayCardSlot
-    {
-        public InPlayCard Card;
-        public int index;
     }
 }
