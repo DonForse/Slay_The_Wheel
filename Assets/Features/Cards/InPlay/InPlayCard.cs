@@ -8,14 +8,16 @@ using Features.Cards.Indicators;
 using Features.Cards.InPlay.Feedback;
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace Features.Cards.InPlay
 {
     public class InPlayCard : MonoBehaviour
     {
         private InPlayCardScriptableObject _cardScriptableObject;
-        [SerializeField] private SpriteRenderer spriteRenderer;
+        [SerializeField] private Image image;
         [SerializeField] private Sprite cardBack;
+        
         [SerializeField] private Transform viewContainer;
         [SerializeField] private TMP_Text hpText;
         [SerializeField] private TMP_Text atkText;
@@ -57,7 +59,7 @@ namespace Features.Cards.InPlay
         {
             OwnerPlayer = owner;
             _cardScriptableObject = runCardScriptableObject;
-            spriteRenderer.sprite = runCardScriptableObject.CardSprite;
+            image.sprite = runCardScriptableObject.CardSprite;
 
             SetAbilityIcons(Abilities.ToArray());
             SetEffectIcons();
@@ -152,7 +154,7 @@ namespace Features.Cards.InPlay
             hpText.text = "0";
             atkText.text = "0";
             _cardScriptableObject.Effects.Clear();
-            spriteRenderer.sprite = cardBack;
+            image.sprite = cardBack;
             UpdateCardScriptableObjectValues(null, _cardScriptableObject);
             yield return inPlayCardFeedbacks.PlayOnDeadFeedback();
         }
