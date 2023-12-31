@@ -76,27 +76,27 @@ namespace Features.Battles
                 new BombOnApplyEffectStrategy(this)
             };
             _playerBattleDeckManager = new BattleDeckManager();
-            _playerBattleDeckManager.Initialize(deck);
+            _playerBattleDeckManager.Initialize(deck, playerController);
 
             _enemiesBattleDeckManager = new BattleDeckManager();
-            _enemiesBattleDeckManager.Initialize(enemies);
+            _enemiesBattleDeckManager.Initialize(enemies, enemyController);
 
-            _heroCardScriptableObject = new InPlayCardScriptableObject(heroCard);
+            _heroCardScriptableObject = new InPlayCardScriptableObject(heroCard, playerController);
 
             var cards = _playerBattleDeckManager.DrawCards(heroCard.WheelSize - 1);
             cards = new List<InPlayCardScriptableObject>() { _heroCardScriptableObject }.Concat(cards).ToList();
 
             var enemiesTemp = _enemiesBattleDeckManager.DrawCards(enemyWheelSize);
-            enemyController.InitializeWheel(false, enemyWheelSize, enemiesTemp);
-            playerController.InitializeWheel(true, heroCard.WheelSize, cards);
+            enemyController.InitializeWheel(enemyWheelSize, enemiesTemp);
+            playerController.InitializeWheel(heroCard.WheelSize, cards);
 
             enemyController.LockInput();
             playerController.UnlockInput();
 
             playerController.Acted += OnPlayerActed;
             enemyController.Acted += OnEnemyActed;
-            playerController.WheelTurn += OnPlayerWheelMoved;
-            enemyController.WheelTurn += OnEnemyWheelMoved;
+            playerController.WheelTurn += OnWheelMoved;
+            enemyController.WheelTurn += OnWheelMoved;
 
             // playerController.SetWheelMovedCallback(OnPlayerWheelMoved);
             // enemyController.SetWheelMovedCallback(OnEnemyWheelMoved);
@@ -256,8 +256,7 @@ namespace Features.Battles
         {
             var defenderCard = damageReceiver.GetCard();
             StartCoroutine(damageReceiver.PlayGetHitAnimation(damage, source));
-            var vulnerable = damageReceiver.GetCard().Effects.FirstOrDefault(x => x.Type == EffectEnum.Vulnerable);
-            if (vulnerable != null && vulnerable.Amount > 0)
+            if (defenderCard.Effects.ContainsKey(EffectEnum.Vulnerable) && defenderCard.Effects[EffectEnum.Vulnerable].Amount > 0)
             {
                 damage += Mathf.FloorToInt(damage / 2f);
             }
@@ -395,16 +394,11 @@ namespace Features.Battles
                 spellView.SetActivateable(spellView.actionCost <= _actions);
             }
         }
+        
 
-        private void OnEnemyWheelMoved(object sender, InPlayCard frontCard)
+        private void OnWheelMoved(object sender, PlayerController controller)
         {
-            Debug.Log($"<color=yellow>{"OnEnemyWheelMoved"}</color>");
-            _busQueue.EnqueueAction(ApplyWheelSpinEffects(enemyController));
-        }
-
-        private void OnPlayerWheelMoved(object sender, InPlayCard frontCard)
-        {
-            _busQueue.EnqueueAction(ApplyWheelSpinEffects(playerController));
+            _busQueue.EnqueueAction(ApplyWheelSpinEffects(controller));
         }
 
         private IEnumerator PlayBotTurn()
@@ -483,8 +477,13 @@ namespace Features.Battles
             {
                 foreach (var card in enemyController.Cards)
                 {
-                    var totalBurns = card.Effects.Count(x => x.Type == EffectEnum.Fire);
-                    card.UpdateEffect(EffectEnum.Fire, totalBurns);
+                    if (card.Effects.TryGetValue(EffectEnum.Fire, out var effect))
+                    {
+                        var totalBurns = effect.Amount;
+                        card.UpdateEffect(EffectEnum.Fire, totalBurns);
+                    }
+
+      
                 }
             }
             else if (skillIndex == 3)
@@ -501,13 +500,15 @@ namespace Features.Battles
         {
             acting = true;
             playerController.LockInput();
-            var burns = enemyController.Cards.Max(x => x.Effects.Count(x => x.Type == EffectEnum.Fire));
+            var burns = enemyController.Cards.SelectMany(x =>
+                x.Effects.Where(x => x.Key == EffectEnum.Fire).Select(fire => fire.Value.Amount)).Max();
             while (burns > 0 && !enemyController.AllUnitsDead())
             {
                 if (enemyController.AllUnitsDead()) yield break;
                 yield return enemyController.Rotate(WheelRotation.Right, burns);
-                burns = enemyController.Cards.Max(x =>
-                    x.Effects.Count(ability => ability.Type == EffectEnum.Fire));
+                burns = enemyController.Cards.SelectMany(x =>
+                    x.Effects.Where(x => x.Key == EffectEnum.Fire).Select(fire => fire.Value.Amount)).Max();
+
             }
 
             playerController.UnlockInput();
@@ -539,8 +540,8 @@ namespace Features.Battles
             {
                 foreach (var strategy in _applyEffectStrategies)
                 {
-                    if (strategy.IsValid(effect, BattleEventEnum.PutAtFront))
-                        yield return strategy.Execute(effect, cardAtFront);
+                    if (strategy.IsValid(effect.Value, BattleEventEnum.PutAtFront))
+                        yield return strategy.Execute(effect.Value, cardAtFront);
                 }
             }
 
@@ -550,8 +551,8 @@ namespace Features.Battles
                 {
                     foreach (var strategy in _applyEffectStrategies)
                     {
-                        if (strategy.IsValid(effect, BattleEventEnum.Spin))
-                            yield return strategy.Execute(effect, card);
+                        if (strategy.IsValid(effect.Value, BattleEventEnum.Spin))
+                            yield return strategy.Execute(effect.Value, card);
                     }
                 }
             }
@@ -576,8 +577,8 @@ namespace Features.Battles
                 {
                     foreach (var strategy in _applyEffectStrategies)
                     {
-                        if (strategy.IsValid(effect, BattleEventEnum.EndTurn))
-                            yield return strategy.Execute(effect, card);
+                        if (strategy.IsValid(effect.Value, BattleEventEnum.EndTurn))
+                            yield return strategy.Execute(effect.Value, card);
                     }
                 }
             }
@@ -600,8 +601,8 @@ namespace Features.Battles
                 {
                     foreach (var strategy in _applyEffectStrategies)
                     {
-                        if (strategy.IsValid(effect, BattleEventEnum.StartTurn))
-                            yield return strategy.Execute(effect, card);
+                        if (strategy.IsValid(effect.Value, BattleEventEnum.StartTurn))
+                            yield return strategy.Execute(effect.Value, card);
                     }
                 }
             }

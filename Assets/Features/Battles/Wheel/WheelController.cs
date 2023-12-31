@@ -41,9 +41,6 @@ namespace Features.Battles.Wheel
                     card.SetCard(cards[i], GetComponentInParent<PlayerController>());
                     go.SetCard(card);
                 }
-
-                
-
             }
 
             enabled = true;

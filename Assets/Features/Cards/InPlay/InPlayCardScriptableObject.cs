@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Features.Battles;
+using Features.Battles.Wheel;
 using UnityEngine;
 
 namespace Features.Cards.InPlay
@@ -166,7 +168,7 @@ namespace Features.Cards.InPlay
             }
         }
 
-        public List<Effect> Effects
+        public Dictionary<EffectEnum,Effect> Effects
         {
             get => _effects;
             set
@@ -186,15 +188,16 @@ namespace Features.Cards.InPlay
         // private List<Ability> _onActAbilities;
         // private List<Ability> _onBattleStartAbilities;
         // private List<Ability> _onDeadAbilities;
-        private List<Effect> _effects;
+        private Dictionary<EffectEnum, Effect> _effects;
         private AttackType _attackType;
         private Sprite _cardSprite;
         private int _actCost;
         private readonly RunCardScriptableObject _runCard;
         private int _armor;
         private List<Ability> _abilities;
+        public readonly PlayerController OwnerPlayer;
 
-        public InPlayCardScriptableObject(RunCardScriptableObject cardScriptableObject)
+        public InPlayCardScriptableObject(RunCardScriptableObject cardScriptableObject, PlayerController owner)
         {
             _cardName = cardScriptableObject.cardName;
             _attack = cardScriptableObject.attack;
@@ -210,8 +213,19 @@ namespace Features.Cards.InPlay
             // _onBattleEndAbilties = cardScriptableObject.onBattlesEndAbiltiies;
             _attackType = cardScriptableObject.attackType;
             _actCost = cardScriptableObject.actCost;
-            _effects = new List<Effect>();
+            _effects = new Dictionary<EffectEnum, Effect>();
             _runCard = cardScriptableObject;
+            OwnerPlayer = owner;
+        }
+
+        public void UpdateEffect(EffectEnum effectType, int value)
+        {
+            if (!_effects.ContainsKey(effectType))
+            {
+                _effects.Add(effectType, new Effect() { Amount = 0, Type = effectType });
+            }
+
+            _effects[effectType].Amount = Mathf.Max(_effects[effectType].Amount +value, 0);
         }
     }
 }

@@ -18,9 +18,9 @@ namespace Features.Cards.InPlay
             foreach (var effect in playCard.Effects)
             {
                 var go = Instantiate(descriptionBoxPrefab, floatingDescriptionsContainer);
-                var effectIcon= effectsIconsScriptableObject.effectIcons.FirstOrDefault(x => x.effect == effect.Type);
+                var effectIcon= effectsIconsScriptableObject.effectIcons.FirstOrDefault(x => x.effect == effect.Value.Type);
                 if (effectIcon != null) 
-                    go.Set(effectIcon.description, effectIcon.image, effect.Amount);
+                    go.Set(effectIcon.description, effectIcon.image, effect.Value.Amount);
             }
             
             foreach (var ability in playCard.Abilities)

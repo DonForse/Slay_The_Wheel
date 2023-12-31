@@ -31,7 +31,7 @@ namespace Features.Cards.InPlay
 
         public bool IsDead => _cardScriptableObject.IsDead;
 
-        public List<Effect> Effects => _cardScriptableObject.Effects;
+        public Dictionary<EffectEnum, Effect> Effects => _cardScriptableObject.Effects;
 
         // public List<Ability> Abilities => _cardScriptableObject.OnDealDamageAbilities
         //     .Concat(_cardScriptableObject.OnAttackAbilities)
@@ -60,7 +60,7 @@ namespace Features.Cards.InPlay
             spriteRenderer.sprite = runCardScriptableObject.CardSprite;
 
             SetAbilityIcons(Abilities.ToArray());
-            SetEffectIcons(Effects.ToArray());
+            SetEffectIcons();
 
             _cardScriptableObject.ValueChanged += UpdateCardScriptableObjectValues;
             _cardScriptableObject.HealthValueChanged += UpdateHealth;
@@ -102,18 +102,19 @@ namespace Features.Cards.InPlay
             abilitiesContainer.gameObject.SetActive(abilitiesContainer.childCount > 0);
         }
 
-        private void SetEffectIcons(Effect[] effects)
+        private void SetEffectIcons()
         {
             foreach (Transform child in effectsContainer)
             {
                 Destroy(child.gameObject);
             }
 
-            foreach (var effect in effects)
+            foreach (var effect in Effects)
             {
-                var abilityIcon = effectsIconsScriptableObject.effectIcons.FirstOrDefault(x => x.effect == effect.Type);
+                var abilityIcon =
+                    effectsIconsScriptableObject.effectIcons.FirstOrDefault(x => x.effect == effect.Value.Type);
                 var go = Instantiate(indicatorPrefab, effectsContainer);
-                go.Set(abilityIcon?.image, effect);
+                go.Set(abilityIcon?.image, effect.Value);
             }
 
             effectsContainer.gameObject.SetActive(effectsContainer.childCount > 0);
@@ -125,10 +126,10 @@ namespace Features.Cards.InPlay
             {
                 hpText.text = "0";
                 atkText.text = "0";
-                SetEffectIcons(Effects?.ToArray());
+                SetEffectIcons();
             }
 
-            SetEffectIcons(Effects?.ToArray());
+            SetEffectIcons();
         }
 
         private void UpdateHealth(object sender, (int previous, int current) e) => hpText.text = e.current.ToString();
@@ -169,17 +170,9 @@ namespace Features.Cards.InPlay
         public void UpdateEffect(EffectEnum effectType, int amount)
         {
             if (IsDead) return;
-            var effectInCard = Effects.FirstOrDefault(x => x.Type == effectType);
-            if (effectInCard == null)
-            {
-                effectInCard = new Effect();
-                Effects.Add(effectInCard);
-            }
+            _cardScriptableObject.UpdateEffect(effectType, amount);
 
-            effectInCard = new Effect() { Type = effectType, Amount = effectInCard.Amount + amount };
-
-            if (effectInCard.Amount > 0)
-                UpdateCardScriptableObjectValues(this, GetCard());
+            UpdateCardScriptableObjectValues(this, GetCard());
         }
 
         public IEnumerator PlayAttack()

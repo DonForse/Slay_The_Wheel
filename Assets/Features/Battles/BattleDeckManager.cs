@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using Features.Battles.Wheel;
 using Features.Cards;
 using Features.Cards.InPlay;
 
@@ -10,9 +11,9 @@ namespace Features.Battles
         private List<InPlayCardScriptableObject> _deck;
         private List<InPlayCardScriptableObject> _discardPile;
 
-        public void Initialize(List<RunCardScriptableObject> cards)
+        public void Initialize(List<RunCardScriptableObject> cards, PlayerController owner)
         {
-            _deck = cards.Select(card => new InPlayCardScriptableObject(card)).ToList();
+            _deck = cards.Select(card => new InPlayCardScriptableObject(card, owner)).ToList();
             _discardPile = new();
 
         }

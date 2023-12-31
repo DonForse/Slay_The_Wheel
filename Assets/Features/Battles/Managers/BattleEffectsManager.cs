@@ -33,9 +33,9 @@ namespace Features.Battles.Managers
                 {
                     foreach (var ability in _effects)
                     {
-                        if (ability.IsValid(cardAbility, battleEventEnum))
+                        if (ability.IsValid(cardAbility.Value, battleEventEnum))
                         {
-                            coroutinesToExecute.Add(ability.Execute(cardAbility, card));
+                            coroutinesToExecute.Add(ability.Execute(cardAbility.Value, card));
                         }
                     }
                 }

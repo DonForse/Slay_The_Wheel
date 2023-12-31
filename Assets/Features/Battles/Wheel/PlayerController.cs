@@ -10,7 +10,6 @@ namespace Features.Battles.Wheel
 {
     public class PlayerController : MonoBehaviour
     {
-        [SerializeField] private InPlayCard inPlayCardPrefab;
         [SerializeField] private WheelController wheelController;
         [HideInInspector] public List<InPlayCard> Cards => _slots.Select(x => x.GetCard()).ToList();
         public int frontCardIndex;
@@ -18,36 +17,18 @@ namespace Features.Battles.Wheel
         private WheelRotation _lastActionDirection;
         private WheelRotation _lastRotation;
         public event EventHandler<InPlayCard> Acted;
-        public event EventHandler<InPlayCard> WheelTurn;
+        public event EventHandler<PlayerController> WheelTurn;
         public event EventHandler<InPlayCard> ActiveCardChanged;
 
         private List<WheelSlot> _slots = new();
         
-        public void InitializeWheel(bool player, int wheelSize, List<InPlayCardScriptableObject> cards)
+        public void InitializeWheel(int wheelSize, List<InPlayCardScriptableObject> cards)
         {
-            // SetRunCards(player, cards);
-
             frontCardIndex = 0;
             
             _slots = wheelController.Initialize(wheelSize, cards);
             wheelController.RotatedLeft += OnTurnLeftAction;
             wheelController.RotatedRight += OnTurnRightAction;
-            // input.SetTurnRightAction(OnTurnRightAction);
-            // input.SetTurnLeftAction(OnTurnLeftAction);
-            // wheelMovement.SetTurnLeftAction(OnTurnLeft);
-            // wheelMovement.SetTurnRightAction(OnTurnRight);
-            // input.Enable();
-            // void SetRunCards(bool player, List<InPlayCardScriptableObject>cards)
-            // {
-            //     var amountToSet = Mathf.Min(wheelSize, cards.Count);
-            //     for (int i = 0; i < amountToSet; i++)
-            //     {
-            //         var inPlayCard = Instantiate(inPlayCardPrefab, this.transform);
-            //         Cards.Add(inPlayCard);
-            //         inPlayCard.SetPlayer(player);
-            //         inPlayCard.SetCard(cards[i], this);
-            //     }
-            // }
         }
 
         private void OnTurnRightAction(object sender, EventArgs e)
@@ -174,28 +155,6 @@ namespace Features.Battles.Wheel
             }
         }
 
-        private void UpdateIndex(WheelRotation direction)
-        {
-            if (direction == WheelRotation.Left)
-                IncrementFrontCardIndex();
-            else
-                DecrementFrontCardIndex();
-        }
-        
-        private void DecrementFrontCardIndex()
-        {
-            frontCardIndex = (frontCardIndex - 1 + Cards.Count) % Cards.Count;
-            ActiveCardChanged?.Invoke(this,Cards[frontCardIndex]);
-            WheelTurn?.Invoke(this, Cards[frontCardIndex]);
-        }
-
-        private void IncrementFrontCardIndex()
-        {
-            frontCardIndex = (frontCardIndex + 1) % Cards.Count;
-            ActiveCardChanged?.Invoke(this,Cards[frontCardIndex]);
-            WheelTurn?.Invoke(this, Cards[frontCardIndex]);
-        }
-
         public void LockInput()
         {
             wheelController.LockPlayerInput();
@@ -208,6 +167,28 @@ namespace Features.Battles.Wheel
             wheelController.UnlockPlayerInput();
             //spells.unlock
             //cardsInHand.unlock
+        }
+
+        private void UpdateIndex(WheelRotation direction)
+        {
+            if (direction == WheelRotation.Left)
+                IncrementFrontCardIndex();
+            else
+                DecrementFrontCardIndex();
+        }
+
+        private void IncrementFrontCardIndex()
+        {
+            frontCardIndex = (frontCardIndex + 1) % Cards.Count;
+            ActiveCardChanged?.Invoke(this,Cards[frontCardIndex]);
+            WheelTurn?.Invoke(this, this);
+        }
+
+        private void DecrementFrontCardIndex()
+        {
+            frontCardIndex = (frontCardIndex - 1 + Cards.Count) % Cards.Count;
+            ActiveCardChanged?.Invoke(this,Cards[frontCardIndex]);
+            WheelTurn?.Invoke(this, this);
         }
     }
 }
