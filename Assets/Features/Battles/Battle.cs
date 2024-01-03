@@ -323,19 +323,6 @@ namespace Features.Battles
             }
         }
 
-        private IEnumerator ApplyDeathRattleEffect(InPlayCard damageReceiver)
-        {
-            foreach (var ability in damageReceiver.GetCard().Abilities)
-            {
-                foreach (var strategy in _applyAbilityStrategies)
-                {
-                    if (strategy.IsValid(ability.Type))
-                        yield return strategy.Execute(ability, damageReceiver, GetEnemyWheel(damageReceiver),
-                            damageReceiver.OwnerPlayer);
-                }
-            }
-        }
-
         private IEnumerator EndBattle(PlayerController defenderPlayerController)
         {
             _busQueue.Clear();
@@ -394,7 +381,7 @@ namespace Features.Battles
                 spellView.SetActivateable(spellView.actionCost <= _actions);
             }
         }
-        
+
 
         private void OnWheelMoved(object sender, PlayerController controller)
         {
@@ -558,6 +545,19 @@ namespace Features.Battles
             }
 
             yield break;
+        }
+
+        private IEnumerator ApplyDeathRattleEffect(InPlayCard damageReceiver)
+        {
+            foreach (var ability in damageReceiver.GetCard().Abilities)
+            {
+                foreach (var strategy in _applyAbilityStrategies)
+                {
+                    if (strategy.IsValid(ability.Type))
+                        yield return strategy.Execute(ability, damageReceiver, GetEnemyWheel(damageReceiver),
+                            damageReceiver.OwnerPlayer);
+                }
+            }
         }
 
         private IEnumerator ApplyEndTurnAbilities(PlayerController attacker, PlayerController defender)
