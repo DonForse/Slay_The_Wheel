@@ -25,12 +25,13 @@ MonoBehaviour:
   - AbilityData:
     - Target: 0
       Amount: 3
-    Type: 10
+    Type: 11
   onDeadAbilities:
   - AbilityData:
     - Target: 5
-      Amount: 10
-    Type: 0
+      Amount: 3
+    Type: 9
   attackType: 0
   cardSprite: {fileID: 21300000, guid: b994799b663dbe94fbe358ef85d87765, type: 3}
   actCost: 1
+  goldCost: 0

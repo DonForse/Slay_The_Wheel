@@ -533,7 +533,8 @@ namespace Features.Battles
         private IEnumerator ApplyWheelSpinEffects(PlayerController controller)
         {
             var cardAtFront = controller.GetFrontCard();
-            foreach (var effect in cardAtFront.Effects)
+            var cardAtFrontEffects = cardAtFront.Effects.ToList();
+            foreach (var effect in cardAtFrontEffects)
             {
                 foreach (var strategy in _applyEffectStrategies)
                 {
@@ -544,7 +545,8 @@ namespace Features.Battles
 
             foreach (var card in controller.Cards)
             {
-                foreach (var effect in card.Effects)
+                var effects = card.Effects.ToList();
+                foreach (var effect in effects)
                 {
                     foreach (var strategy in _applyEffectStrategies)
                     {
@@ -594,7 +596,8 @@ namespace Features.Battles
                     }
                 }
 
-                foreach (var effect in card.Effects)
+                var effects = card.Effects.ToList();
+                foreach (var effect in effects)
                 {
                     foreach (var strategy in _applyEffectStrategies)
                     {
